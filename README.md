@@ -7,7 +7,7 @@ with it for a few hours. Currently, it's VC2010, with some C++11 constructs.
 
 The general goal with this code is to refactor it into something sane, and perhaps
 pull out some of the more general code into libraries. The general engine code I
-think could be merged with a couple of other engines I have. X64, iPhone, Raspberry
+think could be merged with a couple of other engines I have. x64, iPhone, Raspberry
 Pi, and DirectX support could be added, along with some proper collision handling,
 deferred lighting, GPU particles, etc.  Most of this should be pretty easy.
 
