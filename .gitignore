@@ -1,0 +1,12 @@
+*.sdf
+*.suo
+*.user
+*.opensdf
+Debug/*
+Release/*
+3DDemo/Debug/*
+3DDemo/Release/*
+Direct3D9Common/Debug/*
+Direct3D9Common/Release/*
+WindowsCommon/Debug/*
+WindowsCommon/Release/*
