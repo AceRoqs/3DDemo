@@ -21,37 +21,55 @@ enum invoke_it
     again
 };
 
-template <typename DELETER, typename RES>
+template <typename DELETER, typename RESOURCE>
 class scoped_resource
 {
     DELETER m_deleter;
-    RES m_resource;
+    RESOURCE m_resource;
     bool m_execute_on_destruction;
 
-    scoped_resource& operator=(scoped_resource const&) EQUALS_DELETE;
-    scoped_resource(scoped_resource const&) EQUALS_DELETE;
+    scoped_resource& operator=(const scoped_resource&) EQUALS_DELETE;
+    scoped_resource(const scoped_resource&) EQUALS_DELETE;
 
 public:
-    explicit scoped_resource(DELETER&& deleter, RES&& resource, bool should_run = true) NOEXCEPT : m_deleter(std::move(deleter)), m_resource(std::move(resource)), m_execute_on_destruction(should_run)
+    explicit scoped_resource(DELETER&& deleter, RESOURCE&& resource, bool should_run = true) NOEXCEPT :
+        m_deleter(std::move(deleter)),
+        m_resource(std::move(resource)),
+        m_execute_on_destruction(should_run)
     {
     }
 
-    explicit scoped_resource(const DELETER& deleter, const RES& resource, bool should_run = true) NOEXCEPT : m_deleter(deleter), m_resource(resource), m_execute_on_destruction(should_run)
+    explicit scoped_resource(const DELETER& deleter, const RESOURCE& resource, bool should_run = true) NOEXCEPT :
+        m_deleter(deleter),
+        m_resource(resource),
+        m_execute_on_destruction(should_run)
     {
     }
 
-
-    scoped_resource(scoped_resource&& other) NOEXCEPT : m_deleter(other.m_deleter), m_resource(std::move(other.m_resource)), m_execute_on_destruction(other.m_execute_on_destruction)
+    scoped_resource(scoped_resource&& other) NOEXCEPT :
+        m_deleter(other.m_deleter),
+        m_resource(std::move(other.m_resource)),
+        m_execute_on_destruction(other.m_execute_on_destruction)
     {
         other.m_execute_on_destruction = false;
     }
 
+    // Note: Difference with N3830 reference implementation, this is marked NOEXCEPT.
     scoped_resource& operator=(scoped_resource&& other) NOEXCEPT
     {
-        // TODO: If m_resource was movable, what is the point of scoped_resource?
-        invoke();
-        m_resource = std::move(other.m_resource);
-        other.m_execute_on_destruction = false;
+        // Note: Difference with N3830 reference implementation, this handles A=A case.
+        if(this != &other)
+        {
+            // Use std::move on m_resource, even though it is most likely is not movable if used with scoped_resource.
+            // If it is movable, then std::move still provides the proper semantics.
+            invoke();
+            m_resource = std::move(other.m_resource);
+            m_deleter = std::move(other.m_deleter);
+            m_execute_on_destruction = other.m_execute_on_destruction;
+            other.m_execute_on_destruction = false;
+        }
+
+        return *this;
     }
 
     ~scoped_resource()
@@ -64,31 +82,34 @@ public:
 
     void invoke(const invoke_it strategy = std_opt::once) NOEXCEPT
     {
-        if (execute_on_destruction)
+        if (m_execute_on_destruction)
         {
             m_deleter(m_resource);
         }
-        execute_on_destruction = (strategy == invoke_it::again);
+        m_execute_on_destruction = (strategy == std_opt::again);
     }
 
     // Note: Difference with N3830, this does not return a tuple.
-    RES release() NOEXCEPT
+    RESOURCE release() NOEXCEPT
     {
         m_execute_on_destruction = false;
         return std::move(m_resource);
     }
 
     // Note: Difference with N3830, this does not take a tuple.
-    void reset(RES resource) NOEXCEPT
+    void reset(RESOURCE resource) NOEXCEPT
     {
-        invoke(invoke_it::again);
+        // Note: Difference with N3830, operator== is required for resource, and this detects this->reset(this->m_resource).
+        assert(!m_execute_on_destruction || resource != m_resource);
+
+        invoke(std_opt::again);
         m_resource = std::move(resource);
     }
 
-    // Note: Difference with N3830, operator RES not implemented.
+    // Note: Difference with N3830, operator RESOURCE not implemented.
 
     // Note: Difference with N3830, this does not return a tuple.
-    RES get() const NOEXCEPT
+    RESOURCE get() const NOEXCEPT
     {
         return m_resource;
     }
@@ -102,16 +123,16 @@ public:
     }
 };
 
-template<typename DELETER, typename RES>
-scoped_resource<DELETER, RES> make_scoped_resource(DELETER deleter, RES resource)
+template<typename DELETER, typename RESOURCE>
+scoped_resource<DELETER, RESOURCE> make_scoped_resource(DELETER deleter, RESOURCE resource)
 {
-    return scoped_resource<DELETER, RES>(std::move(deleter), std::move(resource));
+    return scoped_resource<DELETER, RESOURCE>(std::move(deleter), std::move(resource));
 }
-template<typename DELETER, typename RES>
-scoped_resource<DELETER, RES> make_scoped_resource_checked(DELETER deleter, RES resource, RES invalid)
+template<typename DELETER, typename RESOURCE>
+scoped_resource<DELETER, RESOURCE> make_scoped_resource_checked(DELETER deleter, RESOURCE resource, RESOURCE invalid)
 {
     auto should_run = (resource != invalid);
-    return scoped_resource<DELETER, RES>(std::move(deleter), std::move(resource), should_run);
+    return scoped_resource<DELETER, RESOURCE>(std::move(deleter), std::move(resource), should_run);
 }
 
 }
