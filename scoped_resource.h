@@ -12,8 +12,18 @@
 namespace std_opt
 {
 
+#ifndef NOEXCEPT
+#if defined(_MSC_VER) && !defined(NDEBUG)
+// MSVC + Debug build: use non-standard empty throw exception specification.
+#define NOEXCEPT throw()
+#else
 #define NOEXCEPT
+#endif
+#endif
+
+#ifndef EQUALS_DELETE
 #define EQUALS_DELETE
+#endif
 
 enum invoke_it
 {
