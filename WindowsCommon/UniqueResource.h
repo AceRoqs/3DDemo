@@ -24,20 +24,26 @@ public:
     Unique_resource(Unique_resource&& resource) : m_value(resource)
     {
         resource.m_value = 0;
-        m_deleter = resource.m_deleter;
+        m_deleter = std::move(resource.m_deleter);
     }
 
     ~Unique_resource()
     {
-        if(m_value != 0)
-        {
-            m_deleter(m_value);
-        }
+        reset();
     }
 
     operator Ty() const
     {
         return m_value;
+    }
+
+    void reset()
+    {
+        if(m_value != 0)
+        {
+            m_deleter(m_value);
+            m_value = 0;
+        }
     }
 
     Ty detach()

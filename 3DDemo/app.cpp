@@ -90,7 +90,8 @@ void Frame_app::app_run(HINSTANCE instance, int show_command)
     HWND window;
     HDC device_context;
     //if(!InitEngine(instance, show_command, &window, &device_context))
-    if(!Startup_Video(instance, show_command, true, &window, &device_context))
+    auto atom = Startup_Video(instance, true, &window, &device_context);
+    if(!atom)
     {
         MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
         return;
@@ -113,6 +114,9 @@ void Frame_app::app_run(HINSTANCE instance, int show_command)
     float camera_y = 0.0f;
     float camera_z = 1.0f;
     float camera_degrees = 0.0f;
+
+    ShowWindow(window, show_command);
+    UpdateWindow(window);
 
     auto execute_frame = [&]()
     {

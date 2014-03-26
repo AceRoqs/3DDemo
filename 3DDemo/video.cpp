@@ -14,7 +14,7 @@ static const int window_height = 600;
 static PCTSTR szAppName = TEXT("3D Demo 1999 (Updated for C++11)");
 static HGLRC rendering_context = nullptr;
 
-static bool Startup_OpenGL(HINSTANCE hInstance, int iCmdShow, bool fWindowed, HWND* phwnd, HDC* phdc);
+static WindowsCommon::Scoped_atom Startup_OpenGL(HINSTANCE hInstance, bool fWindowed, HWND* phwnd, HDC* phdc);
 static void Shutdown_OpenGL(bool fWindowed, HWND hwnd, HDC hdc);
 
 static HGLRC create_gl_context(_In_ HDC device_context)
@@ -177,14 +177,13 @@ LRESULT CALLBACK WndProc(
 //---------------------------------------------------------------------------
 // Startup_Video()
 //---------------------------------------------------------------------------
-bool Startup_Video(
+WindowsCommon::Scoped_atom Startup_Video(
     HINSTANCE hInstance,
-    int iCmdShow,
     bool fWindowed,
     HWND* phwnd,
     HDC* phdc)
 {
-    return Startup_OpenGL(hInstance, iCmdShow, fWindowed, phwnd, phdc);
+    return Startup_OpenGL(hInstance, fWindowed, phwnd, phdc);
 }
 
 //---------------------------------------------------------------------------
@@ -198,21 +197,59 @@ void Shutdown_Video(
     Shutdown_OpenGL(fWindowed, hwnd, hdc);
 }
 
+namespace WindowsCommon
+{
+
+std::function<void (HWND)> destroy_window_functor()
+{
+    return [](_In_ HWND window)
+    {
+        DestroyWindow(window);
+    };
+}
+
+Scoped_window create_normal_window(_In_ PCTSTR window_class_name, _In_ PCTSTR title, int width, int height, _In_opt_ HINSTANCE instance, _In_opt_ PVOID param)
+{
+    Scoped_window window(CreateWindow(
+            window_class_name,      // lpClassName.
+            title,                  // lpWindowName.
+            WS_OVERLAPPEDWINDOW |
+            WS_CLIPCHILDREN |
+            WS_CLIPSIBLINGS,        // dwStyle.
+            CW_USEDEFAULT,          // x.
+            CW_USEDEFAULT,          // y.
+            width,                  // nWidth.
+            height,                 // nHeight.
+            HWND_DESKTOP,           // hwndParent.
+            nullptr,                // hMenu.
+            instance,               // hInstance.
+            param),                 // lpParam.
+        destroy_window_functor());
+
+    if(nullptr == window)
+    {
+        // Expect that WM_NCCREATE and WM_CREATE both succeed, otherwise
+        // a nullptr handle is returned and GetLastError() returns 0.
+        throw_hr(hresult_from_last_error());
+    }
+
+    return window;
+}
+
+}
+
 //---------------------------------------------------------------------------
 // Startup_OpenGL()
 //---------------------------------------------------------------------------
 // TODO: set window width/height if full screen
-static bool Startup_OpenGL(
+static WindowsCommon::Scoped_atom Startup_OpenGL(
     HINSTANCE hInstance,
-    int iCmdShow,
     bool fWindowed,
     HWND* phwnd,
     HDC* device_context)
 {
     const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(hInstance, WndProc, szAppName);
     auto atom = WindowsCommon::register_window_class(window_class, WindowsCommon::unregister_class_functor(hInstance));
-    atom.detach();  // TODO: need to return atom.
-    //RegisterClassEx(&wndclass);
 
     if(fWindowed)
     {
@@ -264,13 +301,10 @@ static bool Startup_OpenGL(
     {
         wglDeleteContext(rendering_context);
         // TODO: leaks if we return here.
-        return false;
+        atom.reset();
     }
 
-    ::ShowWindow(*phwnd, iCmdShow);
-    ::UpdateWindow(*phwnd);
-
-    return true;
+    return atom;
 }
 
 //---------------------------------------------------------------------------
