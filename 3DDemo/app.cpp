@@ -92,7 +92,7 @@ void Frame_app::app_run(HINSTANCE instance, int show_command)
     //if(!InitEngine(instance, show_command, &window, &device_context))
     auto atom = Startup_Video(instance, true, &window, &device_context);
     // TODO: 2014: exception, not null atom, should be thrown.
-    if(!atom.get())
+    if(!atom)
     {
         MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
         return;

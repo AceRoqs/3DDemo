@@ -4,12 +4,11 @@
 namespace WindowsCommon
 {
 
-typedef std_opt::scoped_resource<std::function<void (ATOM)>, ATOM> Scoped_atom;
-typedef std_opt::scoped_resource<std::function<void (HWND)>, HWND> Scoped_window;
+typedef std_opt::unique_resource_t<ATOM, std::function<void (ATOM)>> Scoped_atom;
+typedef std_opt::unique_resource_t<HWND, std::function<void (HWND)>> Scoped_window;
 
-Scoped_atom create_scoped_window_class(const WNDCLASSEX& window_class, _In_ HINSTANCE instance);
-std_opt::scoped_resource<std::function<void (HWND)>, HWND> create_scoped_window(_In_opt_ PCWSTR class_name, _In_opt_ PCWSTR window_name,
-    DWORD style, int x, int y, int width, int height, _In_opt_ HWND parent, _In_opt_ HMENU menu, _In_opt_ HINSTANCE instance, _In_opt_ PVOID param);
+Scoped_atom make_scoped_window_class(_In_ ATOM atom, _In_ HINSTANCE instance);
+Scoped_window make_scoped_window(_In_ HWND window);
 
 }
 

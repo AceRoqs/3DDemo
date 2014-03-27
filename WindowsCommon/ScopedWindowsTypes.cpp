@@ -24,11 +24,9 @@ static std::function<void (ATOM)> unregister_class_functor(_In_ HINSTANCE instan
     };
 }
 
-Scoped_atom create_scoped_window_class(const WNDCLASSEX& window_class, _In_ HINSTANCE instance)
+Scoped_atom make_scoped_window_class(_In_ ATOM atom, _In_ HINSTANCE instance)
 {
-    ATOM atom = RegisterClassEx(&window_class);
-
-    return std::move(std_opt::make_scoped_resource_checked(unregister_class_functor(instance), atom, static_cast<decltype(atom)>(0)));
+    return std::move(std_opt::unique_resource_checked(atom, static_cast<decltype(atom)>(0), unregister_class_functor(instance)));
 }
 
 static std::function<void (HWND)> destroy_window_functor()
@@ -44,23 +42,9 @@ static std::function<void (HWND)> destroy_window_functor()
     };
 }
 
-// TODO: create_scoped_window should take an HWND.  Otherwise this makes lazy evaluation difficult.
-std_opt::scoped_resource<std::function<void (HWND)>, HWND> create_scoped_window(
-    _In_opt_ PCWSTR class_name,
-    _In_opt_ PCWSTR window_name,
-    DWORD style,
-    int x,
-    int y,
-    int width,
-    int height,
-    _In_opt_ HWND parent,
-    _In_opt_ HMENU menu,
-    _In_opt_ HINSTANCE instance,
-    _In_opt_ PVOID param)
+Scoped_window make_scoped_window(_In_ HWND window)
 {
-    HWND window = CreateWindow(class_name, window_name, style, x, y, width, height, parent, menu, instance, param);
-
-    return std::move(std_opt::make_scoped_resource_checked(destroy_window_functor(), window, static_cast<decltype(window)>(nullptr)));
+    return std::move(std_opt::unique_resource_checked(window, static_cast<decltype(window)>(nullptr), destroy_window_functor()));
 }
 
 }

@@ -27,16 +27,60 @@ WNDCLASSEX get_default_blank_window_class(_In_ HINSTANCE instance, _In_ WNDPROC 
 
 Scoped_atom register_window_class(const WNDCLASSEX& window_class)
 {
-    auto atom = create_scoped_window_class(window_class, window_class.hInstance);
+    auto atom = make_scoped_window_class(RegisterClassEx(&window_class), window_class.hInstance);
 
-    if(0 == atom.get())
+    if(0 == atom)
     {
-        HRESULT hr = WindowsCommon::hresult_from_last_error();
+        HRESULT hr = hresult_from_last_error();
         assert(HRESULT_FROM_WIN32(ERROR_CLASS_ALREADY_EXISTS) != hr);
         WindowsCommon::throw_hr(hr);
     }
 
     return std::move(atom);
+}
+
+// TODO: WindowClass.cpp is not the best place for this.
+Scoped_window create_window(
+    _In_opt_ PCWSTR class_name,
+    _In_opt_ PCWSTR window_name,
+    DWORD style,
+    int x,
+    int y,
+    int width,
+    int height,
+    _In_opt_ HWND parent,
+    _In_opt_ HMENU menu,
+    _In_opt_ HINSTANCE instance,
+    _In_opt_ PVOID param)
+{
+    auto window = make_scoped_window(CreateWindow(class_name, window_name, style, x, y, width, height, parent, menu, instance, param));
+
+    if(0 == window)
+    {
+        HRESULT hr = hresult_from_last_error();
+        assert(HRESULT_FROM_WIN32(ERROR_CLASS_ALREADY_EXISTS) != hr);
+        WindowsCommon::throw_hr(hr);
+    }
+
+    return std::move(window);
+}
+
+Scoped_window create_normal_window(_In_ PCTSTR window_class_name, _In_ PCTSTR title, int width, int height, _In_opt_ HINSTANCE instance, _In_opt_ PVOID param)
+{
+    return create_window(
+        window_class_name,      // class_name.
+        title,                  // window_name.
+        WS_OVERLAPPEDWINDOW |
+        WS_CLIPCHILDREN |
+        WS_CLIPSIBLINGS,        // style.
+        CW_USEDEFAULT,          // x.
+        CW_USEDEFAULT,          // y.
+        width,                  // width.
+        height,                 // height.
+        HWND_DESKTOP,           // parent.
+        nullptr,                // menu.
+        instance,               // instance.
+        param);                 // param.
 }
 
 }

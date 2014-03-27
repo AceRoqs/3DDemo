@@ -83,7 +83,7 @@ bool is_window_32bits_per_pixel(_In_ HWND window)
 }
 
 //---------------------------------------------------------------------------
-LRESULT CALLBACK WndProc(
+LRESULT CALLBACK window_proc(
     HWND window,
     UINT message,
     WPARAM w_param,
@@ -197,66 +197,23 @@ void Shutdown_Video(
     Shutdown_OpenGL(fWindowed, hwnd, hdc);
 }
 
-namespace WindowsCommon
-{
-#if 0
-Scoped_window create_normal_window(_In_ PCTSTR window_class_name, _In_ PCTSTR title, int width, int height, _In_opt_ HINSTANCE instance, _In_opt_ PVOID param)
-{
-    Scoped_window window(CreateWindow(
-            window_class_name,      // lpClassName.
-            title,                  // lpWindowName.
-            WS_OVERLAPPEDWINDOW |
-            WS_CLIPCHILDREN |
-            WS_CLIPSIBLINGS,        // dwStyle.
-            CW_USEDEFAULT,          // x.
-            CW_USEDEFAULT,          // y.
-            width,                  // nWidth.
-            height,                 // nHeight.
-            HWND_DESKTOP,           // hwndParent.
-            nullptr,                // hMenu.
-            instance,               // hInstance.
-            param),                 // lpParam.
-        destroy_window_functor());
-
-    if(nullptr == window)
-    {
-        // Expect that WM_NCCREATE and WM_CREATE both succeed, otherwise
-        // a nullptr handle is returned and GetLastError() returns 0.
-        throw_hr(hresult_from_last_error());
-    }
-
-    return window;
-}
-#endif
-
-}
-
 //---------------------------------------------------------------------------
 // Startup_OpenGL()
 //---------------------------------------------------------------------------
 // TODO: set window width/height if full screen
 static WindowsCommon::Scoped_atom Startup_OpenGL(
-    HINSTANCE hInstance,
+    HINSTANCE instance,
     bool fWindowed,
     HWND* phwnd,
     HDC* device_context)
 {
-    const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(hInstance, WndProc, szAppName);
+    const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(instance, window_proc, szAppName);
     auto atom = WindowsCommon::register_window_class(window_class);
 
+    auto window(WindowsCommon::make_scoped_window(nullptr));
     if(fWindowed)
     {
-        *phwnd = CreateWindow(szAppName,
-                              szAppName,
-                              WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-                              CW_USEDEFAULT,
-                              CW_USEDEFAULT,
-                              window_width,
-                              window_height,
-                              HWND_DESKTOP,
-                              nullptr,
-                              hInstance,
-                              nullptr);
+        window = WindowsCommon::create_normal_window(szAppName, szAppName, window_width, window_height, instance, nullptr);
     }
     else
     {
@@ -271,22 +228,24 @@ static WindowsCommon::Scoped_atom Startup_OpenGL(
         ChangeDisplaySettings(&DevMode, CDS_FULLSCREEN);
         DevMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
         ChangeDisplaySettings(&DevMode, CDS_FULLSCREEN);
-        *phwnd = CreateWindow(szAppName,
-                              szAppName,
-                              WS_POPUP | WS_CLIPSIBLINGS,
-                              0,
-                              0,
-                              DevMode.dmPelsWidth,
-                              DevMode.dmPelsHeight,
-                              nullptr,
-                              nullptr,
-                              hInstance,
-                              nullptr);
+
+        window = WindowsCommon::create_window(
+            szAppName,
+            szAppName,
+            WS_POPUP | WS_CLIPSIBLINGS,
+            0,
+            0,
+            DevMode.dmPelsWidth,
+            DevMode.dmPelsHeight,
+            nullptr,
+            nullptr,
+            instance,
+            nullptr);
 
         ShowCursor(false);
     }
 
-    *device_context = GetDC(*phwnd);
+    *device_context = GetDC(window);
 
     // setup OpenGL resource context
     rendering_context = create_gl_context(*device_context);
@@ -295,8 +254,11 @@ static WindowsCommon::Scoped_atom Startup_OpenGL(
         wglDeleteContext(rendering_context);
         // TODO: leaks if we return here.
         // TODO: 2014: throw, don't return atom.
+        window.invoke();
         atom.invoke();
     }
+
+    *phwnd = window.release();
 
     return atom;
 }
