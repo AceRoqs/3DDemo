@@ -25,11 +25,11 @@ WNDCLASSEX get_default_blank_window_class(_In_ HINSTANCE instance, _In_ WNDPROC 
     return window_class;
 }
 
-Scoped_atom register_window_class(const WNDCLASSEX& window_class, const std::function<void (ATOM)>& unregister_class)
+Scoped_atom register_window_class(const WNDCLASSEX& window_class)
 {
-    Scoped_atom atom(RegisterClassEx(&window_class), unregister_class);
+    auto atom = create_scoped_window_class(window_class, window_class.hInstance);
 
-    if(0 == atom)
+    if(0 == atom.get())
     {
         HRESULT hr = WindowsCommon::hresult_from_last_error();
         assert(HRESULT_FROM_WIN32(ERROR_CLASS_ALREADY_EXISTS) != hr);
@@ -37,23 +37,6 @@ Scoped_atom register_window_class(const WNDCLASSEX& window_class, const std::fun
     }
 
     return std::move(atom);
-}
-
-static void unregister_atom(_In_ ATOM atom, _In_ HINSTANCE instance) NOEXCEPT
-{
-    BOOL result = UnregisterClass(MAKEINTATOM(atom), instance);
-    if(!result)
-    {
-        auto hr = WindowsCommon::hresult_from_last_error();
-        (hr);
-        assert(SUCCEEDED(hr));
-    }
-}
-
-std::function<void (ATOM)> unregister_class_functor(_In_ HINSTANCE instance)
-{
-    std::function<void (ATOM)> unregister_class(std::bind(WindowsCommon::unregister_atom, std::placeholders::_1, instance));
-    return unregister_class;
 }
 
 }
