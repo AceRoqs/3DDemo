@@ -15,6 +15,7 @@
     <ClInclude Include="PreCompile.h" />
     <ClInclude Include="PreCPP11.h" />
     <ClInclude Include="ScopedWindowsTypes.h" />
+    <ClInclude Include="scoped_resource.h" />
     <ClInclude Include="UniqueResource.h" />
     <ClInclude Include="WindowClass.h" />
   </ItemGroup>
@@ -24,6 +25,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ScopedWindowsTypes.cpp" />
     <ClCompile Include="WindowClass.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

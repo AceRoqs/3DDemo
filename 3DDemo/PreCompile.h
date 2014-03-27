@@ -19,6 +19,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include "scoped_resource.h"    // N3830 - Not yet in standard.
 
 // Windows API.
 #ifdef WIN32

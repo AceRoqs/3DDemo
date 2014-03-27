@@ -199,15 +199,7 @@ void Shutdown_Video(
 
 namespace WindowsCommon
 {
-
-std::function<void (HWND)> destroy_window_functor()
-{
-    return [](_In_ HWND window)
-    {
-        DestroyWindow(window);
-    };
-}
-
+#if 0
 Scoped_window create_normal_window(_In_ PCTSTR window_class_name, _In_ PCTSTR title, int width, int height, _In_opt_ HINSTANCE instance, _In_opt_ PVOID param)
 {
     Scoped_window window(CreateWindow(
@@ -235,6 +227,7 @@ Scoped_window create_normal_window(_In_ PCTSTR window_class_name, _In_ PCTSTR ti
 
     return window;
 }
+#endif
 
 }
 
@@ -249,7 +242,7 @@ static WindowsCommon::Scoped_atom Startup_OpenGL(
     HDC* device_context)
 {
     const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(hInstance, WndProc, szAppName);
-    auto atom = WindowsCommon::register_window_class(window_class, WindowsCommon::unregister_class_functor(hInstance));
+    auto atom = WindowsCommon::register_window_class(window_class);
 
     if(fWindowed)
     {
@@ -301,7 +294,8 @@ static WindowsCommon::Scoped_atom Startup_OpenGL(
     {
         wglDeleteContext(rendering_context);
         // TODO: leaks if we return here.
-        atom.reset();
+        // TODO: 2014: throw, don't return atom.
+        atom.invoke();
     }
 
     return atom;

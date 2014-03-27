@@ -91,7 +91,8 @@ void Frame_app::app_run(HINSTANCE instance, int show_command)
     HDC device_context;
     //if(!InitEngine(instance, show_command, &window, &device_context))
     auto atom = Startup_Video(instance, true, &window, &device_context);
-    if(!atom)
+    // TODO: 2014: exception, not null atom, should be thrown.
+    if(!atom.get())
     {
         MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
         return;
