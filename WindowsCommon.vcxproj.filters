@@ -33,7 +33,7 @@
     <ClInclude Include="WindowClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="scoped_resource.h">
+    <ClInclude Include="unique_resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
