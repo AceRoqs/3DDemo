@@ -24,9 +24,6 @@
     <ClInclude Include="PreCPP11.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UniqueResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ScopedWindowsTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
