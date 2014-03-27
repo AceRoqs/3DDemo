@@ -6,7 +6,7 @@
 // C++ Standard Library.
 #include <exception>
 #include <functional>
-#include "unique_resource.h"    // N3830 - Not yet in standard.
+#include "unique_resource.h"    // N3949 - Not yet in standard.
 
 // Windows API.
 #ifdef WIN32
