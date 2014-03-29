@@ -31,7 +31,8 @@ Scoped_atom make_scoped_window_class(_In_ ATOM atom, _In_ HINSTANCE instance)
 
 Scoped_atom2 make_scoped_window_class2(_In_ ATOM atom, _In_ HINSTANCE instance)
 {
-    return std::move(Scoped_atom2(atom, instance));
+    return std::move(Scoped_atom2(atom, unregister_class_functor(instance)));
+    //return std::move(Scoped_atom2(atom, instance));
 }
 
 static std::function<void (HWND)> destroy_window_functor()
