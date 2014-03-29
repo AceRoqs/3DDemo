@@ -79,7 +79,7 @@ public:
 
     void invoke(const invoke_it strategy = std_opt::once) NOEXCEPT
     {
-        if (m_execute_on_destruction)
+        if(m_execute_on_destruction)
         {
             // Note: Difference from N3949, there is no try/catch block here.  Deleter should be noexcept.
             m_deleter(m_resource);

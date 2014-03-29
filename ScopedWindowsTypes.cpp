@@ -29,6 +29,11 @@ Scoped_atom make_scoped_window_class(_In_ ATOM atom, _In_ HINSTANCE instance)
     return std::move(std_opt::unique_resource_checked(atom, static_cast<decltype(atom)>(0), unregister_class_functor(instance)));
 }
 
+Scoped_atom2 make_scoped_window_class2(_In_ ATOM atom, _In_ HINSTANCE instance)
+{
+    return std::move(Scoped_atom2(atom, instance));
+}
+
 static std::function<void (HWND)> destroy_window_functor()
 {
     return [](_In_ HWND window)
@@ -44,6 +49,7 @@ static std::function<void (HWND)> destroy_window_functor()
 
 Scoped_window make_scoped_window(_In_ HWND window)
 {
+    // TODO: how can this take a function instead of a lambda for the deleter?
     return std::move(std_opt::unique_resource_checked(window, static_cast<decltype(window)>(nullptr), destroy_window_functor()));
 }
 
