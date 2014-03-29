@@ -7,6 +7,7 @@
 #include "HRException.h"
 #include "resource.h"
 #include "WindowClass.h"
+#include "WGLState.h"
 
 static const int window_width = 800;
 static const int window_height = 600;

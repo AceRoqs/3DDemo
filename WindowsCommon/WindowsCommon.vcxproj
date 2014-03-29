@@ -16,6 +16,7 @@
     <ClInclude Include="PreCPP11.h" />
     <ClInclude Include="ScopedWindowsTypes.h" />
     <ClInclude Include="unique_resource.h" />
+    <ClInclude Include="WGLState.h" />
     <ClInclude Include="WindowClass.h" />
   </ItemGroup>
   <ItemGroup>
