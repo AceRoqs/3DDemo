@@ -12,10 +12,10 @@ typedef std_opt::unique_resource_t<HWND, std::function<void (HWND)>> Scoped_wind
 Scoped_atom make_scoped_window_class(_In_ ATOM atom, _In_ HINSTANCE instance);
 Scoped_window make_scoped_window(_In_ HWND window);
 
-template <typename RESOURCE>
+template <typename RESOURCE, typename DELETER=std::function<void (RESOURCE)>>
 class Scoped_resource
 {
-    std::function<void (RESOURCE)> m_deleter;
+    DELETER m_deleter;
     RESOURCE m_resource;
 
     // Prevent copy.
@@ -29,7 +29,7 @@ public:
         invoke();
     }
 
-    Scoped_resource(RESOURCE resource, std::function<void (ATOM)>&& deleter) : m_deleter(std::move(deleter)), m_resource(resource) {}
+    Scoped_resource(RESOURCE resource, DELETER&& deleter) : m_deleter(std::move(deleter)), m_resource(resource) {}
 
     Scoped_resource(Scoped_resource&& other) NOEXCEPT :
         m_deleter(std::move(other.m_deleter)),
