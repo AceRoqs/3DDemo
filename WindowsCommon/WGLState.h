@@ -16,7 +16,7 @@ struct WGL_state
 
     std_opt::unique_resource_t<ATOM, std::function<void (ATOM)>> m_atom;
 #else
-    Scoped_atom2 atom;
+    Scoped_resource<ATOM> atom;
 #endif
 };
 

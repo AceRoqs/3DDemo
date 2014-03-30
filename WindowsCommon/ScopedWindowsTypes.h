@@ -12,40 +12,40 @@ typedef std_opt::unique_resource_t<HWND, std::function<void (HWND)>> Scoped_wind
 Scoped_atom make_scoped_window_class(_In_ ATOM atom, _In_ HINSTANCE instance);
 Scoped_window make_scoped_window(_In_ HWND window);
 
-// Called Scoped_atom2, really is a scoped_class.
-class Scoped_atom2
+template <typename RESOURCE>
+class Scoped_resource
 {
-    std::function<void (ATOM)> m_deleter;
-    ATOM m_atom;
+    std::function<void (RESOURCE)> m_deleter;
+    RESOURCE m_resource;
 
     // Prevent copy.
-    Scoped_atom2& operator=(const Scoped_atom2&) EQUALS_DELETE;
-    Scoped_atom2(const Scoped_atom2&) EQUALS_DELETE;
+    Scoped_resource& operator=(const Scoped_resource&) EQUALS_DELETE;
+    Scoped_resource(const Scoped_resource&) EQUALS_DELETE;
 
 public:
-    Scoped_atom2() : m_atom(0) {}
-    ~Scoped_atom2()
+    Scoped_resource() : m_resource(0) {}
+    ~Scoped_resource()
     {
         invoke();
     }
 
-    Scoped_atom2(ATOM atom, std::function<void (ATOM)>&& deleter) : m_deleter(std::move(deleter)), m_atom(atom) {}
+    Scoped_resource(RESOURCE resource, std::function<void (ATOM)>&& deleter) : m_deleter(std::move(deleter)), m_resource(resource) {}
 
-    Scoped_atom2(Scoped_atom2&& other) NOEXCEPT :
+    Scoped_resource(Scoped_resource&& other) NOEXCEPT :
         m_deleter(std::move(other.m_deleter)),
-        m_atom(std::move(other.m_atom))
+        m_resource(std::move(other.m_resource))
     {
         other.release();
     }
 
-    Scoped_atom2& operator=(Scoped_atom2&& other) NOEXCEPT
+    Scoped_resource& operator=(Scoped_resource&& other) NOEXCEPT
     {
         // Handle A=A case.
         if(this != &other)
         {
             invoke();
             m_deleter = std::move(other.m_deleter);
-            m_atom = std::move(other.m_atom);
+            m_resource = std::move(other.m_resource);
             other.release();
         }
 
@@ -54,23 +54,23 @@ public:
 
     void invoke() NOEXCEPT
     {
-        if(m_atom != 0)
+        if(m_resource != 0)
         {
-            m_deleter(m_atom);
-            m_atom = 0;
+            m_deleter(m_resource);
+            m_resource = 0;
         }
     }
 
-    ATOM release() NOEXCEPT
+    RESOURCE release() NOEXCEPT
     {
-        ATOM atom = m_atom;
-        m_atom = 0;
+        RESOURCE resource = m_resource;
+        m_resource = 0;
 
-        return atom;
+        return resource;
     }
 };
 
-Scoped_atom2 make_scoped_window_class2(_In_ ATOM atom, _In_ HINSTANCE instance);
+Scoped_resource<ATOM> make_scoped_window_class2(_In_ ATOM atom, _In_ HINSTANCE instance);
 
 }
 

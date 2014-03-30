@@ -29,10 +29,10 @@ Scoped_atom make_scoped_window_class(_In_ ATOM atom, _In_ HINSTANCE instance)
     return std::move(std_opt::unique_resource_checked(atom, static_cast<decltype(atom)>(0), unregister_class_functor(instance)));
 }
 
-Scoped_atom2 make_scoped_window_class2(_In_ ATOM atom, _In_ HINSTANCE instance)
+Scoped_resource<ATOM> make_scoped_window_class2(_In_ ATOM atom, _In_ HINSTANCE instance)
 {
-    return std::move(Scoped_atom2(atom, unregister_class_functor(instance)));
-    //return std::move(Scoped_atom2(atom, instance));
+    return std::move(Scoped_resource<ATOM>(atom, unregister_class_functor(instance)));
+    //return std::move(Scoped_resource(atom, instance));
 }
 
 static std::function<void (HWND)> destroy_window_functor()
