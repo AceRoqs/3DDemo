@@ -1,9 +1,9 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
-#include "ScopedWindowsTypes.h"
+#include "WGLState.h"
 
-WindowsCommon::Scoped_atom Startup_Video(HINSTANCE hInstance, bool fWindowed, HWND* phwnd, HDC* phdc);
+WindowsCommon::WGL_state Startup_Video(HINSTANCE hInstance, bool fWindowed, HDC* phdc);
 void Shutdown_Video(bool fWindowed, HWND hwnd, HDC hdc);
 
 #endif

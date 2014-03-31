@@ -15,7 +15,7 @@ static const int window_height = 600;
 static PCTSTR szAppName = TEXT("3D Demo 1999 (Updated for C++11)");
 static HGLRC rendering_context = nullptr;
 
-static WindowsCommon::Scoped_atom Startup_OpenGL(HINSTANCE hInstance, bool fWindowed, HWND* phwnd, HDC* phdc);
+static WindowsCommon::WGL_state Startup_OpenGL(HINSTANCE hInstance, bool fWindowed, HDC* phdc);
 static void Shutdown_OpenGL(bool fWindowed, HWND hwnd, HDC hdc);
 
 static HGLRC create_gl_context(_In_ HDC device_context)
@@ -178,13 +178,12 @@ LRESULT CALLBACK window_proc(
 //---------------------------------------------------------------------------
 // Startup_Video()
 //---------------------------------------------------------------------------
-WindowsCommon::Scoped_atom Startup_Video(
+WindowsCommon::WGL_state Startup_Video(
     HINSTANCE hInstance,
     bool fWindowed,
-    HWND* phwnd,
     HDC* phdc)
 {
-    return Startup_OpenGL(hInstance, fWindowed, phwnd, phdc);
+    return Startup_OpenGL(hInstance, fWindowed, phdc);
 }
 
 //---------------------------------------------------------------------------
@@ -202,19 +201,20 @@ void Shutdown_Video(
 // Startup_OpenGL()
 //---------------------------------------------------------------------------
 // TODO: set window width/height if full screen
-static WindowsCommon::Scoped_atom Startup_OpenGL(
+static WindowsCommon::WGL_state Startup_OpenGL(
     HINSTANCE instance,
     bool fWindowed,
-    HWND* phwnd,
     HDC* device_context)
 {
     const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(instance, window_proc, szAppName);
-    auto atom = WindowsCommon::register_window_class(window_class);
 
-    auto window(WindowsCommon::make_scoped_window(nullptr));
+    WindowsCommon::WGL_state state;
+    state.atom = WindowsCommon::register_window_class(window_class);
+
+    //auto window(WindowsCommon::make_scoped_window(nullptr));
     if(fWindowed)
     {
-        window = WindowsCommon::create_normal_window(szAppName, szAppName, window_width, window_height, instance, nullptr);
+        state.window = WindowsCommon::create_normal_window(szAppName, szAppName, window_width, window_height, instance, nullptr);
     }
     else
     {
@@ -230,7 +230,7 @@ static WindowsCommon::Scoped_atom Startup_OpenGL(
         DevMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
         ChangeDisplaySettings(&DevMode, CDS_FULLSCREEN);
 
-        window = WindowsCommon::create_window(
+        state.window = WindowsCommon::create_window(
             szAppName,
             szAppName,
             WS_POPUP | WS_CLIPSIBLINGS,
@@ -246,7 +246,7 @@ static WindowsCommon::Scoped_atom Startup_OpenGL(
         ShowCursor(false);
     }
 
-    *device_context = GetDC(window);
+    *device_context = GetDC(state.window);
 
     // setup OpenGL resource context
     rendering_context = create_gl_context(*device_context);
@@ -255,13 +255,11 @@ static WindowsCommon::Scoped_atom Startup_OpenGL(
         wglDeleteContext(rendering_context);
         // TODO: leaks if we return here.
         // TODO: 2014: throw, don't return atom.
-        window.invoke();
-        atom.invoke();
+        state.window.invoke();
+        state.atom.invoke();
     }
 
-    *phwnd = window.release();
-
-    return atom;
+    return state;
 }
 
 //---------------------------------------------------------------------------

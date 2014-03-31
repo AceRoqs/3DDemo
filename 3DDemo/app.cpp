@@ -87,18 +87,16 @@ namespace WindowsCommon
 
 void Frame_app::app_run(HINSTANCE instance, int show_command)
 {
-    HWND window;
     HDC device_context;
-    //if(!InitEngine(instance, show_command, &window, &device_context))
-    auto atom = Startup_Video(instance, true, &window, &device_context);
+    auto state = Startup_Video(instance, true, &device_context);
     // TODO: 2014: exception, not null atom, should be thrown.
-    if(!atom)
+    if(!state.atom)
     {
         MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
         return;
     }
 
-    Input_device keyboard(instance, window);
+    Input_device keyboard(instance, state.window);
 
     // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
     initialize_gl_constants();
@@ -116,8 +114,8 @@ void Frame_app::app_run(HINSTANCE instance, int show_command)
     float camera_z = 1.0f;
     float camera_degrees = 0.0f;
 
-    ShowWindow(window, show_command);
-    UpdateWindow(window);
+    ShowWindow(state.window, show_command);
+    UpdateWindow(state.window);
 
     auto execute_frame = [&]()
     {
@@ -129,7 +127,7 @@ void Frame_app::app_run(HINSTANCE instance, int show_command)
     (return_code);
 
     // EndEngine(window, device_context);
-    Shutdown_Video(s_fWindowed, window, device_context);
+    Shutdown_Video(s_fWindowed, state.window.release(), device_context);
 }
 
 }
