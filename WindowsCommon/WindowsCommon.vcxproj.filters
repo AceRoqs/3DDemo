@@ -30,9 +30,6 @@
     <ClInclude Include="WindowClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="unique_resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WGLState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
