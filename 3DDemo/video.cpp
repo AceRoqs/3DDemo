@@ -15,7 +15,7 @@ static const int window_height = 600;
 static PCTSTR szAppName = TEXT("3D Demo 1999 (Updated for C++11)");
 static HGLRC rendering_context = nullptr;
 
-static WindowsCommon::WGL_state Startup_OpenGL(HINSTANCE hInstance, bool fWindowed, HDC* phdc);
+static WindowsCommon::WGL_state Startup_OpenGL(HINSTANCE hInstance, bool fWindowed);
 static void Shutdown_OpenGL(bool fWindowed, HWND hwnd, HDC hdc);
 
 static HGLRC create_gl_context(_In_ HDC device_context)
@@ -178,12 +178,9 @@ LRESULT CALLBACK window_proc(
 //---------------------------------------------------------------------------
 // Startup_Video()
 //---------------------------------------------------------------------------
-WindowsCommon::WGL_state Startup_Video(
-    HINSTANCE hInstance,
-    bool fWindowed,
-    HDC* phdc)
+WindowsCommon::WGL_state Startup_Video(_In_ HINSTANCE hInstance, bool fWindowed)
 {
-    return Startup_OpenGL(hInstance, fWindowed, phdc);
+    return Startup_OpenGL(hInstance, fWindowed);
 }
 
 //---------------------------------------------------------------------------
@@ -201,17 +198,13 @@ void Shutdown_Video(
 // Startup_OpenGL()
 //---------------------------------------------------------------------------
 // TODO: set window width/height if full screen
-static WindowsCommon::WGL_state Startup_OpenGL(
-    HINSTANCE instance,
-    bool fWindowed,
-    HDC* device_context)
+static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWindowed)
 {
     const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(instance, window_proc, szAppName);
 
     WindowsCommon::WGL_state state;
     state.atom = WindowsCommon::register_window_class(window_class);
 
-    //auto window(WindowsCommon::make_scoped_window(nullptr));
     if(fWindowed)
     {
         state.window = WindowsCommon::create_normal_window(szAppName, szAppName, window_width, window_height, instance, nullptr);
@@ -246,15 +239,16 @@ static WindowsCommon::WGL_state Startup_OpenGL(
         ShowCursor(false);
     }
 
-    *device_context = GetDC(state.window);
+    state.device_context = WindowsCommon::get_device_context(state.window);
 
     // setup OpenGL resource context
-    rendering_context = create_gl_context(*device_context);
-    if(!wglMakeCurrent(*device_context, rendering_context))
+    rendering_context = create_gl_context(state.device_context);
+    if(!wglMakeCurrent(state.device_context, rendering_context))
     {
         wglDeleteContext(rendering_context);
         // TODO: leaks if we return here.
         // TODO: 2014: throw, don't return atom.
+        state.device_context.invoke();
         state.window.invoke();
         state.atom.invoke();
     }

@@ -3,7 +3,7 @@
 
 #include "WGLState.h"
 
-WindowsCommon::WGL_state Startup_Video(HINSTANCE hInstance, bool fWindowed, HDC* phdc);
+WindowsCommon::WGL_state Startup_Video(HINSTANCE hInstance, bool fWindowed);
 void Shutdown_Video(bool fWindowed, HWND hwnd, HDC hdc);
 
 #endif

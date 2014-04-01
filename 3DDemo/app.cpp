@@ -87,8 +87,7 @@ namespace WindowsCommon
 
 void Frame_app::app_run(HINSTANCE instance, int show_command)
 {
-    HDC device_context;
-    auto state = Startup_Video(instance, true, &device_context);
+    auto state = Startup_Video(instance, true);
     // TODO: 2014: exception, not null atom, should be thrown.
     if(!state.atom)
     {
@@ -117,7 +116,9 @@ void Frame_app::app_run(HINSTANCE instance, int show_command)
     ShowWindow(state.window, show_command);
     UpdateWindow(state.window);
 
-    auto execute_frame = [&]()
+    // Lambda requires copy constructor, which Scoped_device_context does not provide.
+    const HDC device_context = state.device_context;
+    auto execute_frame = [&, device_context]()
     {
         keyboard.get_input(&camera_x, &camera_y, &camera_z, &camera_degrees);
         draw_list([=](){ SwapBuffers(device_context); }, polys, camera_x, camera_y, camera_z, camera_degrees);
@@ -127,7 +128,7 @@ void Frame_app::app_run(HINSTANCE instance, int show_command)
     (return_code);
 
     // EndEngine(window, device_context);
-    Shutdown_Video(s_fWindowed, state.window.release(), device_context);
+    Shutdown_Video(s_fWindowed, state.window.release(), state.device_context.release());
 }
 
 }
