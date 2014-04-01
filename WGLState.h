@@ -15,15 +15,17 @@ struct WGL_state
     {
     }
 
-    WGL_state(WGL_state&& state) : atom(std::move(state.atom)), window(std::move(state.window))
+    WGL_state(WGL_state&& state) : atom(std::move(state.atom)), window(std::move(state.window)), device_context(std::move(state.device_context))
     {
     }
 #else
 #error This compiler may autodefine the default move constructor.
 #endif
 
+    // The order of these fields matter, as destruction must happen in the opposite order.
     Scoped_atom atom;
     Scoped_window window;
+    Scoped_device_context device_context;
 };
 
 }

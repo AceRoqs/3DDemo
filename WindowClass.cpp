@@ -36,7 +36,7 @@ Scoped_atom register_window_class(const WNDCLASSEX& window_class)
         WindowsCommon::throw_hr(hr);
     }
 
-    return std::move(atom);
+    return atom;
 }
 
 // TODO: WindowClass.cpp is not the best place for this.
@@ -55,14 +55,13 @@ Scoped_window create_window(
 {
     auto window = make_scoped_window(CreateWindow(class_name, window_name, style, x, y, width, height, parent, menu, instance, param));
 
-    if(0 == window)
+    if(nullptr == window)
     {
         HRESULT hr = hresult_from_last_error();
-        assert(HRESULT_FROM_WIN32(ERROR_CLASS_ALREADY_EXISTS) != hr);
         WindowsCommon::throw_hr(hr);
     }
 
-    return std::move(window);
+    return window;
 }
 
 Scoped_window create_normal_window(_In_ PCTSTR window_class_name, _In_ PCTSTR title, int width, int height, _In_opt_ HINSTANCE instance, _In_opt_ PVOID param)
@@ -81,6 +80,18 @@ Scoped_window create_normal_window(_In_ PCTSTR window_class_name, _In_ PCTSTR ti
         nullptr,                // menu.
         instance,               // instance.
         param);                 // param.
+}
+
+Scoped_device_context get_device_context(_In_ HWND window)
+{
+    auto device_context = WindowsCommon::make_scoped_device_context(GetDC(window), window);
+
+    if(nullptr == device_context)
+    {
+        WindowsCommon::throw_hr(E_FAIL);
+    }
+
+    return device_context;
 }
 
 }
