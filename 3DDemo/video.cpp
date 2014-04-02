@@ -13,10 +13,9 @@ static const int window_width = 800;
 static const int window_height = 600;
 
 static PCTSTR szAppName = TEXT("3D Demo 1999 (Updated for C++11)");
-static HGLRC rendering_context = nullptr;
 
 static WindowsCommon::WGL_state Startup_OpenGL(HINSTANCE hInstance, bool fWindowed);
-static void Shutdown_OpenGL(bool fWindowed, HWND hwnd, HDC hdc);
+static void Shutdown_OpenGL(bool fWindowed, WindowsCommon::WGL_state& state);
 
 static HGLRC create_gl_context(_In_ HDC device_context)
 {
@@ -188,10 +187,9 @@ WindowsCommon::WGL_state Startup_Video(_In_ HINSTANCE hInstance, bool fWindowed)
 //---------------------------------------------------------------------------
 void Shutdown_Video(
     bool fWindowed,
-    HWND hwnd,
-    HDC hdc)
+    WindowsCommon::WGL_state& state)
 {
-    Shutdown_OpenGL(fWindowed, hwnd, hdc);
+    Shutdown_OpenGL(fWindowed, state);
 }
 
 //---------------------------------------------------------------------------
@@ -242,10 +240,11 @@ static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWi
     state.device_context = WindowsCommon::get_device_context(state.window);
 
     // setup OpenGL resource context
-    rendering_context = create_gl_context(state.device_context);
-    if(!wglMakeCurrent(state.device_context, rendering_context))
+    state.rendering_context = create_gl_context(state.device_context);
+    if(!wglMakeCurrent(state.device_context, state.rendering_context))
     {
-        wglDeleteContext(rendering_context);
+        wglDeleteContext(state.rendering_context);
+        state.rendering_context = 0;
         // TODO: leaks if we return here.
         // TODO: 2014: throw, don't return atom.
         state.device_context.invoke();
@@ -259,8 +258,7 @@ static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWi
 //---------------------------------------------------------------------------
 static void Shutdown_OpenGL(
     bool fWindowed,
-    HWND hwnd,
-    HDC hdc)
+    WindowsCommon::WGL_state& state)
 {
     // TODO11: This is releasing a DC and destroying a window that
     // has already finished the message loop.  i.e. The window is
@@ -270,13 +268,13 @@ static void Shutdown_OpenGL(
     // TODO: only shutdown if valid GL context
     // release OpenGL resource context
     ::wglMakeCurrent(nullptr, nullptr);
-    ::wglDeleteContext(rendering_context);
-    ::ReleaseDC(hwnd, hdc);
+    ::wglDeleteContext(state.rendering_context);
+    //::ReleaseDC(hwnd, hdc);
     if(!fWindowed)
     {
         ::ChangeDisplaySettings(nullptr, 0);
     }
 
-    ::DestroyWindow(hwnd);
+    //::DestroyWindow(hwnd);
 }
 

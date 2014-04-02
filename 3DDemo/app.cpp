@@ -128,7 +128,11 @@ void Frame_app::app_run(HINSTANCE instance, int show_command)
     (return_code);
 
     // EndEngine(window, device_context);
-    Shutdown_Video(s_fWindowed, state.window.release(), state.device_context.release());
+    Shutdown_Video(s_fWindowed, state);
+
+    // TODO: 2014: release contents, since they are invalid.  These should just be handled by destructor..
+    state.device_context.release();
+    state.window.release();
 }
 
 }
