@@ -65,5 +65,21 @@ Scoped_device_context make_scoped_device_context(_In_ HDC device_context, _In_ H
     return std::move(Scoped_device_context(device_context, release_device_context_functor(window)));
 }
 
+static void delete_gl_context(_In_ HGLRC gl_context)
+{
+    
+    if(!wglDeleteContext(gl_context))
+    {
+        auto hr = hresult_from_last_error();
+        (hr);
+        assert(SUCCEEDED(hr));
+    }
+}
+
+Scoped_gl_context make_scoped_gl_context(_In_ HGLRC gl_context)
+{
+    return std::move(Scoped_gl_context(gl_context, delete_gl_context));
+}
+
 }
 

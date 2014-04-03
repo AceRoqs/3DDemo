@@ -84,7 +84,7 @@ Scoped_window create_normal_window(_In_ PCTSTR window_class_name, _In_ PCTSTR ti
 
 Scoped_device_context get_device_context(_In_ HWND window)
 {
-    auto device_context = WindowsCommon::make_scoped_device_context(GetDC(window), window);
+    auto device_context = make_scoped_device_context(GetDC(window), window);
 
     if(nullptr == device_context)
     {
@@ -92,6 +92,51 @@ Scoped_device_context get_device_context(_In_ HWND window)
     }
 
     return device_context;
+}
+
+Scoped_gl_context create_gl_context(_In_ HDC device_context)
+{
+    const PIXELFORMATDESCRIPTOR descriptor =
+    {
+        sizeof(PIXELFORMATDESCRIPTOR),      // Size of this descriptor.
+        1,                                  // Version number.
+        PFD_DRAW_TO_WINDOW |                // Support window.
+        PFD_SUPPORT_OPENGL |                // Support OpenGL.
+        PFD_GENERIC_ACCELERATED |           // Support hardware acceleration.
+        PFD_DOUBLEBUFFER,                   // Double buffered.
+        PFD_TYPE_RGBA,                      // RGBA type.
+        32,                                 // 32-bit color depth.
+        0, 0, 0, 0, 0, 0,                   // Color bits ignored.
+        0,                                  // No alpha buffer.
+        0,                                  // Shift bit ignored.
+        0,                                  // No accumulation buffer.
+        0, 0, 0, 0,                         // Accum bits ignored.
+        24,                                 // 24-bit z-buffer.
+        8,                                  // 8-bit stencil buffer.
+        0,                                  // No auxiliary buffer.
+        PFD_MAIN_PLANE,                     // Main layer.
+        0,                                  // Reserved.
+        0, 0, 0                             // Layer masks ignored.
+    };
+
+    const int pixel_format = ChoosePixelFormat(device_context, &descriptor);
+    if(pixel_format == 0)
+    {
+        throw_hr(hresult_from_last_error());
+    }
+
+    if(!SetPixelFormat(device_context, pixel_format, &descriptor))
+    {
+        throw_hr(hresult_from_last_error());
+    }
+
+    auto rendering_context = make_scoped_gl_context(wglCreateContext(device_context));
+    if(nullptr == rendering_context)
+    {
+        throw_hr(hresult_from_last_error());
+    }
+
+    return rendering_context;
 }
 
 }
