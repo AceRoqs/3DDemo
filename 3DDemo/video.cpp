@@ -15,54 +15,7 @@ static const int window_height = 600;
 static PCTSTR szAppName = TEXT("3D Demo 1999 (Updated for C++11)");
 
 static WindowsCommon::WGL_state Startup_OpenGL(HINSTANCE hInstance, bool fWindowed);
-static void Shutdown_OpenGL(bool fWindowed, WindowsCommon::WGL_state& state);
-
-static HGLRC create_gl_context(_In_ HDC device_context)
-{
-    const PIXELFORMATDESCRIPTOR descriptor =
-    {
-        sizeof(PIXELFORMATDESCRIPTOR),      // Size of this descriptor.
-        1,                                  // Version number.
-        PFD_DRAW_TO_WINDOW |                // Support window.
-        PFD_SUPPORT_OPENGL |                // Support OpenGL.
-        PFD_GENERIC_ACCELERATED |           // Support hardware acceleration.
-        PFD_DOUBLEBUFFER,                   // Double buffered.
-        PFD_TYPE_RGBA,                      // RGBA type.
-        32,                                 // 32-bit color depth.
-        0, 0, 0, 0, 0, 0,                   // Color bits ignored.
-        0,                                  // No alpha buffer.
-        0,                                  // Shift bit ignored.
-        0,                                  // No accumulation buffer.
-        0, 0, 0, 0,                         // Accum bits ignored.
-        24,                                 // 24-bit z-buffer.
-        8,                                  // 8-bit stencil buffer.
-        0,                                  // No auxiliary buffer.
-        PFD_MAIN_PLANE,                     // Main layer.
-        0,                                  // Reserved.
-        0, 0, 0                             // Layer masks ignored.
-    };
-
-    using namespace WindowsCommon;
-
-    const int pixel_format = ChoosePixelFormat(device_context, &descriptor);
-    if(pixel_format == 0)
-    {
-        throw_hr(hresult_from_last_error());
-    }
-
-    if(!SetPixelFormat(device_context, pixel_format, &descriptor))
-    {
-        throw_hr(hresult_from_last_error());
-    }
-
-    const HGLRC rendering_context = wglCreateContext(device_context);
-    if(rendering_context == nullptr)
-    {
-        throw_hr(hresult_from_last_error());
-    }
-
-    return rendering_context;
-}
+static void Shutdown_OpenGL(bool fWindowed);
 
 //---------------------------------------------------------------------------
 bool is_window_32bits_per_pixel(_In_ HWND window)
@@ -186,10 +139,9 @@ WindowsCommon::WGL_state Startup_Video(_In_ HINSTANCE hInstance, bool fWindowed)
 // Shutdown_Video()
 //---------------------------------------------------------------------------
 void Shutdown_Video(
-    bool fWindowed,
-    WindowsCommon::WGL_state& state)
+    bool fWindowed)
 {
-    Shutdown_OpenGL(fWindowed, state);
+    Shutdown_OpenGL(fWindowed);
 }
 
 //---------------------------------------------------------------------------
@@ -240,13 +192,11 @@ static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWi
     state.device_context = WindowsCommon::get_device_context(state.window);
 
     // setup OpenGL resource context
-    state.rendering_context = create_gl_context(state.device_context);
-    if(!wglMakeCurrent(state.device_context, state.rendering_context))
+    state.gl_context = create_gl_context(state.device_context);
+    if(!wglMakeCurrent(state.device_context, state.gl_context))
     {
-        wglDeleteContext(state.rendering_context);
-        state.rendering_context = 0;
-        // TODO: leaks if we return here.
         // TODO: 2014: throw, don't return atom.
+        state.gl_context.invoke();
         state.device_context.invoke();
         state.window.invoke();
         state.atom.invoke();
@@ -257,8 +207,7 @@ static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWi
 
 //---------------------------------------------------------------------------
 static void Shutdown_OpenGL(
-    bool fWindowed,
-    WindowsCommon::WGL_state& state)
+    bool fWindowed)
 {
     // TODO11: This is releasing a DC and destroying a window that
     // has already finished the message loop.  i.e. The window is
@@ -268,7 +217,7 @@ static void Shutdown_OpenGL(
     // TODO: only shutdown if valid GL context
     // release OpenGL resource context
     ::wglMakeCurrent(nullptr, nullptr);
-    ::wglDeleteContext(state.rendering_context);
+    //::wglDeleteContext(state.gl_context);
     //::ReleaseDC(hwnd, hdc);
     if(!fWindowed)
     {
