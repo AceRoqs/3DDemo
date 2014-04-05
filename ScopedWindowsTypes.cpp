@@ -16,7 +16,7 @@ static void unregister_atom(_In_ ATOM atom, _In_ HINSTANCE instance) NOEXCEPT
     }
 }
 
-static std::function<void (ATOM)> unregister_class_functor(_In_ HINSTANCE instance)
+static std::function<void (ATOM)> unregister_class_functor(_In_ HINSTANCE instance) NOEXCEPT
 {
     return [=](ATOM atom)
     {
@@ -44,7 +44,7 @@ Scoped_window make_scoped_window(_In_ HWND window)
     return std::move(Scoped_resource<HWND>(window, destroy_window));
 }
 
-static void release_device_context(_In_ HDC device_context, _In_ HWND window)
+static void release_device_context(_In_ HDC device_context, _In_ HWND window) NOEXCEPT
 {
     if(!ReleaseDC(window, device_context))
     {
@@ -65,7 +65,7 @@ Scoped_device_context make_scoped_device_context(_In_ HDC device_context, _In_ H
     return std::move(Scoped_device_context(device_context, release_device_context_functor(window)));
 }
 
-static void delete_gl_context(_In_ HGLRC gl_context)
+static void delete_gl_context(_In_ HGLRC gl_context) NOEXCEPT
 {
     
     if(!wglDeleteContext(gl_context))
