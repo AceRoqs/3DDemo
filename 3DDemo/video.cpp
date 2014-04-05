@@ -12,22 +12,15 @@
 static const int window_width = 800;
 static const int window_height = 600;
 
-static PCTSTR szAppName = TEXT("3D Demo 1999 (Updated for C++11)");
-
 static WindowsCommon::WGL_state Startup_OpenGL(HINSTANCE hInstance, bool fWindowed);
 static void Shutdown_OpenGL(bool fWindowed);
 
 //---------------------------------------------------------------------------
 bool is_window_32bits_per_pixel(_In_ HWND window)
 {
-    std::unique_ptr<HDC__, std::function<void (HDC)>> device_context(
-        ::GetDC(window),
-        [window](HDC device_context)
-        {
-            ::ReleaseDC(window, device_context);
-        });
+    WindowsCommon::Scoped_device_context device_context = WindowsCommon::get_device_context(window);
 
-    if(::GetDeviceCaps(device_context.get(), BITSPIXEL) < 32)
+    if(::GetDeviceCaps(device_context, BITSPIXEL) < 32)
     {
         return false;
     }
@@ -150,14 +143,16 @@ void Shutdown_Video(
 // TODO: set window width/height if full screen
 static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWindowed)
 {
-    const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(instance, window_proc, szAppName);
+    PCTSTR app_title = TEXT("3D Demo 1999 (Updated for C++11)");
+
+    const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(instance, window_proc, app_title);
 
     WindowsCommon::WGL_state state;
     state.atom = WindowsCommon::register_window_class(window_class);
 
     if(fWindowed)
     {
-        state.window = WindowsCommon::create_normal_window(szAppName, szAppName, window_width, window_height, instance, nullptr);
+        state.window = WindowsCommon::create_normal_window(app_title, app_title, window_width, window_height, instance, nullptr);
     }
     else
     {
@@ -174,8 +169,8 @@ static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWi
         ChangeDisplaySettings(&DevMode, CDS_FULLSCREEN);
 
         state.window = WindowsCommon::create_window(
-            szAppName,
-            szAppName,
+            app_title,
+            app_title,
             WS_POPUP | WS_CLIPSIBLINGS,
             0,
             0,
@@ -189,9 +184,7 @@ static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWi
         ShowCursor(false);
     }
 
-    state.device_context = WindowsCommon::get_device_context(state.window);
-
-    // setup OpenGL resource context
+    state.device_context = get_device_context(state.window);
     state.gl_context = create_gl_context(state.device_context);
     state.make_current_context = create_current_context(state.device_context, state.gl_context);
 
