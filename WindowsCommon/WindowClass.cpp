@@ -139,5 +139,18 @@ Scoped_gl_context create_gl_context(_In_ HDC device_context)
     return rendering_context;
 }
 
+Scoped_current_context create_current_context(_In_ HDC device_context, _In_ HGLRC gl_context)
+{
+    auto current_context = make_scoped_current_context(gl_context);
+
+    if(!wglMakeCurrent(device_context, gl_context))
+    {
+        current_context.release();
+        throw_hr(WindowsCommon::hresult_from_last_error());
+    }
+
+    return current_context;
+}
+
 }
 

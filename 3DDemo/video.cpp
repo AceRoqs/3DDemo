@@ -193,14 +193,7 @@ static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWi
 
     // setup OpenGL resource context
     state.gl_context = create_gl_context(state.device_context);
-    if(!wglMakeCurrent(state.device_context, state.gl_context))
-    {
-        // TODO: 2014: throw, don't return atom.
-        state.gl_context.invoke();
-        state.device_context.invoke();
-        state.window.invoke();
-        state.atom.invoke();
-    }
+    state.make_current_context = create_current_context(state.device_context, state.gl_context);
 
     return state;
 }
@@ -216,7 +209,7 @@ static void Shutdown_OpenGL(
 
     // TODO: only shutdown if valid GL context
     // release OpenGL resource context
-    ::wglMakeCurrent(nullptr, nullptr);
+    //::wglMakeCurrent(nullptr, nullptr);
     //::wglDeleteContext(state.gl_context);
     //::ReleaseDC(hwnd, hdc);
     if(!fWindowed)

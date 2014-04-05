@@ -88,7 +88,7 @@ namespace WindowsCommon
 void Frame_app::app_run(HINSTANCE instance, int show_command)
 {
     auto state = Startup_Video(instance, true);
-    // TODO: 2014: exception, not null atom, should be thrown.
+    // TODO: 2014: exception, not null atom, is thrown.  A try/catch block needs to be implemented in app_run.
     if(!state.atom)
     {
         MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
@@ -130,7 +130,8 @@ void Frame_app::app_run(HINSTANCE instance, int show_command)
     // EndEngine(window, device_context);
     Shutdown_Video(s_fWindowed);
 
-    // TODO: 2014: release contents, since they are invalid.  These should just be handled by destructor..
+    // TODO: 2014: release contents, since they are invalid.  These should just be handled by destructor.
+    state.make_current_context.invoke();
     state.gl_context.release();
     state.device_context.release();
     state.window.release();
