@@ -15,7 +15,12 @@ struct WGL_state
     {
     }
 
-    WGL_state(WGL_state&& state) : atom(std::move(state.atom)), window(std::move(state.window)), device_context(std::move(state.device_context)), gl_context(std::move(state.gl_context))
+    WGL_state(WGL_state&& state) :
+        atom(std::move(state.atom)),
+        window(std::move(state.window)),
+        device_context(std::move(state.device_context)),
+        gl_context(std::move(state.gl_context)),
+        make_current_context(std::move(state.make_current_context))
     {
     }
 #else
@@ -27,6 +32,7 @@ struct WGL_state
     Scoped_window window;
     Scoped_device_context device_context;
     Scoped_gl_context gl_context;
+    Scoped_current_context make_current_context;
 };
 
 }

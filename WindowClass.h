@@ -15,6 +15,7 @@ Scoped_window create_window(_In_opt_ PCWSTR class_name, _In_opt_ PCWSTR window_n
 Scoped_window create_normal_window(_In_ PCTSTR window_class_name, _In_ PCTSTR title, int width, int height, _In_opt_ HINSTANCE instance, _In_opt_ PVOID param);
 Scoped_device_context get_device_context(_In_ HWND window);
 Scoped_gl_context create_gl_context(_In_ HDC device_context);
+Scoped_current_context create_current_context(_In_ HDC device_context, _In_ HGLRC gl_context);
 
 }
 
