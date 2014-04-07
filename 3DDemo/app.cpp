@@ -87,7 +87,7 @@ namespace WindowsCommon
 
 void Frame_app::app_run(HINSTANCE instance, int show_command)
 {
-    auto state = Startup_Video(instance, true);
+    auto state = Startup_Video(instance, true, this);
     // TODO: 2014: exception, not null atom, is thrown.  A try/catch block needs to be implemented in app_run.
     if(!state.atom)
     {

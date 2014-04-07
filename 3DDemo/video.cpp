@@ -12,7 +12,7 @@
 static const int window_width = 800;
 static const int window_height = 600;
 
-static WindowsCommon::WGL_state Startup_OpenGL(HINSTANCE hInstance, bool fWindowed);
+static WindowsCommon::WGL_state Startup_OpenGL(HINSTANCE hInstance, bool fWindowed, WindowsCommon::Frame_app* frame);
 static void Shutdown_OpenGL(bool fWindowed);
 
 //---------------------------------------------------------------------------
@@ -123,9 +123,9 @@ LRESULT CALLBACK window_proc(
 //---------------------------------------------------------------------------
 // Startup_Video()
 //---------------------------------------------------------------------------
-WindowsCommon::WGL_state Startup_Video(_In_ HINSTANCE hInstance, bool fWindowed)
+WindowsCommon::WGL_state Startup_Video(_In_ HINSTANCE hInstance, bool fWindowed, WindowsCommon::Frame_app* frame)
 {
-    return Startup_OpenGL(hInstance, fWindowed);
+    return Startup_OpenGL(hInstance, fWindowed, frame);
 }
 
 //---------------------------------------------------------------------------
@@ -141,7 +141,7 @@ void Shutdown_Video(
 // Startup_OpenGL()
 //---------------------------------------------------------------------------
 // TODO: set window width/height if full screen
-static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWindowed)
+static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWindowed, WindowsCommon::Frame_app* frame)
 {
     PCTSTR app_title = TEXT("3D Demo 1999 (Updated for C++11)");
 
@@ -152,7 +152,7 @@ static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWi
 
     if(fWindowed)
     {
-        state.window = WindowsCommon::create_normal_window(app_title, app_title, window_width, window_height, instance, nullptr);
+        state.window = WindowsCommon::create_normal_window(app_title, app_title, window_width, window_height, instance, frame);
     }
     else
     {
