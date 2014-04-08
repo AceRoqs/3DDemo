@@ -93,7 +93,7 @@ LRESULT CALLBACK Frame_app::static_window_proc(__in HWND window, UINT message, W
         CREATESTRUCT* create_struct = reinterpret_cast<CREATESTRUCT*>(l_param);
 
         // This function should never fail.
-        auto app = reinterpret_cast<Frame_app*>(create_struct->lpCreateParams);
+        const auto app = reinterpret_cast<Frame_app*>(create_struct->lpCreateParams);
         SetWindowLongPtr(window, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(app));
     }
 
@@ -101,7 +101,7 @@ LRESULT CALLBACK Frame_app::static_window_proc(__in HWND window, UINT message, W
 
     // GetWindowLongPtr should never fail.
     // The variable 'app' is not valid until WM_NCCREATE has been sent.
-    auto app = reinterpret_cast<Frame_app*>(GetWindowLongPtr(window, GWLP_USERDATA));
+    const auto app = reinterpret_cast<Frame_app*>(GetWindowLongPtr(window, GWLP_USERDATA));
     if(app != nullptr)
     {
         return_value = app->window_proc(window, message, w_param, l_param);
@@ -152,9 +152,10 @@ LRESULT Frame_app::window_proc(_In_ HWND window, UINT message, WPARAM w_param, L
     return return_value;
 }
 
-void Frame_app::app_run(HINSTANCE instance, int show_command)
+void app_run(HINSTANCE instance, int show_command)
 {
-    auto state = Startup_Video(instance, true, this);
+    Frame_app app;
+    auto state = Startup_Video(instance, true, &app);
     // TODO: 2014: exception, not null atom, is thrown.  A try/catch block needs to be implemented in app_run.
     if(!state.atom)
     {

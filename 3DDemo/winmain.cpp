@@ -22,8 +22,7 @@ int WINAPI _tWinMain(__in HINSTANCE instance,   // Handle to the program instanc
 
     try
     {
-        WindowsCommon::Frame_app app;
-        app.app_run(instance, show_command);
+        WindowsCommon::app_run(instance, show_command);
     }
     catch(const WindowsCommon::HRESULT_exception& ex)
     {
