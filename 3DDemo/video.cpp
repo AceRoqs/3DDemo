@@ -53,7 +53,7 @@ static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWi
 {
     PCTSTR app_title = TEXT("3D Demo 1999 (Updated for C++11)");
 
-    const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(instance, WindowsCommon::Frame_app::window_proc, app_title);
+    const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(instance, WindowsCommon::Frame_app::static_window_proc, app_title);
 
     WindowsCommon::WGL_state state;
     state.atom = WindowsCommon::register_window_class(window_class);

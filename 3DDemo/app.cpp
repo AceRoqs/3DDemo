@@ -85,11 +85,36 @@ static int game_message_loop(std::function<void(void)> execute_frame)
 namespace WindowsCommon
 {
 
-LRESULT CALLBACK Frame_app::window_proc(
-    __in HWND window,
-    UINT message,
-    WPARAM w_param,
-    LPARAM l_param)
+LRESULT CALLBACK Frame_app::static_window_proc(__in HWND window, UINT message, WPARAM w_param, LPARAM l_param)
+{
+    // Sent by CreateWindow.
+    if(message == WM_NCCREATE)
+    {
+        CREATESTRUCT* create_struct = reinterpret_cast<CREATESTRUCT*>(l_param);
+
+        // This function should never fail.
+        auto app = reinterpret_cast<Frame_app*>(create_struct->lpCreateParams);
+        SetWindowLongPtr(window, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(app));
+    }
+
+    LRESULT return_value;
+
+    // GetWindowLongPtr should never fail.
+    // The variable 'app' is not valid until WM_NCCREATE has been sent.
+    auto app = reinterpret_cast<Frame_app*>(GetWindowLongPtr(window, GWLP_USERDATA));
+    if(app != nullptr)
+    {
+        return_value = app->window_proc(window, message, w_param, l_param);
+    }
+    else
+    {
+        return_value = DefWindowProc(window, message, w_param, l_param);
+    }
+
+    return return_value;
+}
+
+LRESULT Frame_app::window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param)
 {
     LRESULT return_value = 0;
 
