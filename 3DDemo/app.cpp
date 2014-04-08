@@ -85,6 +85,88 @@ static int game_message_loop(std::function<void(void)> execute_frame)
 namespace WindowsCommon
 {
 
+LRESULT CALLBACK Frame_app::window_proc(
+    HWND window,
+    UINT message,
+    WPARAM w_param,
+    LPARAM l_param)
+{
+    LRESULT return_value = 0;
+
+    switch(message)
+    {
+        case WM_CREATE:
+        {
+            break;
+        }
+
+        case WM_SIZE:
+        {
+            RECT rect;
+            ::GetClientRect(window, &rect);
+
+            // TODO: remove OpenGL dependancy
+            ::glViewport(rect.left, rect.top, rect.right, rect.bottom);
+
+            break;
+        }
+
+        case WM_ACTIVATEAPP:
+        {
+            if(static_cast<BOOL>(w_param))
+            {
+                // NOTE: Reload any changed resources here.
+            }
+
+            break;
+        }
+
+#if 0
+        case WM_SYSKEYDOWN:
+        {
+            if(VK_RETURN == wParam)
+            {
+//                MessageBox(window, "Toggle full screen mode here", "NOTIMPLEMENTED", 0);
+//                Shutdown_Video(s_fWindowed);
+
+                EndEngine();
+                s_fWindowed = !s_fWindowed;
+//                Startup_Video(GetModuleHandle(nullptr), SW_SHOW, s_fWindowed);
+//                StartLoad();
+                InitEngine(GetModuleHandle(nullptr), SW_SHOW);
+                // TODO: this leaks the dynamic arrays?
+                start_load("polydefs.txt");
+            }
+            else if(VK_F4 == wParam)
+            {
+                DestroyWindow(window);
+            }
+
+            break;
+        }
+#endif
+
+        case WM_ERASEBKGND:
+        {
+            break;
+        }
+
+        case WM_DESTROY:
+        {
+            PostQuitMessage(0);
+            return 0;
+        }
+
+        default:
+        {
+            return_value = DefWindowProc(window, message, w_param, l_param);
+            break;
+        }
+    }
+
+    return return_value;
+}
+
 void Frame_app::app_run(HINSTANCE instance, int show_command)
 {
     auto state = Startup_Video(instance, true, this);
