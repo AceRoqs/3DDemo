@@ -4,7 +4,7 @@
 #include "WGLState.h"
 #include "app.h"
 
-WindowsCommon::WGL_state Startup_Video(HINSTANCE hInstance, bool fWindowed, WindowsCommon::Frame_app* frame);
+WindowsCommon::WGL_state Startup_Video(HINSTANCE hInstance, bool fWindowed, WindowsCommon::Window_procedure* window_proc);
 void Shutdown_Video(bool fWindowed);
 
 #endif

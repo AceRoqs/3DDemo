@@ -85,7 +85,7 @@ static int game_message_loop(std::function<void(void)> execute_frame)
 namespace WindowsCommon
 {
 
-LRESULT CALLBACK Frame_app::static_window_proc(__in HWND window, UINT message, WPARAM w_param, LPARAM l_param)
+LRESULT CALLBACK Window_procedure::static_window_proc(__in HWND window, UINT message, WPARAM w_param, LPARAM l_param)
 {
     // Sent by CreateWindow.
     if(message == WM_NCCREATE)
@@ -93,7 +93,7 @@ LRESULT CALLBACK Frame_app::static_window_proc(__in HWND window, UINT message, W
         CREATESTRUCT* create_struct = reinterpret_cast<CREATESTRUCT*>(l_param);
 
         // This function should never fail.
-        const auto app = reinterpret_cast<Frame_app*>(create_struct->lpCreateParams);
+        const auto app = reinterpret_cast<Window_procedure*>(create_struct->lpCreateParams);
         SetWindowLongPtr(window, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(app));
     }
 
@@ -101,7 +101,7 @@ LRESULT CALLBACK Frame_app::static_window_proc(__in HWND window, UINT message, W
 
     // GetWindowLongPtr should never fail.
     // The variable 'app' is not valid until WM_NCCREATE has been sent.
-    const auto app = reinterpret_cast<Frame_app*>(GetWindowLongPtr(window, GWLP_USERDATA));
+    const auto app = reinterpret_cast<Window_procedure*>(GetWindowLongPtr(window, GWLP_USERDATA));
     if(app != nullptr)
     {
         return_value = app->window_proc(window, message, w_param, l_param);
@@ -114,7 +114,13 @@ LRESULT CALLBACK Frame_app::static_window_proc(__in HWND window, UINT message, W
     return return_value;
 }
 
-LRESULT Frame_app::window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param)
+class OpenGL_window_procedure : public Window_procedure
+{
+public:
+    LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param);
+};
+
+LRESULT OpenGL_window_procedure::window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param)
 {
     LRESULT return_value = 0;
 
@@ -122,11 +128,10 @@ LRESULT Frame_app::window_proc(_In_ HWND window, UINT message, WPARAM w_param, L
     {
         case WM_SIZE:
         {
-            RECT rect;
-            ::GetClientRect(window, &rect);
+            RECT client_rectangle;
+            ::GetClientRect(window, &client_rectangle);
 
-            // TODO: remove OpenGL dependancy
-            ::glViewport(rect.left, rect.top, rect.right, rect.bottom);
+            ::glViewport(client_rectangle.left, client_rectangle.top, client_rectangle.right, client_rectangle.bottom);
 
             break;
         }
@@ -154,7 +159,7 @@ LRESULT Frame_app::window_proc(_In_ HWND window, UINT message, WPARAM w_param, L
 
 void app_run(HINSTANCE instance, int show_command)
 {
-    Frame_app app;
+    OpenGL_window_procedure app;
     auto state = Startup_Video(instance, true, &app);
     // TODO: 2014: exception, not null atom, is thrown.  A try/catch block needs to be implemented in app_run.
     if(!state.atom)

@@ -12,7 +12,7 @@
 static const int window_width = 800;
 static const int window_height = 600;
 
-static WindowsCommon::WGL_state Startup_OpenGL(HINSTANCE hInstance, bool fWindowed, WindowsCommon::Frame_app* frame);
+static WindowsCommon::WGL_state Startup_OpenGL(HINSTANCE hInstance, bool fWindowed, WindowsCommon::Window_procedure* window_proc);
 static void Shutdown_OpenGL(bool fWindowed);
 
 //---------------------------------------------------------------------------
@@ -31,9 +31,9 @@ bool is_window_32bits_per_pixel(_In_ HWND window)
 //---------------------------------------------------------------------------
 // Startup_Video()
 //---------------------------------------------------------------------------
-WindowsCommon::WGL_state Startup_Video(_In_ HINSTANCE hInstance, bool fWindowed, WindowsCommon::Frame_app* frame)
+WindowsCommon::WGL_state Startup_Video(_In_ HINSTANCE hInstance, bool fWindowed, WindowsCommon::Window_procedure* window_proc)
 {
-    return Startup_OpenGL(hInstance, fWindowed, frame);
+    return Startup_OpenGL(hInstance, fWindowed, window_proc);
 }
 
 //---------------------------------------------------------------------------
@@ -49,18 +49,18 @@ void Shutdown_Video(
 // Startup_OpenGL()
 //---------------------------------------------------------------------------
 // TODO: set window width/height if full screen
-static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWindowed, WindowsCommon::Frame_app* frame)
+static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWindowed, WindowsCommon::Window_procedure* window_proc)
 {
     PCTSTR app_title = TEXT("3D Demo 1999 (Updated for C++11)");
 
-    const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(instance, WindowsCommon::Frame_app::static_window_proc, app_title);
+    const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(instance, WindowsCommon::Window_procedure::static_window_proc, app_title);
 
     WindowsCommon::WGL_state state;
     state.atom = WindowsCommon::register_window_class(window_class);
 
     if(fWindowed)
     {
-        state.window = WindowsCommon::create_normal_window(app_title, app_title, window_width, window_height, instance, frame);
+        state.window = WindowsCommon::create_normal_window(app_title, app_title, window_width, window_height, instance, window_proc);
     }
     else
     {
