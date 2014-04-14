@@ -114,8 +114,12 @@ LRESULT CALLBACK Window_procedure::static_window_proc(__in HWND window, UINT mes
     return return_value;
 }
 
+// TODO: Should be a wgl window proc.
 class OpenGL_window_procedure : public Window_procedure
 {
+public:
+    WindowsCommon::WGL_state m_state;
+
 public:
     LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param);
 };
@@ -160,7 +164,7 @@ LRESULT OpenGL_window_procedure::window_proc(_In_ HWND window, UINT message, WPA
 void app_run(HINSTANCE instance, int show_command)
 {
     OpenGL_window_procedure app;
-    auto state = Startup_Video(instance, true, &app);
+    auto state = Startup_OpenGL(instance, true, &app);
     // TODO: 2014: exception, not null atom, is thrown.  A try/catch block needs to be implemented in app_run.
     if(!state.atom)
     {
@@ -201,7 +205,7 @@ void app_run(HINSTANCE instance, int show_command)
     (return_code);
 
     // EndEngine(window, device_context);
-    Shutdown_Video(s_fWindowed);
+    Shutdown_OpenGL(s_fWindowed);
 
     // TODO: 2014: release contents, since they are invalid.  These should just be handled by destructor.
     state.make_current_context.invoke();

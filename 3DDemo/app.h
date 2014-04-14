@@ -1,7 +1,8 @@
 #ifndef APP_H
 #define APP_H
 
-namespace WindowsCommon{
+namespace WindowsCommon
+{
 
 class Window_procedure
 {

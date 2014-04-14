@@ -12,9 +12,6 @@
 static const int window_width = 800;
 static const int window_height = 600;
 
-static WindowsCommon::WGL_state Startup_OpenGL(HINSTANCE hInstance, bool fWindowed, WindowsCommon::Window_procedure* window_proc);
-static void Shutdown_OpenGL(bool fWindowed);
-
 //---------------------------------------------------------------------------
 bool is_window_32bits_per_pixel(_In_ HWND window)
 {
@@ -29,27 +26,10 @@ bool is_window_32bits_per_pixel(_In_ HWND window)
 }
 
 //---------------------------------------------------------------------------
-// Startup_Video()
-//---------------------------------------------------------------------------
-WindowsCommon::WGL_state Startup_Video(_In_ HINSTANCE hInstance, bool fWindowed, WindowsCommon::Window_procedure* window_proc)
-{
-    return Startup_OpenGL(hInstance, fWindowed, window_proc);
-}
-
-//---------------------------------------------------------------------------
-// Shutdown_Video()
-//---------------------------------------------------------------------------
-void Shutdown_Video(
-    bool fWindowed)
-{
-    Shutdown_OpenGL(fWindowed);
-}
-
-//---------------------------------------------------------------------------
 // Startup_OpenGL()
 //---------------------------------------------------------------------------
 // TODO: set window width/height if full screen
-static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWindowed, WindowsCommon::Window_procedure* window_proc)
+WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWindowed, WindowsCommon::Window_procedure* window_proc)
 {
     PCTSTR app_title = TEXT("3D Demo 1999 (Updated for C++11)");
 
@@ -106,9 +86,7 @@ static WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWi
     return state;
 }
 
-//---------------------------------------------------------------------------
-static void Shutdown_OpenGL(
-    bool fWindowed)
+void Shutdown_OpenGL(bool fWindowed)
 {
     // TODO11: This is releasing a DC and destroying a window that
     // has already finished the message loop.  i.e. The window is
