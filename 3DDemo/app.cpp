@@ -85,46 +85,16 @@ static int game_message_loop(std::function<void(void)> execute_frame)
 namespace WindowsCommon
 {
 
-LRESULT CALLBACK Window_procedure::static_window_proc(__in HWND window, UINT message, WPARAM w_param, LPARAM l_param)
-{
-    // Sent by CreateWindow.
-    if(message == WM_NCCREATE)
-    {
-        CREATESTRUCT* create_struct = reinterpret_cast<CREATESTRUCT*>(l_param);
-
-        // This function should never fail.
-        const auto app = reinterpret_cast<Window_procedure*>(create_struct->lpCreateParams);
-        SetWindowLongPtr(window, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(app));
-    }
-
-    LRESULT return_value;
-
-    // GetWindowLongPtr should never fail.
-    // The variable 'app' is not valid until WM_NCCREATE has been sent.
-    const auto app = reinterpret_cast<Window_procedure*>(GetWindowLongPtr(window, GWLP_USERDATA));
-    if(app != nullptr)
-    {
-        return_value = app->window_proc(window, message, w_param, l_param);
-    }
-    else
-    {
-        return_value = DefWindowProc(window, message, w_param, l_param);
-    }
-
-    return return_value;
-}
-
-// TODO: Should be a wgl window proc.
-class OpenGL_window_procedure : public Window_procedure
+class WindowGL_window_procedure : public Window_procedure
 {
 public:
     WindowsCommon::WGL_state m_state;
 
-public:
+protected:
     LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param);
 };
 
-LRESULT OpenGL_window_procedure::window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param)
+LRESULT WindowGL_window_procedure::window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param)
 {
     LRESULT return_value = 0;
 
@@ -145,12 +115,6 @@ LRESULT OpenGL_window_procedure::window_proc(_In_ HWND window, UINT message, WPA
             break;
         }
 
-        case WM_DESTROY:
-        {
-            PostQuitMessage(0);
-            break;
-        }
-
         default:
         {
             return_value = DefWindowProc(window, message, w_param, l_param);
@@ -161,18 +125,38 @@ LRESULT OpenGL_window_procedure::window_proc(_In_ HWND window, UINT message, WPA
     return return_value;
 }
 
+class App_window_procedure : public WindowsCommon::WindowGL_window_procedure
+{
+protected:
+    LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param)
+    {
+        LRESULT return_value = 0;
+
+        if(message == WM_DESTROY)
+        {
+            PostQuitMessage(0);
+        }
+        else
+        {
+            return_value = WindowGL_window_procedure::window_proc(window, message, w_param, l_param);
+        }
+
+        return return_value;
+    }
+};
+
 void app_run(HINSTANCE instance, int show_command)
 {
-    OpenGL_window_procedure app;
-    auto state = Startup_OpenGL(instance, true, &app);
+    App_window_procedure app;
+    app.m_state = Startup_OpenGL(instance, true, &app);
     // TODO: 2014: exception, not null atom, is thrown.  A try/catch block needs to be implemented in app_run.
-    if(!state.atom)
+    if(!app.m_state.atom)
     {
         MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
         return;
     }
 
-    Input_device keyboard(instance, state.window);
+    Input_device keyboard(instance, app.m_state.window);
 
     // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
     initialize_gl_constants();
@@ -190,11 +174,11 @@ void app_run(HINSTANCE instance, int show_command)
     float camera_z = 1.0f;
     float camera_degrees = 0.0f;
 
-    ShowWindow(state.window, show_command);
-    UpdateWindow(state.window);
+    ShowWindow(app.m_state.window, show_command);
+    UpdateWindow(app.m_state.window);
 
     // Lambda requires copy constructor, which Scoped_device_context does not provide.
-    const HDC device_context = state.device_context;
+    const HDC device_context = app.m_state.device_context;
     auto execute_frame = [&, device_context]()
     {
         keyboard.get_input(&camera_x, &camera_y, &camera_z, &camera_degrees);
@@ -208,10 +192,10 @@ void app_run(HINSTANCE instance, int show_command)
     Shutdown_OpenGL(s_fWindowed);
 
     // TODO: 2014: release contents, since they are invalid.  These should just be handled by destructor.
-    state.make_current_context.invoke();
-    state.gl_context.release();
-    state.device_context.release();
-    state.window.release();
+    app.m_state.make_current_context.invoke();
+    app.m_state.gl_context.release();
+    app.m_state.device_context.release();
+    app.m_state.window.release();
 }
 
 }

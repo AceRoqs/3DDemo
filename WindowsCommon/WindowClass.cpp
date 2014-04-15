@@ -5,6 +5,35 @@
 namespace WindowsCommon
 {
 
+LRESULT CALLBACK Window_procedure::static_window_proc(__in HWND window, UINT message, WPARAM w_param, LPARAM l_param)
+{
+    // Sent by CreateWindow.
+    if(message == WM_NCCREATE)
+    {
+        CREATESTRUCT* create_struct = reinterpret_cast<CREATESTRUCT*>(l_param);
+
+        // This function should never fail.
+        const auto app = reinterpret_cast<Window_procedure*>(create_struct->lpCreateParams);
+        SetWindowLongPtr(window, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(app));
+    }
+
+    LRESULT return_value;
+
+    // GetWindowLongPtr should never fail.
+    // The variable 'app' is not valid until WM_NCCREATE has been sent.
+    const auto app = reinterpret_cast<Window_procedure*>(GetWindowLongPtr(window, GWLP_USERDATA));
+    if(app != nullptr)
+    {
+        return_value = app->window_proc(window, message, w_param, l_param);
+    }
+    else
+    {
+        return_value = DefWindowProc(window, message, w_param, l_param);
+    }
+
+    return return_value;
+}
+
 WNDCLASSEX get_default_blank_window_class(_In_ HINSTANCE instance, _In_ WNDPROC window_proc, _In_ PCTSTR window_class_name) NOEXCEPT
 {
     WNDCLASSEX window_class;

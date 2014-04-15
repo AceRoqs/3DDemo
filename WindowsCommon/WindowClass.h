@@ -7,6 +7,15 @@
 namespace WindowsCommon
 {
 
+class Window_procedure
+{
+public:
+    static LRESULT CALLBACK static_window_proc(__in HWND window, UINT message, WPARAM w_param, LPARAM l_param);
+
+protected:
+    virtual LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) = 0;
+};
+
 WNDCLASSEX get_default_blank_window_class(_In_ HINSTANCE instance, _In_ WNDPROC window_proc, _In_ PCTSTR window_class_name) NOEXCEPT;
 Scoped_atom register_window_class(const WNDCLASSEX& window_class);
 
