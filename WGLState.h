@@ -9,19 +9,34 @@ namespace WindowsCommon
 struct WGL_state
 {
 // http://stackoverflow.com/questions/70013/how-to-detect-if-im-compiling-code-with-visual-studio-2008
-#if _MSC_VER == 1600
-    // Add default and move constructors as VS2010 doesn't default define a move constructor.
+#if _MSC_VER == 1600 || _MSC_VER == 1700
+    // Add default and move constructors as VS2010/2012 doesn't default define a move constructor.
     WGL_state()
     {
     }
 
-    WGL_state(WGL_state&& state) :
-        atom(std::move(state.atom)),
-        window(std::move(state.window)),
-        device_context(std::move(state.device_context)),
-        gl_context(std::move(state.gl_context)),
-        make_current_context(std::move(state.make_current_context))
+    WGL_state(WGL_state&& other) :
+        atom(std::move(other.atom)),
+        window(std::move(other.window)),
+        device_context(std::move(other.device_context)),
+        gl_context(std::move(other.gl_context)),
+        make_current_context(std::move(other.make_current_context))
     {
+    }
+
+    WGL_state& operator=(WGL_state&& other) NOEXCEPT
+    {
+        // Handle A=A case.
+        if(this != &other)
+        {
+            atom = std::move(other.atom);
+            window = std::move(other.window);
+            device_context = std::move(other.device_context);
+            gl_context = std::move(other.gl_context);
+            make_current_context = std::move(other.make_current_context);
+        }
+
+        return *this;
     }
 #else
 #error This compiler may autodefine the default move constructor.
