@@ -3,7 +3,7 @@
 #include "polygon.h"
 #include "input.h"
 #include "coord.h"
-#include "video.h"
+#include "WindowsGL.h"
 #include "world.h"
 #include "render.h"
 #include "HRException.h"

@@ -135,7 +135,6 @@
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="render.cpp" />
     <ClCompile Include="input.cpp" />
-    <ClCompile Include="video.cpp" />
     <ClCompile Include="pcx.cpp" />
     <ClCompile Include="targaw32.cpp" />
     <ClCompile Include="gltex.cpp" />
@@ -157,7 +156,6 @@
     <ClInclude Include="render.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="targa.h" />
-    <ClInclude Include="video.h" />
     <ClInclude Include="world.h" />
   </ItemGroup>
   <ItemGroup>

@@ -30,9 +30,6 @@
     <ClCompile Include="input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="video.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="gltex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -75,9 +72,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="coord.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="video.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="world.h">
