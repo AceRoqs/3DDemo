@@ -51,6 +51,7 @@ struct WGL_state
     Scoped_current_context make_current_context;
 };
 
+// TODO: 2014 WindowsGL_window_procedure is more than a window_proc?
 class WindowGL_window_procedure : public Window_procedure
 {
 public:
