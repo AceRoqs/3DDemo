@@ -26,6 +26,7 @@
     </ClCompile>
     <ClCompile Include="ScopedWindowsTypes.cpp" />
     <ClCompile Include="WindowClass.cpp" />
+    <ClCompile Include="WindowsGL.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F87DF4F3-6744-4DFF-BDCF-1CB9AAA654D1}</ProjectGuid>
