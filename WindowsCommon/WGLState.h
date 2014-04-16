@@ -2,6 +2,7 @@
 #define WGLSTATE_H
 
 #include "ScopedWindowsTypes.h"
+#include "WindowClass.h"
 
 namespace WindowsCommon
 {
@@ -48,6 +49,15 @@ struct WGL_state
     Scoped_device_context device_context;
     Scoped_gl_context gl_context;
     Scoped_current_context make_current_context;
+};
+
+class WindowGL_window_procedure : public Window_procedure
+{
+public:
+    WindowsCommon::WGL_state m_state;
+
+protected:
+    LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param);
 };
 
 }

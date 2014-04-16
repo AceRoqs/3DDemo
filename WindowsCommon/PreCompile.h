@@ -38,5 +38,7 @@
 #include "PreCPP11.h"
 #endif
 
+#include <gl/GL.h>
+
 #endif
 
