@@ -60,6 +60,9 @@ protected:
     LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param);
 };
 
+WindowsCommon::WGL_state Startup_OpenGL(HINSTANCE hInstance, bool fWindowed, WindowsCommon::Window_procedure* window_proc);
+void Shutdown_OpenGL(bool fWindowed);
+
 }
 
 #endif
