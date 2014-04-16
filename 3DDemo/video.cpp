@@ -5,15 +5,10 @@
 #include "PreCompile.h"
 #include "video.h"
 #include "HRException.h"
-#include "resource.h"
 #include "WindowClass.h"
 #include "WindowsGL.h"
 
-static const int window_width = 800;
-static const int window_height = 600;
-
-//---------------------------------------------------------------------------
-bool is_window_32bits_per_pixel(_In_ HWND window)
+static bool is_window_32bits_per_pixel(_In_ HWND window)
 {
     WindowsCommon::Scoped_device_context device_context = WindowsCommon::get_device_context(window);
 
@@ -25,12 +20,12 @@ bool is_window_32bits_per_pixel(_In_ HWND window)
     return true;
 }
 
-//---------------------------------------------------------------------------
-// Startup_OpenGL()
-//---------------------------------------------------------------------------
 // TODO: set window width/height if full screen
 WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWindowed, WindowsCommon::Window_procedure* window_proc)
 {
+    const int window_width = 800;
+    const int window_height = 600;
+
     PCTSTR app_title = TEXT("3D Demo 1999 (Updated for C++11)");
 
     const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(instance, WindowsCommon::Window_procedure::static_window_proc, app_title);
