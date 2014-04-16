@@ -54,14 +54,17 @@ struct WGL_state
 class WindowGL_window_procedure : public Window_procedure
 {
 public:
+    WindowGL_window_procedure(_In_ HINSTANCE instance, bool windowed);
+    ~WindowGL_window_procedure();
+
     WindowsCommon::WGL_state m_state;
 
 protected:
     LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param);
-};
 
-WindowsCommon::WGL_state Startup_OpenGL(HINSTANCE hInstance, bool fWindowed, WindowsCommon::Window_procedure* window_proc);
-void Shutdown_OpenGL(bool fWindowed);
+private:
+    bool m_windowed;
+};
 
 }
 

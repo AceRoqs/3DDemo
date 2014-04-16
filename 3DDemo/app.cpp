@@ -87,6 +87,11 @@ namespace WindowsCommon
 
 class App_window_procedure : public WindowsCommon::WindowGL_window_procedure
 {
+public:
+    App_window_procedure(_In_ HINSTANCE instance, bool windowed) : WindowGL_window_procedure(instance, windowed)
+    {
+    }
+
 protected:
     LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param)
     {
@@ -107,8 +112,7 @@ protected:
 
 void app_run(HINSTANCE instance, int show_command)
 {
-    App_window_procedure app;
-    app.m_state = Startup_OpenGL(instance, true, &app);
+    App_window_procedure app(instance, true);
     // TODO: 2014: exception, not null atom, is thrown.  A try/catch block needs to be implemented in app_run.
     if(!app.m_state.atom)
     {
@@ -149,13 +153,13 @@ void app_run(HINSTANCE instance, int show_command)
     (return_code);
 
     // EndEngine(window, device_context);
-    Shutdown_OpenGL(s_fWindowed);
+    //Shutdown_OpenGL(s_fWindowed);
 
     // TODO: 2014: release contents, since they are invalid.  These should just be handled by destructor.
-    app.m_state.make_current_context.invoke();
-    app.m_state.gl_context.release();
-    app.m_state.device_context.release();
-    app.m_state.window.release();
+    //app.m_state.make_current_context.invoke();
+    //app.m_state.gl_context.release();
+    //app.m_state.device_context.release();
+    //app.m_state.window.release();
 }
 
 }
