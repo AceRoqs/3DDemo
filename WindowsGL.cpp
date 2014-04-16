@@ -19,7 +19,7 @@ static bool is_window_32bits_per_pixel(_In_ HWND window)
 }
 
 // TODO: set window width/height if full screen
-WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWindowed, WindowsCommon::Window_procedure* window_proc)
+WindowGL_window_procedure::WindowGL_window_procedure(_In_ HINSTANCE instance, bool windowed) : m_windowed(windowed)
 {
     const int window_width = 800;
     const int window_height = 600;
@@ -28,12 +28,11 @@ WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWindowed,
 
     const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(instance, WindowsCommon::Window_procedure::static_window_proc, app_title);
 
-    WindowsCommon::WGL_state state;
-    state.atom = WindowsCommon::register_window_class(window_class);
+    m_state.atom = WindowsCommon::register_window_class(window_class);
 
-    if(fWindowed)
+    if(windowed)
     {
-        state.window = WindowsCommon::create_normal_window(app_title, app_title, window_width, window_height, instance, window_proc);
+        m_state.window = WindowsCommon::create_normal_window(app_title, app_title, window_width, window_height, instance, this);
     }
     else
     {
@@ -49,7 +48,7 @@ WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWindowed,
         DevMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
         ChangeDisplaySettings(&DevMode, CDS_FULLSCREEN);
 
-        state.window = WindowsCommon::create_window(
+        m_state.window = WindowsCommon::create_window(
             app_title,
             app_title,
             WS_POPUP | WS_CLIPSIBLINGS,
@@ -65,21 +64,19 @@ WindowsCommon::WGL_state Startup_OpenGL(_In_ HINSTANCE instance, bool fWindowed,
         ShowCursor(false);
     }
 
-    if(!is_window_32bits_per_pixel(state.window))
+    if(!is_window_32bits_per_pixel(m_state.window))
     {
         // TODO: 2014: This message text is good - find some way to pass this via the exception.
         //MessageBox(window, TEXT("3D Engine demo requires 32-bit color."), TEXT("System requirements"), MB_OK);
         WindowsCommon::throw_hr(E_FAIL);
     }
 
-    state.device_context = get_device_context(state.window);
-    state.gl_context = create_gl_context(state.device_context);
-    state.make_current_context = create_current_context(state.device_context, state.gl_context);
-
-    return state;
+    m_state.device_context = get_device_context(m_state.window);
+    m_state.gl_context = create_gl_context(m_state.device_context);
+    m_state.make_current_context = create_current_context(m_state.device_context, m_state.gl_context);
 }
 
-void Shutdown_OpenGL(bool fWindowed)
+WindowGL_window_procedure::~WindowGL_window_procedure()
 {
     // TODO11: This is releasing a DC and destroying a window that
     // has already finished the message loop.  i.e. The window is
@@ -91,7 +88,7 @@ void Shutdown_OpenGL(bool fWindowed)
     //::wglMakeCurrent(nullptr, nullptr);
     //::wglDeleteContext(state.gl_context);
     //::ReleaseDC(hwnd, hdc);
-    if(!fWindowed)
+    if(!m_windowed)
     {
         ::ChangeDisplaySettings(nullptr, 0);
     }
