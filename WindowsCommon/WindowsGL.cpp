@@ -1,5 +1,5 @@
 #include "PreCompile.h"
-#include "WGLState.h"
+#include "WindowsGL.h"      // Pick up forward declarations to ensure correctness.
 
 namespace WindowsCommon
 {
