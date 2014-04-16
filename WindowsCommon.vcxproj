@@ -15,7 +15,7 @@
     <ClInclude Include="PreCompile.h" />
     <ClInclude Include="PreCPP11.h" />
     <ClInclude Include="ScopedWindowsTypes.h" />
-    <ClInclude Include="WGLState.h" />
+    <ClInclude Include="WindowsGL.h" />
     <ClInclude Include="WindowClass.h" />
   </ItemGroup>
   <ItemGroup>

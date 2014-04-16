@@ -30,7 +30,7 @@
     <ClInclude Include="WindowClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WGLState.h">
+    <ClInclude Include="WindowsGL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
