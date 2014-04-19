@@ -132,7 +132,7 @@ void app_run(HINSTANCE instance, int show_command)
         const HDC device_context = app.m_state.device_context;
         auto execute_frame = [&, device_context]()
         {
-            keyboard.get_input(&camera.m_x, &camera.m_y, &camera.m_z, &camera.m_degrees);
+            camera = keyboard.get_input(camera);
             draw_list([=](){ SwapBuffers(device_context); }, polys, camera.m_x, camera.m_y, camera.m_z, camera.m_degrees);
         };
 

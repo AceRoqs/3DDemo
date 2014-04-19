@@ -60,16 +60,18 @@ static bool TestPolys(
 
 //---------------------------------------------------------------------------
 // TODO: modularize and move out of main
-void Input_device::get_input(float* camera_x, float* camera_y, float* camera_z, float* camera_degrees)
+Camera Input_device::get_input(const Camera& camera)
 {
     static long msec = 0;
     long tick_count;
 
     float new_x, new_y, new_z;
 
-    new_x = *camera_x;
-    new_y = *camera_y;
-    new_z = *camera_z;
+    new_x = camera.m_x;
+    new_y = camera.m_y;
+    new_z = camera.m_z;
+
+    Camera new_camera = camera;
 
     // TODO: get number of times from system queue
     // TODO: this is a bunch of crap
@@ -100,72 +102,74 @@ void Input_device::get_input(float* camera_x, float* camera_y, float* camera_z, 
             const double BLAH = 0.0174;
             if(keybuffer[DIK_NUMPAD2] | keybuffer[DIK_DOWN])
             {
-                new_x += float(SPEED * sin(*camera_degrees * (BLAH)));
-                float temp = *camera_x;
+                new_x += float(SPEED * sin(camera.m_degrees * (BLAH)));
+                float temp = camera.m_x;
                 if(TestPolys(new_x, new_y, new_z))
                 {
-                    *camera_x = new_x;
+                    new_camera.m_x = new_x;
                 }
-                new_z += float(-SPEED * cos(*camera_degrees * (BLAH)));
+                new_z += float(-SPEED * cos(camera.m_degrees * (BLAH)));
                 if(TestPolys(temp, new_y, new_z))
                 {
-                    *camera_z = new_z;
+                    new_camera.m_z = new_z;
                 }
             }
             if(keybuffer[DIK_NUMPAD8] | keybuffer[DIK_UP])
             {
-                new_x += float(-SPEED * sin(*camera_degrees * (BLAH)));
-                float temp = *camera_x;
+                new_x += float(-SPEED * sin(camera.m_degrees * (BLAH)));
+                float temp = camera.m_x;
                 if(TestPolys(new_x, new_y, new_z))
                 {
-                    *camera_x = new_x;
+                    new_camera.m_x = new_x;
                 }
-                new_z += float(SPEED * cos(*camera_degrees * (BLAH)));
+                new_z += float(SPEED * cos(camera.m_degrees * (BLAH)));
                 if(TestPolys(temp, new_y, new_z))
                 {
-                    *camera_z = new_z;
+                    new_camera.m_z = new_z;
                 }
             }
             if(keybuffer[DIK_D])
             {
-                new_x += float(-SPEED * cos(*camera_degrees * (BLAH)));
-                float temp = *camera_x;
+                new_x += float(-SPEED * cos(camera.m_degrees * (BLAH)));
+                float temp = camera.m_x;
                 if(TestPolys(new_x, new_y, new_z))
                 {
-                    *camera_x = new_x;
+                    new_camera.m_x = new_x;
                 }
-                new_z += float(-SPEED * sin(*camera_degrees * (BLAH)));
+                new_z += float(-SPEED * sin(camera.m_degrees * (BLAH)));
                 if(TestPolys(temp, new_y, new_z))
                 {
-                    *camera_z = new_z;
+                    new_camera.m_z = new_z;
                 }
             }
             if(keybuffer[DIK_A])
             {
-                new_x += float(SPEED * cos(*camera_degrees * (BLAH)));
-                float temp = *camera_x;
+                new_x += float(SPEED * cos(camera.m_degrees * (BLAH)));
+                float temp = camera.m_x;
                 if(TestPolys(new_x, new_y, new_z))
                 {
-                    *camera_x = new_x;
+                    new_camera.m_x = new_x;
                 }
-                new_z += float(SPEED * sin(*camera_degrees * (BLAH)));
+                new_z += float(SPEED * sin(camera.m_degrees * (BLAH)));
                 if(TestPolys(temp, new_y, new_z))
                 {
-                    *camera_z = new_z;
+                    new_camera.m_z = new_z;
                 }
             }
             if(keybuffer[DIK_NUMPAD4] | keybuffer[DIK_LEFT])
             {
-                *camera_degrees -= 3;
+                new_camera.m_degrees -= 3;
             }
             if(keybuffer[DIK_NUMPAD6] | keybuffer[DIK_RIGHT])
             {
-                *camera_degrees += 3;
+                new_camera.m_degrees += 3;
             }
         }
 
         // TODO: send data to system queue instead of moving camera
         msec = tick_count;
     }
+
+    return new_camera;
 }
 
