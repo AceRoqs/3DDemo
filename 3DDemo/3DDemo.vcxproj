@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClInclude Include="app.h" />
     <ClInclude Include="block.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="coord.h" />
     <ClInclude Include="gltex.h" />
     <ClInclude Include="input.h" />

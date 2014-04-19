@@ -7,6 +7,7 @@
 #include "world.h"
 #include "render.h"
 #include "HRException.h"
+#include "Camera.h"
 
 static bool s_fWindowed = true;
 
@@ -122,10 +123,7 @@ void app_run(HINSTANCE instance, int show_command)
 
         initialize_gl_world_data(vertex_formats, texture_coords);
 
-        float camera_x = 0.0f;
-        float camera_y = 0.0f;
-        float camera_z = 1.0f;
-        float camera_degrees = 0.0f;
+        Camera camera(0.0f, 0.0f, 1.0f, 0.0f);
 
         ShowWindow(app.m_state.window, show_command);
         UpdateWindow(app.m_state.window);
@@ -134,8 +132,8 @@ void app_run(HINSTANCE instance, int show_command)
         const HDC device_context = app.m_state.device_context;
         auto execute_frame = [&, device_context]()
         {
-            keyboard.get_input(&camera_x, &camera_y, &camera_z, &camera_degrees);
-            draw_list([=](){ SwapBuffers(device_context); }, polys, camera_x, camera_y, camera_z, camera_degrees);
+            keyboard.get_input(&camera.m_x, &camera.m_y, &camera.m_z, &camera.m_degrees);
+            draw_list([=](){ SwapBuffers(device_context); }, polys, camera.m_x, camera.m_y, camera.m_z, camera.m_degrees);
         };
 
         int return_code = game_message_loop(execute_frame);
