@@ -93,7 +93,7 @@ public:
     }
 
 protected:
-    LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param)
+    LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) NOEXCEPT
     {
         LRESULT return_value = WindowGL_window_procedure::window_proc(window, message, w_param, l_param);
 
