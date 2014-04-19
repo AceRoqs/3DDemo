@@ -83,6 +83,8 @@ Camera Input_device::get_input(const Camera& camera)
     }
     else //if((tick_count - msec) > 16)
     {
+        const auto ticks = tick_count - msec;
+
         char keybuffer[256];
         //for(int i = 0; i < tick_count - msec; i+= 16) 
         {
@@ -98,18 +100,19 @@ Camera Input_device::get_input(const Camera& camera)
                 m_device->GetDeviceState(256, (LPVOID)&keybuffer);
             }
 
-            const double SPEED = 0.09;
-            //const double SPEED = 0.15;
-            const double BLAH = 0.0174;
+            const auto walk_distance_per_tick = 0.5f;
+            const auto walk_distance = walk_distance_per_tick * ticks;
+            const auto SPEED = 0.09f;
+            const auto BLAH = 0.0174f;
             if(keybuffer[DIK_NUMPAD2] | keybuffer[DIK_DOWN])
             {
-                new_x += float(SPEED * sin(camera.m_degrees * (BLAH)));
+                new_x += SPEED * sinf(camera.m_degrees * (BLAH)) * walk_distance;
                 float temp = camera.m_x;
                 if(TestPolys(new_x, new_y, new_z))
                 {
                     new_camera.m_x = new_x;
                 }
-                new_z += float(-SPEED * cos(camera.m_degrees * (BLAH)));
+                new_z -= SPEED * cosf(camera.m_degrees * (BLAH)) * walk_distance;
                 if(TestPolys(temp, new_y, new_z))
                 {
                     new_camera.m_z = new_z;
@@ -117,13 +120,13 @@ Camera Input_device::get_input(const Camera& camera)
             }
             if(keybuffer[DIK_NUMPAD8] | keybuffer[DIK_UP])
             {
-                new_x += float(-SPEED * sin(camera.m_degrees * (BLAH)));
+                new_x -= SPEED * sinf(camera.m_degrees * (BLAH)) * walk_distance;
                 float temp = camera.m_x;
                 if(TestPolys(new_x, new_y, new_z))
                 {
                     new_camera.m_x = new_x;
                 }
-                new_z += float(SPEED * cos(camera.m_degrees * (BLAH)));
+                new_z += SPEED * cosf(camera.m_degrees * (BLAH)) * walk_distance;
                 if(TestPolys(temp, new_y, new_z))
                 {
                     new_camera.m_z = new_z;
@@ -131,13 +134,13 @@ Camera Input_device::get_input(const Camera& camera)
             }
             if(keybuffer[DIK_D])
             {
-                new_x += float(-SPEED * cos(camera.m_degrees * (BLAH)));
+                new_x -= SPEED * cosf(camera.m_degrees * (BLAH)) * walk_distance;
                 float temp = camera.m_x;
                 if(TestPolys(new_x, new_y, new_z))
                 {
                     new_camera.m_x = new_x;
                 }
-                new_z += float(-SPEED * sin(camera.m_degrees * (BLAH)));
+                new_z -= SPEED * sinf(camera.m_degrees * (BLAH)) * walk_distance;
                 if(TestPolys(temp, new_y, new_z))
                 {
                     new_camera.m_z = new_z;
@@ -145,25 +148,27 @@ Camera Input_device::get_input(const Camera& camera)
             }
             if(keybuffer[DIK_A])
             {
-                new_x += float(SPEED * cos(camera.m_degrees * (BLAH)));
+                new_x += SPEED * cosf(camera.m_degrees * (BLAH)) * walk_distance;
                 float temp = camera.m_x;
                 if(TestPolys(new_x, new_y, new_z))
                 {
                     new_camera.m_x = new_x;
                 }
-                new_z += float(SPEED * sin(camera.m_degrees * (BLAH)));
+                new_z += SPEED * sinf(camera.m_degrees * (BLAH)) * walk_distance;
                 if(TestPolys(temp, new_y, new_z))
                 {
                     new_camera.m_z = new_z;
                 }
             }
+            const auto keyboard_rotational_speed_per_tick = 0.5f;
+            const auto rotation_degrees = keyboard_rotational_speed_per_tick * ticks;
             if(keybuffer[DIK_NUMPAD4] | keybuffer[DIK_LEFT])
             {
-                new_camera.m_degrees -= 3;
+                new_camera.m_degrees -= rotation_degrees;
             }
             if(keybuffer[DIK_NUMPAD6] | keybuffer[DIK_RIGHT])
             {
-                new_camera.m_degrees += 3;
+                new_camera.m_degrees += rotation_degrees;
             }
         }
 
