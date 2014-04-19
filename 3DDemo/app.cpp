@@ -38,8 +38,6 @@ static int game_message_loop(std::function<void(void)> execute_frame)
         {
             // Renderer and window handle were destroyed in WM_DESTROY.
 //            assert(nullptr == m_renderer);
-//            assert(!IsWindow(window.get()));
-//            window.release();
             break;
         }
 
@@ -140,8 +138,10 @@ void app_run(HINSTANCE instance, int show_command)
             draw_list([=](){ SwapBuffers(device_context); }, polys, camera_x, camera_y, camera_z, camera_degrees);
         };
 
-        //int return_code = game_message_loop(execute_frame);
-        //(return_code);
+        int return_code = game_message_loop(execute_frame);
+        (return_code);
+
+        assert(!IsWindow(app.m_state.window));
     }
     catch(...)
     {
