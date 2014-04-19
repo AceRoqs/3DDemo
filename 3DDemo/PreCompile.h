@@ -12,6 +12,7 @@
 #endif // _MSC_VER
 
 // C++ Standard Library.
+#define _USE_MATH_DEFINES
 #include <cstdint>
 #include <cmath>
 #include <memory>

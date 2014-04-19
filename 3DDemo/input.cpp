@@ -103,15 +103,17 @@ Camera Input_device::get_input(const Camera& camera)
             const auto walk_distance_per_tick = 0.045f;
             const auto walk_distance = walk_distance_per_tick * ticks;
             const auto BLAH = 0.0174f;
+            const auto sine = sinf(camera.m_degrees * (BLAH)) * walk_distance;
+            const auto cosine = cosf(camera.m_degrees * (BLAH)) * walk_distance;
             if(keybuffer[DIK_NUMPAD2] | keybuffer[DIK_DOWN])
             {
-                new_x += sinf(camera.m_degrees * (BLAH)) * walk_distance;
+                new_x += sine;
                 float temp = camera.m_x;
                 if(TestPolys(new_x, new_y, new_z))
                 {
                     new_camera.m_x = new_x;
                 }
-                new_z -= cosf(camera.m_degrees * (BLAH)) * walk_distance;
+                new_z -= cosine;
                 if(TestPolys(temp, new_y, new_z))
                 {
                     new_camera.m_z = new_z;
@@ -119,13 +121,13 @@ Camera Input_device::get_input(const Camera& camera)
             }
             if(keybuffer[DIK_NUMPAD8] | keybuffer[DIK_UP])
             {
-                new_x -= sinf(camera.m_degrees * (BLAH)) * walk_distance;
+                new_x -= sine;
                 float temp = camera.m_x;
                 if(TestPolys(new_x, new_y, new_z))
                 {
                     new_camera.m_x = new_x;
                 }
-                new_z += cosf(camera.m_degrees * (BLAH)) * walk_distance;
+                new_z += cosine;
                 if(TestPolys(temp, new_y, new_z))
                 {
                     new_camera.m_z = new_z;
@@ -133,13 +135,13 @@ Camera Input_device::get_input(const Camera& camera)
             }
             if(keybuffer[DIK_D])
             {
-                new_x -= cosf(camera.m_degrees * (BLAH)) * walk_distance;
+                new_x -= cosine;
                 float temp = camera.m_x;
                 if(TestPolys(new_x, new_y, new_z))
                 {
                     new_camera.m_x = new_x;
                 }
-                new_z -= sinf(camera.m_degrees * (BLAH)) * walk_distance;
+                new_z -= sine;
                 if(TestPolys(temp, new_y, new_z))
                 {
                     new_camera.m_z = new_z;
@@ -147,13 +149,13 @@ Camera Input_device::get_input(const Camera& camera)
             }
             if(keybuffer[DIK_A])
             {
-                new_x += cosf(camera.m_degrees * (BLAH)) * walk_distance;
+                new_x += cosine;
                 float temp = camera.m_x;
                 if(TestPolys(new_x, new_y, new_z))
                 {
                     new_camera.m_x = new_x;
                 }
-                new_z += sinf(camera.m_degrees * (BLAH)) * walk_distance;
+                new_z += sine;
                 if(TestPolys(temp, new_y, new_z))
                 {
                     new_camera.m_z = new_z;
@@ -163,11 +165,11 @@ Camera Input_device::get_input(const Camera& camera)
             const auto rotation_degrees = keyboard_rotational_speed_per_tick * ticks;
             if(keybuffer[DIK_NUMPAD4] | keybuffer[DIK_LEFT])
             {
-                new_camera.m_degrees -= rotation_degrees;
+                new_camera.m_degrees = fmod(new_camera.m_degrees - rotation_degrees + 360.f, 360.f);
             }
             if(keybuffer[DIK_NUMPAD6] | keybuffer[DIK_RIGHT])
             {
-                new_camera.m_degrees += rotation_degrees;
+                new_camera.m_degrees = fmod(new_camera.m_degrees + rotation_degrees, 360.f);
             }
         }
 
