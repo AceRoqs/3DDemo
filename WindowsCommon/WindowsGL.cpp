@@ -78,22 +78,11 @@ WindowGL_window_procedure::WindowGL_window_procedure(_In_ HINSTANCE instance, bo
 
 WindowGL_window_procedure::~WindowGL_window_procedure()
 {
-    // TODO11: This is releasing a DC and destroying a window that
-    // has already finished the message loop.  i.e. The window is
-    // already destroyed.  Handle this stuff in WM_CLOSE.
-    // Does this mean that WM_CREATE should be used for init??
-
-    // TODO: only shutdown if valid GL context
-    // release OpenGL resource context
-    //::wglMakeCurrent(nullptr, nullptr);
-    //::wglDeleteContext(state.gl_context);
-    //::ReleaseDC(hwnd, hdc);
+    // TODO: 2014: This is just a placeholder - the fullscreen OpenGL code isn't currently exercised.
     if(!m_windowed)
     {
         ::ChangeDisplaySettings(nullptr, 0);
     }
-
-    //::DestroyWindow(hwnd);
 }
 
 LRESULT WindowGL_window_procedure::window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param)
@@ -114,6 +103,19 @@ LRESULT WindowGL_window_procedure::window_proc(_In_ HWND window, UINT message, W
 
         case WM_ERASEBKGND:
         {
+            // Do not erase background, as the whole window area will be refreshed anyway.
+            break;
+        }
+
+        case WM_DESTROY:
+        {
+            m_state.make_current_context.invoke();
+            m_state.gl_context.invoke();
+            m_state.device_context.invoke();
+
+            // No need to invoke destructor of window, as that would dispatch another WM_DESTROY.
+            m_state.window.release();
+
             break;
         }
 

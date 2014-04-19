@@ -95,15 +95,11 @@ public:
 protected:
     LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param)
     {
-        LRESULT return_value = 0;
+        LRESULT return_value = WindowGL_window_procedure::window_proc(window, message, w_param, l_param);
 
         if(message == WM_DESTROY)
         {
             PostQuitMessage(0);
-        }
-        else
-        {
-            return_value = WindowGL_window_procedure::window_proc(window, message, w_param, l_param);
         }
 
         return return_value;
@@ -112,54 +108,46 @@ protected:
 
 void app_run(HINSTANCE instance, int show_command)
 {
-    App_window_procedure app(instance, true);
-    // TODO: 2014: exception, not null atom, is thrown.  A try/catch block needs to be implemented in app_run.
-    if(!app.m_state.atom)
+    try
     {
-        MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
-        return;
+        App_window_procedure app(instance, true);
+        Input_device keyboard(instance, app.m_state.window);
+
+        // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
+        initialize_gl_constants();
+
+        std::vector<CPolygon> polys;
+        std::vector<Position_vertex> vertex_formats;
+        std::vector<TexCoord> texture_coords;
+
+        start_load("polydefs.txt", &polys, &vertex_formats, &texture_coords);
+
+        initialize_gl_world_data(vertex_formats, texture_coords);
+
+        float camera_x = 0.0f;
+        float camera_y = 0.0f;
+        float camera_z = 1.0f;
+        float camera_degrees = 0.0f;
+
+        ShowWindow(app.m_state.window, show_command);
+        UpdateWindow(app.m_state.window);
+
+        // Lambda requires copy constructor, which Scoped_device_context does not provide.
+        const HDC device_context = app.m_state.device_context;
+        auto execute_frame = [&, device_context]()
+        {
+            keyboard.get_input(&camera_x, &camera_y, &camera_z, &camera_degrees);
+            draw_list([=](){ SwapBuffers(device_context); }, polys, camera_x, camera_y, camera_z, camera_degrees);
+        };
+
+        //int return_code = game_message_loop(execute_frame);
+        //(return_code);
     }
-
-    Input_device keyboard(instance, app.m_state.window);
-
-    // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
-    initialize_gl_constants();
-
-    std::vector<CPolygon> polys;
-    std::vector<Position_vertex> vertex_formats;
-    std::vector<TexCoord> texture_coords;
-
-    start_load("polydefs.txt", &polys, &vertex_formats, &texture_coords);
-
-    initialize_gl_world_data(vertex_formats, texture_coords);
-
-    float camera_x = 0.0f;
-    float camera_y = 0.0f;
-    float camera_z = 1.0f;
-    float camera_degrees = 0.0f;
-
-    ShowWindow(app.m_state.window, show_command);
-    UpdateWindow(app.m_state.window);
-
-    // Lambda requires copy constructor, which Scoped_device_context does not provide.
-    const HDC device_context = app.m_state.device_context;
-    auto execute_frame = [&, device_context]()
+    catch(...)
     {
-        keyboard.get_input(&camera_x, &camera_y, &camera_z, &camera_degrees);
-        draw_list([=](){ SwapBuffers(device_context); }, polys, camera_x, camera_y, camera_z, camera_degrees);
-    };
-
-    int return_code = game_message_loop(execute_frame);
-    (return_code);
-
-    // EndEngine(window, device_context);
-    //Shutdown_OpenGL(s_fWindowed);
-
-    // TODO: 2014: release contents, since they are invalid.  These should just be handled by destructor.
-    //app.m_state.make_current_context.invoke();
-    //app.m_state.gl_context.release();
-    //app.m_state.device_context.release();
-    //app.m_state.window.release();
+        // TODO: uninitialize isn't always the correct text.
+        MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
+    }
 }
 
 }
