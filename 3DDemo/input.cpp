@@ -1,6 +1,7 @@
 #include "PreCompile.h"
 #include "input.h"          // Pick up forward declarations to ensure correctness.
 #include "HRException.h"
+#include "Camera.h"
 
 //---------------------------------------------------------------------------
 Input_device::Input_device(
