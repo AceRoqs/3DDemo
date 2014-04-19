@@ -5,7 +5,7 @@
 namespace WindowsCommon
 {
 
-LRESULT CALLBACK Window_procedure::static_window_proc(__in HWND window, UINT message, WPARAM w_param, LPARAM l_param)
+LRESULT CALLBACK Window_procedure::static_window_proc(__in HWND window, UINT message, WPARAM w_param, LPARAM l_param) NOEXCEPT
 {
     // Sent by CreateWindow.
     if(message == WM_NCCREATE)

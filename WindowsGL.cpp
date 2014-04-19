@@ -18,6 +18,38 @@ static bool is_window_32bits_per_pixel(_In_ HWND window)
     return true;
 }
 
+#if _MSC_VER == 1600 || _MSC_VER == 1700
+WGL_state::WGL_state()
+{
+}
+
+WGL_state::WGL_state(WGL_state&& other) :
+    atom(std::move(other.atom)),
+    window(std::move(other.window)),
+    device_context(std::move(other.device_context)),
+    gl_context(std::move(other.gl_context)),
+    make_current_context(std::move(other.make_current_context))
+{
+}
+
+WGL_state& WGL_state::operator=(WGL_state&& other) NOEXCEPT
+{
+    // Handle A=A case.
+    if(this != &other)
+    {
+        atom = std::move(other.atom);
+        window = std::move(other.window);
+        device_context = std::move(other.device_context);
+        gl_context = std::move(other.gl_context);
+        make_current_context = std::move(other.make_current_context);
+    }
+
+    return *this;
+}
+#else
+#error This compiler may autodefine the default move constructor.
+#endif
+
 // TODO: set window width/height if full screen
 WindowGL_window_procedure::WindowGL_window_procedure(_In_ HINSTANCE instance, bool windowed) : m_windowed(windowed)
 {
@@ -85,7 +117,7 @@ WindowGL_window_procedure::~WindowGL_window_procedure()
     }
 }
 
-LRESULT WindowGL_window_procedure::window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param)
+LRESULT WindowGL_window_procedure::window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) NOEXCEPT
 {
     LRESULT return_value = 0;
 
