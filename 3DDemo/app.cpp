@@ -133,7 +133,7 @@ void app_run(HINSTANCE instance, int show_command)
         auto execute_frame = [&, device_context]()
         {
             camera = keyboard.get_input(camera);
-            draw_list([=](){ SwapBuffers(device_context); }, polys, camera.m_x, camera.m_y, camera.m_z, camera.m_degrees);
+            draw_list([=](){ SwapBuffers(device_context); }, polys, camera);
         };
 
         int return_code = game_message_loop(execute_frame);

@@ -8,6 +8,7 @@
 #include "particle.h"
 #include "world.h"
 #include "coord.h"
+#include "Camera.h"
 
 struct QPoint
 {
@@ -68,10 +69,7 @@ void initialize_gl_world_data(
 void draw_list(
     std::function<void(void)> swap_buffers,
     const std::vector<CPolygon>& poly_vector,
-    float camera_x,
-    float camera_y,
-    float camera_z,
-    float camera_degrees)
+    const Camera& camera)
 {
     glClearDepth(1.0);
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -80,8 +78,8 @@ void draw_list(
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glRotatef(camera_degrees, 0, 1, 0);
-    glTranslatef(camera_x, camera_y, camera_z);
+    glRotatef(camera.m_degrees, 0, 1, 0);
+    glTranslatef(camera.m_x, camera.m_y, camera.m_z);
     // first pass texturing
     glColor4f(1.0, 1.0, 1.0, 1.0);
 
@@ -148,14 +146,14 @@ void draw_list(
 */
     }
 
-    BezCurve(camera_x, camera_y, camera_z);
+    BezCurve(camera.m_x, camera.m_y, camera.m_z);
 
 //    glUnlockArraysEXT();
 //  glDisable(GL_CULL_FACE);
     emitter.setPosition(-3, 0, -10.5);
 //    emitter.setPosition(0, 0, 0);
     emitter.Update();
-    emitter.Draw(camera_x, camera_y, camera_z, camera_degrees, 6);
+    emitter.Draw(camera.m_x, camera.m_y, camera.m_z, camera.m_degrees, 6);
 
     swap_buffers();
 #if 1
