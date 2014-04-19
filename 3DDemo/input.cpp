@@ -2,6 +2,7 @@
 #include "input.h"          // Pick up forward declarations to ensure correctness.
 #include "HRException.h"
 #include "Camera.h"
+#include "Tracing.h"
 
 //---------------------------------------------------------------------------
 Input_device::Input_device(
@@ -88,10 +89,7 @@ Camera Input_device::get_input(const Camera& camera)
         char keybuffer[256];
         //for(int i = 0; i < tick_count - msec; i+= 16) 
         {
-            char sz[100];
-            sprintf_s(sz, 100, "tick_count - msec: %d\r\n", tick_count - msec);
-            OutputDebugStringA(sz);
-            //int d = (tick_count - msec) / 16;
+            WindowsCommon::dprintf("tick_count - msec: %d\r\n", tick_count - msec);
 
             if(m_device->GetDeviceState(256, (LPVOID)&keybuffer) != DI_OK)
             {
