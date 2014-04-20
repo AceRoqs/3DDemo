@@ -60,6 +60,34 @@ static bool TestPolys(
     return true;
 }
 
+enum Action
+{
+    Move_forward,
+    Move_backward,
+    Strafe_right,
+    Strafe_left,
+    Turn_right,
+    Turn_left
+};
+
+const static struct Action_map
+{
+    int input;
+    Action action;
+} action_map[] =
+{
+    DIK_NUMPAD2, Move_backward,
+    DIK_DOWN, Move_backward,
+    DIK_NUMPAD8, Move_forward,
+    DIK_UP, Move_forward,
+    DIK_D, Strafe_right,
+    DIK_A, Strafe_left,
+    DIK_NUMPAD4, Turn_left,
+    DIK_LEFT, Turn_left,
+    DIK_NUMPAD6, Turn_right,
+    DIK_RIGHT, Turn_right,
+};
+
 //---------------------------------------------------------------------------
 // TODO: modularize and move out of main
 Camera Input_device::get_input(const Camera& camera)
@@ -98,76 +126,106 @@ Camera Input_device::get_input(const Camera& camera)
                 m_device->GetDeviceState(256, (LPVOID)&keybuffer);
             }
 
+            // TODO: 2014: should this be an input map rather than an action map?
+            std::list<Action> actions;
+            for(int ix = 0; ix < ARRAYSIZE(action_map); ++ix)
+            {
+                if(keybuffer[action_map[ix].input])
+                {
+                    actions.push_back(action_map[ix].action);
+                }
+            }
+
+            actions.sort();
+            actions.unique();
+
             const auto walk_distance_per_tick = 0.045f;
             const auto walk_distance = walk_distance_per_tick * ticks;
             const auto BLAH = 0.0174f;
             const auto sine = sinf(camera.m_degrees * (BLAH)) * walk_distance;
             const auto cosine = cosf(camera.m_degrees * (BLAH)) * walk_distance;
-            if(keybuffer[DIK_NUMPAD2] | keybuffer[DIK_DOWN])
-            {
-                new_x += sine;
-                float temp = camera.m_x;
-                if(TestPolys(new_x, new_y, new_z))
-                {
-                    new_camera.m_x = new_x;
-                }
-                new_z -= cosine;
-                if(TestPolys(temp, new_y, new_z))
-                {
-                    new_camera.m_z = new_z;
-                }
-            }
-            if(keybuffer[DIK_NUMPAD8] | keybuffer[DIK_UP])
-            {
-                new_x -= sine;
-                float temp = camera.m_x;
-                if(TestPolys(new_x, new_y, new_z))
-                {
-                    new_camera.m_x = new_x;
-                }
-                new_z += cosine;
-                if(TestPolys(temp, new_y, new_z))
-                {
-                    new_camera.m_z = new_z;
-                }
-            }
-            if(keybuffer[DIK_D])
-            {
-                new_x -= cosine;
-                float temp = camera.m_x;
-                if(TestPolys(new_x, new_y, new_z))
-                {
-                    new_camera.m_x = new_x;
-                }
-                new_z -= sine;
-                if(TestPolys(temp, new_y, new_z))
-                {
-                    new_camera.m_z = new_z;
-                }
-            }
-            if(keybuffer[DIK_A])
-            {
-                new_x += cosine;
-                float temp = camera.m_x;
-                if(TestPolys(new_x, new_y, new_z))
-                {
-                    new_camera.m_x = new_x;
-                }
-                new_z += sine;
-                if(TestPolys(temp, new_y, new_z))
-                {
-                    new_camera.m_z = new_z;
-                }
-            }
             const auto keyboard_rotational_speed_per_tick = 0.5f;
             const auto rotation_degrees = keyboard_rotational_speed_per_tick * ticks;
-            if(keybuffer[DIK_NUMPAD4] | keybuffer[DIK_LEFT])
+
+            for(auto action = actions.cbegin(); action != actions.cend(); ++action)
             {
-                new_camera.m_degrees = fmod(new_camera.m_degrees - rotation_degrees + 360.f, 360.f);
-            }
-            if(keybuffer[DIK_NUMPAD6] | keybuffer[DIK_RIGHT])
-            {
-                new_camera.m_degrees = fmod(new_camera.m_degrees + rotation_degrees, 360.f);
+                switch(*action)
+                {
+                    case Move_forward:
+                    {
+                        new_x -= sine;
+                        float temp = camera.m_x;
+                        if(TestPolys(new_x, new_y, new_z))
+                        {
+                            new_camera.m_x = new_x;
+                        }
+                        new_z += cosine;
+                        if(TestPolys(temp, new_y, new_z))
+                        {
+                            new_camera.m_z = new_z;
+                        }
+                        break;
+                    }
+
+                    case Move_backward:
+                    {
+                        new_x += sine;
+                        float temp = camera.m_x;
+                        if(TestPolys(new_x, new_y, new_z))
+                        {
+                            new_camera.m_x = new_x;
+                        }
+                        new_z -= cosine;
+                        if(TestPolys(temp, new_y, new_z))
+                        {
+                            new_camera.m_z = new_z;
+                        }
+                        break;
+                    }
+                    case Strafe_right:
+                    {
+                        new_x -= cosine;
+                        float temp = camera.m_x;
+                        if(TestPolys(new_x, new_y, new_z))
+                        {
+                            new_camera.m_x = new_x;
+                        }
+                        new_z -= sine;
+                        if(TestPolys(temp, new_y, new_z))
+                        {
+                            new_camera.m_z = new_z;
+                        }
+                        break;
+                    }
+
+                    case Strafe_left:
+                    {
+                        new_x += cosine;
+                        float temp = camera.m_x;
+                        if(TestPolys(new_x, new_y, new_z))
+                        {
+                            new_camera.m_x = new_x;
+                        }
+                        new_z += sine;
+                        if(TestPolys(temp, new_y, new_z))
+                        {
+                            new_camera.m_z = new_z;
+                        }
+                        break;
+                    }
+
+                    case Turn_right:
+                    {
+                        new_camera.m_degrees = fmod(new_camera.m_degrees + rotation_degrees, 360.f);
+                        break;
+                    }
+
+                    case Turn_left:
+                    {
+                        new_camera.m_degrees = fmod(new_camera.m_degrees - rotation_degrees + 360.f, 360.f);
+                        break;
+                    }
+                }
             }
         }
 

@@ -20,6 +20,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <list>
 
 // Windows API.
 #ifdef WIN32
