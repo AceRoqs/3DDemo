@@ -33,10 +33,7 @@ Input_device::~Input_device()
 //---------------------------------------------------------------------------
 // returns false if the line between the new points and
 // the current camera view points crosses a solid polygon.
-static bool TestPolys(
-    float x,
-    float y,
-    float z)
+static bool TestPolys(float x, float y, float z)
 {
     (y);    // unreferenced parameter
 
@@ -93,37 +90,26 @@ const static struct Action_map
 Camera Input_device::get_input(const Camera& camera)
 {
     static long msec = 0;
-    long tick_count;
-
-    float new_x, new_y, new_z;
-
-    new_x = camera.m_x;
-    new_y = camera.m_y;
-    new_z = camera.m_z;
 
     Camera new_camera = camera;
 
     // TODO: get number of times from system queue
     // TODO: this is a bunch of crap
-    tick_count = ::GetTickCount();
-    if(msec == 0)
-    {
-        msec = tick_count;
-    }
-    else //if((tick_count - msec) > 16)
+    const auto tick_count = GetTickCount();
+    if(msec > 0)
     {
         const auto ticks = tick_count - msec;
 
         char keybuffer[256];
         //for(int i = 0; i < tick_count - msec; i+= 16) 
         {
-            WindowsCommon::dprintf("tick_count - msec: %d\r\n", tick_count - msec);
+            WindowsCommon::dprintf("tick_count - msec: %d\r\n", ticks);
 
-            if(m_device->GetDeviceState(256, (LPVOID)&keybuffer) != DI_OK)
+            if(m_device->GetDeviceState(256, static_cast<PVOID>(&keybuffer)) != DI_OK)
             {
                 // TODO11: bail out if acquire fails.
                 m_device->Acquire();
-                m_device->GetDeviceState(256, (LPVOID)&keybuffer);
+                m_device->GetDeviceState(256, static_cast<PVOID>(&keybuffer));
             }
 
             // TODO: 2014: should this be an input map rather than an action map?
@@ -141,12 +127,17 @@ Camera Input_device::get_input(const Camera& camera)
 
             const auto walk_distance_per_tick = 0.045f;
             const auto walk_distance = walk_distance_per_tick * ticks;
-            const auto BLAH = 0.0174f;
-            const auto sine = sinf(camera.m_degrees * (BLAH)) * walk_distance;
-            const auto cosine = cosf(camera.m_degrees * (BLAH)) * walk_distance;
+            const auto radians_per_degree = 0.0174f;
+            const auto sine = sinf(new_camera.m_degrees * radians_per_degree) * walk_distance;
+            const auto cosine = cosf(new_camera.m_degrees * radians_per_degree) * walk_distance;
             const auto keyboard_rotational_speed_per_tick = 0.5f;
             const auto rotation_degrees = keyboard_rotational_speed_per_tick * ticks;
 
+            // Accumulate all movement inputs before application.  This will prevent
+            // two contractory button presses (e.g. strafe and forward) from bouncing
+            // between each other in, say, a corner.
+            float new_x = new_camera.m_x;
+            float new_z = new_camera.m_z;
             for(auto action = actions.cbegin(); action != actions.cend(); ++action)
             {
                 switch(*action)
@@ -154,63 +145,28 @@ Camera Input_device::get_input(const Camera& camera)
                     case Move_forward:
                     {
                         new_x -= sine;
-                        float temp = camera.m_x;
-                        if(TestPolys(new_x, new_y, new_z))
-                        {
-                            new_camera.m_x = new_x;
-                        }
                         new_z += cosine;
-                        if(TestPolys(temp, new_y, new_z))
-                        {
-                            new_camera.m_z = new_z;
-                        }
                         break;
                     }
 
                     case Move_backward:
                     {
                         new_x += sine;
-                        float temp = camera.m_x;
-                        if(TestPolys(new_x, new_y, new_z))
-                        {
-                            new_camera.m_x = new_x;
-                        }
                         new_z -= cosine;
-                        if(TestPolys(temp, new_y, new_z))
-                        {
-                            new_camera.m_z = new_z;
-                        }
                         break;
                     }
+
                     case Strafe_right:
                     {
                         new_x -= cosine;
-                        float temp = camera.m_x;
-                        if(TestPolys(new_x, new_y, new_z))
-                        {
-                            new_camera.m_x = new_x;
-                        }
                         new_z -= sine;
-                        if(TestPolys(temp, new_y, new_z))
-                        {
-                            new_camera.m_z = new_z;
-                        }
                         break;
                     }
 
                     case Strafe_left:
                     {
                         new_x += cosine;
-                        float temp = camera.m_x;
-                        if(TestPolys(new_x, new_y, new_z))
-                        {
-                            new_camera.m_x = new_x;
-                        }
                         new_z += sine;
-                        if(TestPolys(temp, new_y, new_z))
-                        {
-                            new_camera.m_z = new_z;
-                        }
                         break;
                     }
 
@@ -227,11 +183,23 @@ Camera Input_device::get_input(const Camera& camera)
                     }
                 }
             }
-        }
 
-        // TODO: send data to system queue instead of moving camera
-        msec = tick_count;
+            // Testing each coordinate on its own only is correct because each boundary is axis aligned.
+            float updated_x = new_camera.m_x;
+            if(TestPolys(new_x, new_camera.m_y, new_camera.m_z))
+            {
+                updated_x = new_x;
+            }
+            if(TestPolys(new_camera.m_x, new_camera.m_y, new_z))
+            {
+                new_camera.m_z = new_z;
+            }
+            new_camera.m_x = updated_x;
+        }
     }
+
+    // TODO: send data to system queue instead of moving camera
+    msec = tick_count;
 
     return new_camera;
 }
