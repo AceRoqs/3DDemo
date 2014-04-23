@@ -8,7 +8,6 @@
 #include "coord.h"
 #include "gltex.h"
 
-//---------------------------------------------------------------------------
 // TODO: 2014: This should not be extern.
 const float g_WorldVector[] =
 {
@@ -78,6 +77,31 @@ static const float WorldTexture[] =
     2.5, 0.0,
     2.5, 1.0,
 };
+
+// Returns true if the point is inside the bounds of all polygons in the world.
+bool is_point_in_world(float x, float y, float z)
+{
+    (y);    // unreferenced parameter
+
+//    return true;
+    // TODO: finishme
+    if(x < -9.0 || x > 9.0)
+    {
+        return false;
+    }
+    if(z < 1.0 || z > 19.0)
+    {
+        return false;
+    }
+    if(z < 11.0)
+    {
+        if(x < -1.25 || x > 1.25)
+        {
+            return false;
+        }
+    }
+    return true;
+}
 
 //---------------------------------------------------------------------------
 static void load_world_data(

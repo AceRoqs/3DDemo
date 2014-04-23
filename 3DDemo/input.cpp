@@ -3,6 +3,7 @@
 #include "HRException.h"
 #include "Camera.h"
 #include "Tracing.h"
+#include "world.h"      // Temp: input.cpp should not do action mapping.
 
 //---------------------------------------------------------------------------
 Input_device::Input_device(
@@ -28,33 +29,6 @@ Input_device::Input_device(
 Input_device::~Input_device()
 {
     m_device->Unacquire();
-}
-
-//---------------------------------------------------------------------------
-// returns false if the line between the new points and
-// the current camera view points crosses a solid polygon.
-static bool TestPolys(float x, float y, float z)
-{
-    (y);    // unreferenced parameter
-
-//    return true;
-    // TODO: finishme
-    if(x < -9.0 || x > 9.0)
-    {
-        return false;
-    }
-    if(z < 1.0 || z > 19.0)
-    {
-        return false;
-    }
-    if(z < 11.0)
-    {
-        if(x < -1.25 || x > 1.25)
-        {
-            return false;
-        }
-    }
-    return true;
 }
 
 enum Action
@@ -156,11 +130,11 @@ static Camera apply_actions(const std::list<Action>& actions, const Camera& came
 
     // Testing each coordinate on its own only is correct because each boundary is axis aligned.
     float updated_x = new_camera.m_x;
-    if(TestPolys(new_x, new_camera.m_y, new_camera.m_z))
+    if(is_point_in_world(new_x, new_camera.m_y, new_camera.m_z))
     {
         updated_x = new_x;
     }
-    if(TestPolys(new_camera.m_x, new_camera.m_y, new_z))
+    if(is_point_in_world(new_camera.m_x, new_camera.m_y, new_z))
     {
         new_camera.m_z = new_z;
     }
