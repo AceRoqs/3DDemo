@@ -144,6 +144,7 @@
     <ResourceCompile Include="3DDemo.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Action.h" />
     <ClInclude Include="app.h" />
     <ClInclude Include="block.h" />
     <ClInclude Include="Camera.h" />

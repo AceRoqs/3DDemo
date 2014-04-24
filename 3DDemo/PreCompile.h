@@ -13,6 +13,7 @@
 
 // C++ Standard Library.
 #define _USE_MATH_DEFINES
+#include <array>
 #include <cstdint>
 #include <cmath>
 #include <memory>

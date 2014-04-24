@@ -4,6 +4,9 @@
 #include "Camera.h"
 #include "Tracing.h"
 #include "world.h"      // Temp: input.cpp should not do action mapping.
+#include "Action.h"
+
+#define KEYBOARD_BUFFER_SIZE 256
 
 //---------------------------------------------------------------------------
 Input_device::Input_device(
@@ -15,8 +18,9 @@ Input_device::Input_device(
 
     ATL::CComPtr<IDirectInput8> direct_input;
     throw_hr(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, reinterpret_cast<PVOID*>(&direct_input), nullptr));
-
     throw_hr(direct_input->CreateDevice(GUID_SysKeyboard, &m_device, nullptr));
+
+    assert(c_dfDIKeyboard.dwDataSize == KEYBOARD_BUFFER_SIZE);
     throw_hr(m_device->SetDataFormat(&c_dfDIKeyboard));
     throw_hr(m_device->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
 
@@ -31,16 +35,7 @@ Input_device::~Input_device()
     m_device->Unacquire();
 }
 
-enum Action
-{
-    Move_forward,
-    Move_backward,
-    Strafe_right,
-    Strafe_left,
-    Turn_right,
-    Turn_left
-};
-
+// TODO: 2014: Come up with a new name since "action map" is also a DirectInput concept.
 const static struct Action_map
 {
     int input;
@@ -143,6 +138,26 @@ static Camera apply_actions(const std::list<Action>& actions, const Camera& came
     return new_camera;
 }
 
+typedef std::array<uint8_t, KEYBOARD_BUFFER_SIZE> Keyboard_state;
+static std::list<Action> actions_from_keyboard_state(const Keyboard_state& keyboard_state)
+{
+    // TODO: 2014: should this be an input map of all inputs (mouse, keyboard, network, time)
+    // rather than an action map?
+    std::list<Action> actions;
+    for(int ix = 0; ix < ARRAYSIZE(action_map); ++ix)
+    {
+        if(keyboard_state[action_map[ix].input])
+        {
+            actions.push_back(action_map[ix].action);
+        }
+    }
+
+    actions.sort();
+    actions.unique();
+
+    return actions;
+}
+
 Camera Input_device::get_input(const Camera& camera)
 {
     static long msec = 0;
@@ -152,41 +167,29 @@ Camera Input_device::get_input(const Camera& camera)
     // TODO: get number of times from system queue
     // TODO: this is a bunch of crap
     const auto tick_count = GetTickCount();
-    if(msec > 0)
-    {
-        const auto ticks = tick_count - msec;
+    const bool first_tick = (msec == 0);
+    const auto ticks = tick_count - msec;
+    // TODO: send data to system queue instead of moving camera
+    msec = tick_count;
 
-        char keybuffer[256];
-        //for(int i = 0; i < tick_count - msec; i+= 16) 
+    if(!first_tick)
+    {
+        //for(int i = 0; i < ticks; i+= 16) 
         {
             WindowsCommon::dprintf("tick_count - msec: %d\r\n", ticks);
 
-            if(m_device->GetDeviceState(256, static_cast<PVOID>(&keybuffer)) != DI_OK)
-            {
-                // TODO11: bail out if acquire fails.
-                m_device->Acquire();
-                m_device->GetDeviceState(256, static_cast<PVOID>(&keybuffer));
-            }
-
-            // TODO: 2014: should this be an input map rather than an action map?
             std::list<Action> actions;
-            for(int ix = 0; ix < ARRAYSIZE(action_map); ++ix)
+            if(SUCCEEDED(m_device->Acquire()))
             {
-                if(keybuffer[action_map[ix].input])
-                {
-                    actions.push_back(action_map[ix].action);
-                }
-            }
+                Keyboard_state keyboard_state;
+                WindowsCommon::throw_hr(m_device->GetDeviceState(keyboard_state.size(), &keyboard_state));
 
-            actions.sort();
-            actions.unique();
+                actions = actions_from_keyboard_state(keyboard_state);
+            }
 
             new_camera = apply_actions(actions, new_camera, ticks);
         }
     }
-
-    // TODO: send data to system queue instead of moving camera
-    msec = tick_count;
 
     return new_camera;
 }
