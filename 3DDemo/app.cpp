@@ -8,6 +8,8 @@
 #include "render.h"
 #include "HRException.h"
 #include "Camera.h"
+#include "Tracing.h"
+#include "Action.h"
 
 static bool s_fWindowed = true;
 
@@ -128,11 +130,38 @@ void app_run(HINSTANCE instance, int show_command)
         ShowWindow(app.m_state.window, show_command);
         UpdateWindow(app.m_state.window);
 
+        long msec = 0;
+
         // Lambda requires copy constructor, which Scoped_device_context does not provide.
         const HDC device_context = app.m_state.device_context;
         auto execute_frame = [&, device_context]()
         {
-            camera = keyboard.get_input(camera);
+            Camera new_camera = camera;
+
+            // TODO: get number of times from system queue
+            // TODO: this is a bunch of crap
+            const auto tick_count = GetTickCount();
+            const bool first_tick = (msec == 0);
+            const auto ticks = tick_count - msec;
+            // TODO: send data to system queue instead of moving camera
+            msec = tick_count;
+
+            if(!first_tick)
+            {
+                //for(int i = 0; i < ticks; i+= 16) 
+                {
+                    WindowsCommon::dprintf("tick_count - msec: %d\r\n", ticks);
+
+                    Keyboard_state keyboard_state;
+                    keyboard.get_input(&keyboard_state);
+
+                    std::list<Action> actions = actions_from_keyboard_state(keyboard_state);
+                    new_camera = apply_actions(actions, new_camera, ticks);
+                }
+            }
+
+            camera = new_camera;
+
             draw_list([=](){ SwapBuffers(device_context); }, polys, camera);
         };
 
