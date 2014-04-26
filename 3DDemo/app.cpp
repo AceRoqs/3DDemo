@@ -10,6 +10,7 @@
 #include "Camera.h"
 #include "Tracing.h"
 #include "Action.h"
+#include "DirectInputMap.h"
 
 static bool s_fWindowed = true;
 

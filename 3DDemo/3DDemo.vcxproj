@@ -127,6 +127,7 @@
   <ItemGroup>
     <ClCompile Include="Action.cpp" />
     <ClCompile Include="app.cpp" />
+    <ClCompile Include="DirectInputMap.cpp" />
     <ClCompile Include="PreCompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -150,6 +151,7 @@
     <ClInclude Include="block.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="coord.h" />
+    <ClInclude Include="DirectInputMap.h" />
     <ClInclude Include="gltex.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="particle.h" />
