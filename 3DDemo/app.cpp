@@ -90,7 +90,8 @@ namespace WindowsCommon
 class App_window_procedure : public WindowsCommon::WindowGL_window_procedure
 {
 public:
-    App_window_procedure(_In_ HINSTANCE instance, bool windowed) : WindowGL_window_procedure(instance, windowed)
+    App_window_procedure(_In_ HINSTANCE instance, bool windowed) :
+        WindowGL_window_procedure(TEXT("3D Demo 1999 (Updated for C++11)"), instance, windowed)
     {
     }
 

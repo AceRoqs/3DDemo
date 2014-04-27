@@ -32,7 +32,7 @@ struct WGL_state
 class WindowGL_window_procedure : public Window_procedure
 {
 public:
-    WindowGL_window_procedure(_In_ HINSTANCE instance, bool windowed);
+    WindowGL_window_procedure(_In_ PCTSTR window_title, _In_ HINSTANCE instance, bool windowed);
     ~WindowGL_window_procedure();
 
     WindowsCommon::WGL_state m_state;

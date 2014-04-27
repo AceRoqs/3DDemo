@@ -51,20 +51,18 @@ WGL_state& WGL_state::operator=(WGL_state&& other) NOEXCEPT
 #endif
 
 // TODO: set window width/height if full screen
-WindowGL_window_procedure::WindowGL_window_procedure(_In_ HINSTANCE instance, bool windowed) : m_windowed(windowed)
+WindowGL_window_procedure::WindowGL_window_procedure(_In_ PCTSTR window_title, _In_ HINSTANCE instance, bool windowed) : m_windowed(windowed)
 {
     const int window_width = 800;
     const int window_height = 600;
 
-    PCTSTR app_title = TEXT("3D Demo 1999 (Updated for C++11)");
-
-    const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(instance, WindowsCommon::Window_procedure::static_window_proc, app_title);
+    const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(instance, WindowsCommon::Window_procedure::static_window_proc, window_title);
 
     m_state.atom = WindowsCommon::register_window_class(window_class);
 
     if(windowed)
     {
-        m_state.window = WindowsCommon::create_normal_window(app_title, app_title, window_width, window_height, instance, this);
+        m_state.window = WindowsCommon::create_normal_window(window_title, window_title, window_width, window_height, instance, this);
     }
     else
     {
@@ -81,8 +79,8 @@ WindowGL_window_procedure::WindowGL_window_procedure(_In_ HINSTANCE instance, bo
         ChangeDisplaySettings(&DevMode, CDS_FULLSCREEN);
 
         m_state.window = WindowsCommon::create_window(
-            app_title,
-            app_title,
+            window_title,
+            window_title,
             WS_POPUP | WS_CLIPSIBLINGS,
             0,
             0,
