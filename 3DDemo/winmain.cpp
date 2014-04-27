@@ -30,7 +30,7 @@ int WINAPI _tWinMain(__in HINSTANCE instance,   // Handle to the program instanc
         // do not localize the error string, as that can fail.  Also, do
         // not use types like ostringstream which dynamically allocate memory.
         TCHAR message[128];
-        ex.get_error_string(message, _countof(message));
+        ex.get_error_string(message, ARRAYSIZE(message));
         MessageBox(nullptr, message, TEXT("Error"), MB_OK | MB_ICONERROR);
 
         // Set the ERRORLEVEL to 1, indicating an error.

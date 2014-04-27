@@ -22,10 +22,10 @@ void HRESULT_exception::get_error_string(_Out_z_cap_(size) PTSTR error_string, s
                           m_hr,
                           0,
                           message,
-                          _countof(message),
+                          ARRAYSIZE(message),
                           nullptr))
     {
-        StringCchCopy(message, _countof(message), TEXT("Unknown"));
+        StringCchCopy(message, ARRAYSIZE(message), TEXT("Unknown"));
     }
 
     StringCchPrintf(error_string, size, TEXT("Error: %08x: %s"), m_hr, message);
