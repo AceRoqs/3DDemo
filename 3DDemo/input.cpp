@@ -2,6 +2,9 @@
 #include "input.h"          // Pick up forward declarations to ensure correctness.
 #include "HRException.h"
 
+namespace WindowsCommon
+{
+
 Input_device::Input_device(_In_ HINSTANCE hInstance, _In_ HWND hwnd)
 {
     // Create DirectInput keyboard device.
@@ -31,5 +34,7 @@ void Input_device::get_input(_In_ Keyboard_state* keyboard_state)
     {
         WindowsCommon::throw_hr(m_device->GetDeviceState(keyboard_state->size(), keyboard_state));
     }
+}
+
 }
 

@@ -111,7 +111,7 @@ void app_run(HINSTANCE instance, int show_command)
     try
     {
         App_window_procedure app(instance, true);
-        Input_device keyboard(instance, app.m_state.window);
+        WindowsCommon::Input_device keyboard(instance, app.m_state.window);
 
         // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
         initialize_gl_constants();
