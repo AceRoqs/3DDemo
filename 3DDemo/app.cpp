@@ -84,9 +84,6 @@ static int game_message_loop(std::function<void(void)> execute_frame)
     return message.wParam;
 }
 
-namespace WindowsCommon
-{
-
 class App_window_procedure : public WindowsCommon::WindowGL_window_procedure
 {
 public:
@@ -177,7 +174,5 @@ void app_run(HINSTANCE instance, int show_command)
         // TODO: uninitialize isn't always the correct text.
         MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
     }
-}
-
 }
 
