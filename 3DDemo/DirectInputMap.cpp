@@ -23,7 +23,7 @@ const static struct Action_map
     DIK_RIGHT,   Turn_right,
 };
 
-std::list<Action> actions_from_keyboard_state(const Keyboard_state& keyboard_state)
+std::list<Action> actions_from_keyboard_state(const WindowsCommon::Keyboard_state& keyboard_state)
 {
     // TODO: 2014: should this be an input map of all inputs (mouse, keyboard, network, time)
     // rather than an action map?

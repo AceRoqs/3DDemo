@@ -1,15 +1,12 @@
-#ifndef INPUT_H
-#define INPUT_H
-
-// TODO: Is this the best place for this?
-#define KEYBOARD_BUFFER_SIZE 256
-typedef std::array<uint8_t, KEYBOARD_BUFFER_SIZE> Keyboard_state;
+#ifndef INPUTDEVICE_H
+#define INPUTDEVICE_H
 
 namespace WindowsCommon
 {
 
-// TODO: Not sure how to make this OS independent yet.  Moving input functions to a class
-// since there is state to maintain, and statics suck - 3/7/2014.
+#define KEYBOARD_BUFFER_SIZE 256
+typedef std::array<uint8_t, KEYBOARD_BUFFER_SIZE> Keyboard_state;
+
 class Input_device
 {
 public:

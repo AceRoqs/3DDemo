@@ -151,7 +151,7 @@ void app_run(HINSTANCE instance, int show_command)
                 {
                     WindowsCommon::dprintf("tick_count - msec: %d\r\n", ticks);
 
-                    Keyboard_state keyboard_state;
+                    WindowsCommon::Keyboard_state keyboard_state;
                     keyboard.get_input(&keyboard_state);
 
                     std::list<Action> actions = actions_from_keyboard_state(keyboard_state);
