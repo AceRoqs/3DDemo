@@ -1,5 +1,5 @@
 #include "PreCompile.h"
-#include "input.h"          // Pick up forward declarations to ensure correctness.
+#include "InputDevice.h"    // Pick up forward declarations to ensure correctness.
 #include "HRException.h"
 
 namespace WindowsCommon

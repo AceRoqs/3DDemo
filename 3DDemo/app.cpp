@@ -1,7 +1,7 @@
 #include "PreCompile.h"
 #include "app.h"
 #include "polygon.h"
-#include "input.h"
+#include "InputDevice.h"
 #include "coord.h"
 #include "WindowsGL.h"
 #include "world.h"
