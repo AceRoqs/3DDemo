@@ -51,9 +51,6 @@
     <ClCompile Include="DirectInputMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InputDevice.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -99,9 +96,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DirectInputMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="InputDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

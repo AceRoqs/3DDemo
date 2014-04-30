@@ -136,7 +136,6 @@
     <ClCompile Include="particle.cpp" />
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="render.cpp" />
-    <ClCompile Include="InputDevice.cpp" />
     <ClCompile Include="pcx.cpp" />
     <ClCompile Include="targaw32.cpp" />
     <ClCompile Include="gltex.cpp" />
@@ -153,7 +152,6 @@
     <ClInclude Include="coord.h" />
     <ClInclude Include="DirectInputMap.h" />
     <ClInclude Include="gltex.h" />
-    <ClInclude Include="InputDevice.h" />
     <ClInclude Include="particle.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="pcx.h" />
