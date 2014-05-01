@@ -14,6 +14,26 @@
 
 static bool s_fWindowed = true;
 
+static bool dispatch_all_windows_messages(_Out_ MSG* message)
+{
+    // Clear out all the messages before drawing a new frame.
+    BOOL message_exists = PeekMessage(message, nullptr, 0, 0, PM_REMOVE);
+    while(message_exists)
+    {
+        if(WM_QUIT == message->message)
+        {
+            break;
+        }
+
+        ::TranslateMessage(message);
+        DispatchMessage(message);
+
+        message_exists = PeekMessage(message, nullptr, 0, 0, PM_REMOVE);
+    }
+
+    return !message_exists || (WM_QUIT != message->message);
+}
+
 static int game_message_loop(std::function<void(void)> execute_frame)
 {
     MSG message;
@@ -23,22 +43,7 @@ static int game_message_loop(std::function<void(void)> execute_frame)
         DWORD dwTicks = ::GetTickCount();
 #endif
 
-        // Clear out all the messages before drawing a new frame.
-        BOOL message_exists = PeekMessage(&message, nullptr, 0, 0, PM_REMOVE);
-        while(message_exists)
-        {
-            if(WM_QUIT == message.message)
-            {
-                break;
-            }
-
-            ::TranslateMessage(&message);
-            DispatchMessage(&message);
-
-            message_exists = PeekMessage(&message, nullptr, 0, 0, PM_REMOVE);
-        }
-
-        if(message_exists && (WM_QUIT == message.message))
+        if(!dispatch_all_windows_messages(&message))
         {
             // Renderer and window handle were destroyed in WM_DESTROY.
 //            assert(nullptr == m_renderer);
