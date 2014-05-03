@@ -4,7 +4,7 @@
 namespace WindowsCommon
 {
 
-void dprintf(_In_ PCSTR format, ...)
+void dprintf(_In_ PCSTR format, ...) NOEXCEPT
 {
 #ifndef NDEBUG
     va_list args;

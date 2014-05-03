@@ -29,7 +29,7 @@ Scoped_atom make_scoped_window_class(_In_ ATOM atom, _In_ HINSTANCE instance)
     return std::move(Scoped_atom(atom, unregister_class_functor(instance)));
 }
 
-static void destroy_window(_In_ HWND window)
+static void destroy_window(_In_ HWND window) NOEXCEPT
 {
     if(!DestroyWindow(window))
     {
@@ -52,7 +52,7 @@ static void release_device_context(_In_ HDC device_context, _In_ HWND window) NO
     }
 }
 
-static std::function<void (HDC)> release_device_context_functor(_In_ HWND window)
+static std::function<void (HDC)> release_device_context_functor(_In_ HWND window) NOEXCEPT
 {
     return [=](HDC device_context)
     {
@@ -80,7 +80,7 @@ Scoped_gl_context make_scoped_gl_context(_In_ HGLRC gl_context)
     return std::move(Scoped_gl_context(gl_context, std::function<void (HGLRC)>(delete_gl_context)));
 }
 
-static void clear_gl_context(_In_opt_ HGLRC gl_context)
+static void clear_gl_context(_In_opt_ HGLRC gl_context) NOEXCEPT
 {
     UNREFERENCED_PARAMETER(gl_context);
 
