@@ -28,11 +28,16 @@ Input_device::~Input_device()
     m_device->Unacquire();
 }
 
-void Input_device::get_input(_In_ Keyboard_state* keyboard_state)
+void Input_device::get_input(_In_ Keyboard_state* keyboard_state) const
 {
     if(SUCCEEDED(m_device->Acquire()))
     {
         WindowsCommon::throw_hr(m_device->GetDeviceState(keyboard_state->size(), keyboard_state));
+    }
+    else
+    {
+        // Assume no state change if device cannot be acquired.
+        keyboard_state->fill(0);
     }
 }
 

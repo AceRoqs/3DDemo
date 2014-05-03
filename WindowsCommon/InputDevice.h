@@ -12,7 +12,7 @@ class Input_device
 public:
     Input_device(_In_ HINSTANCE hInstance, _In_ HWND hwnd);
     ~Input_device();
-    void get_input(_In_ Keyboard_state* keyboard_state);
+    void get_input(_In_ Keyboard_state* keyboard_state) const;
 
 private:
     ATL::CComPtr<IDirectInputDevice8> m_device;
