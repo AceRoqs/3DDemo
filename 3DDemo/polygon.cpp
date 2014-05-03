@@ -20,19 +20,19 @@ std::istream& operator>>(std::istream& is, Graphics::Polygon& polygon)
 
     unsigned int num_points;
     is >> num_points;
-    if(num_points)
+    if(num_points > 0)
     {
         polygon.points.reserve(num_points);
         polygon.texture_coordinates.reserve(num_points);
 
-        for(unsigned int i = 0; i < num_points; ++i)
+        for(unsigned int ix = 0; ix < num_points; ++ix)
         {
             int point;
             is >> point;
             polygon.points.push_back(point);
         }
 
-        for(unsigned int i = 0; i < num_points; ++i)
+        for(unsigned int ix = 0; ix < num_points; ++ix)
         {
             int texture_coordinate;
             is >> texture_coordinate;
