@@ -14,7 +14,7 @@
 
 static bool s_fWindowed = true;
 
-static int game_message_loop(const WindowsCommon::Input_device& keyboard, const std::vector<CPolygon>& polys)
+static UINT_PTR game_message_loop(const WindowsCommon::Input_device& keyboard, const std::vector<CPolygon>& polys)
 {
     Camera camera(0.0f, 0.0f, 1.0f, 0.0f);
     long msec = 0;
@@ -108,26 +108,36 @@ void app_run(HINSTANCE instance, int show_command)
     try
     {
         App_window_procedure app(instance, true);
-        WindowsCommon::Input_device keyboard(instance, app.m_state.window);
-
-        // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
-        initialize_gl_constants();
 
         std::vector<CPolygon> polys;
         std::vector<Position_vertex> vertex_formats;
         std::vector<TexCoord> texture_coords;
 
+        // TODO: 2014: start_load before anything else, so that async reads can happen in the background.
+        // This cannot happen today, since start_load calls OpenGL to bind textures.
         start_load("polydefs.txt", &polys, &vertex_formats, &texture_coords);
 
+        // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
+        initialize_gl_constants();
         initialize_gl_world_data(vertex_formats, texture_coords);
 
         ShowWindow(app.m_state.window, show_command);
         UpdateWindow(app.m_state.window);
 
-        int return_code = game_message_loop(keyboard, polys);
-        (return_code);
+        WindowsCommon::Input_device keyboard(instance, app.m_state.window);
 
-        assert(!IsWindow(app.m_state.window));
+        auto return_code = game_message_loop(keyboard, polys);
+
+        // _tWinMain return code is an int type.
+        assert(INT_MAX > return_code);
+
+        // Window procedure doesn't currently have a reason to return non-zero.
+        assert(0 == return_code);
+
+        // This would be the legal part of the return code.
+        //static_cast<int>(return_code);
+
+        assert((nullptr == app.m_state.window) && "window handle was never released.");
     }
     // Convert exceptions to a OS native error type for later display.
     catch(const WindowsCommon::HRESULT_exception& ex)
