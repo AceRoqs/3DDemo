@@ -1,36 +1,22 @@
-//=========================================================================
-// Copyright (c) 1999 Toby Jones. All rights reserved.
-// Purpose: CPolygon class
-//=========================================================================
 #ifndef POLYGON_H
 #define POLYGON_H
 
-class CPolygon
+namespace Graphics
 {
-private:
-    unsigned int num_points;
-    unsigned int* points;       // indices into vector table
-    unsigned int* st;           // indices into texture coordinate table
-    unsigned int texture;       // texture number
-    unsigned int lightmap;      // index into lightmap list
 
-public:
-    CPolygon();
-    CPolygon(const CPolygon&);
-    ~CPolygon();
+struct Polygon
+{
+    std::vector<int> points;                // Indices into vertex list (used for load only).
+    std::vector<int> texture_coordinates;   // Indices into texture coordinate list (used for load only).
+    unsigned int texture;                   // Texture ID.
+    unsigned int lightmap;                  // Index into lightmap list.
 
-    CPolygon& operator=(const CPolygon&);
-
-    unsigned int getTexture() const;
-    unsigned int getNumPoints() const;
-    unsigned int getPoint(unsigned int) const;
-    unsigned int getTexCoord(unsigned int) const;
-    bool hasLightmap() const;
-    unsigned int getLightmap() const;
-
-    friend std::istream& operator>>(std::istream&, CPolygon&);
-    friend std::ostream& operator<<(std::ostream&, CPolygon&);
+    Polygon();
 };
+
+}
+
+std::istream& operator>>(std::istream& is, Graphics::Polygon& polygon);
 
 #endif
 

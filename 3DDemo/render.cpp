@@ -67,7 +67,7 @@ void initialize_gl_world_data(
 // TODO: add more flushes
 // TODO: modularize into separate functions
 void draw_list(
-    const std::vector<CPolygon>& poly_vector,
+    const std::vector<Graphics::Polygon>& poly_vector,
     const Camera& camera)
 {
     glClearDepth(1.0);
@@ -89,8 +89,8 @@ void draw_list(
     for(unsigned int ii = 0; ii < poly_vector.size(); ii++)
     {
     glColor4f(1.0, 1.0, 1.0, 1.0);
-        const CPolygon* iter = &poly_vector[ii];
-        glBindTexture(GL_TEXTURE_2D, iter->getTexture());
+        const Graphics::Polygon* iter = &poly_vector[ii];
+        glBindTexture(GL_TEXTURE_2D, iter->texture);
         glBlendFunc(GL_ONE, GL_ZERO);
         glDepthFunc(GL_LESS);
 
@@ -117,14 +117,14 @@ void draw_list(
         }
         glEnd();
 */
-        if(iter->hasLightmap() == 0)
+        if(iter->lightmap == 0)
         {
             continue;
         }
 
         glDepthFunc(GL_EQUAL);
         glColor4f(0.0, 0.0, 0.0, 0.25f);
-        glBindTexture(GL_TEXTURE_2D, iter->getLightmap());
+        glBindTexture(GL_TEXTURE_2D, iter->lightmap);
 //      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
 

@@ -14,7 +14,7 @@
 
 static bool s_fWindowed = true;
 
-static UINT_PTR game_message_loop(const WindowsCommon::Input_device& keyboard, const std::vector<CPolygon>& polys)
+static UINT_PTR game_message_loop(const WindowsCommon::Input_device& keyboard, const std::vector<Graphics::Polygon>& polys)
 {
     Camera camera(0.0f, 0.0f, 1.0f, 0.0f);
     long msec = 0;
@@ -109,7 +109,7 @@ void app_run(HINSTANCE instance, int show_command)
     {
         App_window_procedure app(instance, true);
 
-        std::vector<CPolygon> polys;
+        std::vector<Graphics::Polygon> polys;
         std::vector<Position_vertex> vertex_formats;
         std::vector<TexCoord> texture_coords;
 

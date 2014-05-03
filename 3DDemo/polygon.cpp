@@ -1,123 +1,46 @@
-//=========================================================================
-// Copyright (c) 1999 Toby Jones. All rights reserved.
-// Purpose: Polygon class
-//=========================================================================
 #include "PreCompile.h"
 #include "polygon.h"
 
-CPolygon::CPolygon()
+namespace Graphics
 {
-    num_points = 0;
-    points = st = nullptr;
-    texture = 0;
+
+Polygon::Polygon() :
+    texture(0),
+    lightmap(0)
+{
 }
 
-CPolygon::CPolygon(const CPolygon& copy_from)
-{
-    points = st = nullptr;
-    *this = copy_from;
 }
 
-CPolygon::~CPolygon()
+std::istream& operator>>(std::istream& is, Graphics::Polygon& polygon)
 {
-    delete[] points;
-    delete[] st;
-}
+    // Clear and realloc vectors.
+    std::vector<int>().swap(polygon.points);
+    std::vector<int>().swap(polygon.texture_coordinates);
 
-CPolygon& CPolygon::operator=(const CPolygon& copy_from)
-{
-    if(this != &copy_from)
+    unsigned int num_points;
+    is >> num_points;
+    if(num_points)
     {
-        num_points = copy_from.num_points;
-        delete[] points;
-        delete[] st;
-        points = st = nullptr;
-        if(num_points)
+        polygon.points.reserve(num_points);
+        polygon.texture_coordinates.reserve(num_points);
+
+        for(unsigned int i = 0; i < num_points; ++i)
         {
-            points = new(std::nothrow) unsigned int[num_points];
-            st = new(std::nothrow) unsigned int[num_points];
-            for(unsigned int i = 0; i < num_points; ++i)
-            {
-                points[i] = copy_from.points[i];
-                st[i] = copy_from.st[i];
-            }
+            int point;
+            is >> point;
+            polygon.points.push_back(point);
         }
-        texture = copy_from.texture;
-        lightmap = copy_from.lightmap;
-    } // A == A
-    return *this;
-}
 
-unsigned int CPolygon::getTexture() const
-{
-    return texture;
-}
-
-unsigned int CPolygon::getNumPoints() const
-{
-    return num_points;
-}
-
-unsigned int CPolygon::getPoint(unsigned int index) const
-{
-    assert(index < num_points);
-    return points[index];
-}
-
-unsigned int CPolygon::getTexCoord(unsigned int index) const
-{
-    assert(index < num_points);
-    return st[index];
-}
-
-bool CPolygon::hasLightmap() const
-{
-    return (lightmap != 0);
-}
-
-unsigned int CPolygon::getLightmap() const
-{
-    return lightmap;
-}
-
-std::istream& operator>>(std::istream& is, CPolygon& polygon)
-{
-    is >> polygon.num_points;
-    delete[] polygon.points;
-    delete[] polygon.st;
-    if(polygon.num_points)
-    {
-        polygon.points = new(std::nothrow) unsigned int[polygon.num_points];
-        polygon.st = new(std::nothrow) unsigned int[polygon.num_points];
-        for(unsigned int i = 0; i < polygon.num_points; ++i)
+        for(unsigned int i = 0; i < num_points; ++i)
         {
-            is >> polygon.points[i];
-        }
-        for(unsigned int i = 0; i < polygon.num_points; ++i)
-        {
-            is >> polygon.st[i];
+            int texture_coordinate;
+            is >> texture_coordinate;
+            polygon.texture_coordinates.push_back(texture_coordinate);
         }
     }
-    else
-    {
-        polygon.points = polygon.st = nullptr;
-    }
+
     is >> polygon.texture >> polygon.lightmap;
     return is;
-}
-
-std::ostream& operator<<(std::ostream& os, CPolygon& polygon)
-{
-    os << polygon.num_points;
-    for(unsigned int i = 0; i < polygon.num_points; ++i)
-    {
-        os << polygon.points[i];
-    }
-    for(unsigned int i = 0; i < polygon.num_points; ++i)
-    {
-        os << polygon.st[i];
-    }
-    os << polygon.texture << polygon.lightmap << std::endl;
-    return os;
 }
 
