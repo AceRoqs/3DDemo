@@ -30,40 +30,20 @@ static int game_message_loop(std::function<void(void)> execute_frame)
             break;
         }
 
-        try
-        {
-            execute_frame();
+        execute_frame();
 
 #ifdef DRAW_FRAMERATE
-            dwTicks = ::GetTickCount() - dwTicks;
+        dwTicks = ::GetTickCount() - dwTicks;
 
-            TCHAR a[] = TEXT("frames/sec:     ");
-            HDC hdc = GetDC(window);
-            ::TextOut(hdc, 0, 0, a, lstrlen(a));
-            _itot_s(DWORD(1.0f / (float(dwTicks) / 1000.0f)), a+12, 5, 10);
-            ::SetBkColor(hdc, 0);
-            ::SetTextColor(hdc, 0xffffff);
-            ::TextOut(hdc, 0, 0, a, lstrlen(a));
-            ReleaseDC(window, hdc);
+        TCHAR a[] = TEXT("frames/sec:     ");
+        HDC hdc = GetDC(window);
+        ::TextOut(hdc, 0, 0, a, lstrlen(a));
+        _itot_s(DWORD(1.0f / (float(dwTicks) / 1000.0f)), a+12, 5, 10);
+        ::SetBkColor(hdc, 0);
+        ::SetTextColor(hdc, 0xffffff);
+        ::TextOut(hdc, 0, 0, a, lstrlen(a));
+        ReleaseDC(window, hdc);
 #endif
-        }
-        // Convert exceptions to a OS native error type for later display.
-        catch(const WindowsCommon::HRESULT_exception& ex)
-        {
-            UNREFERENCED_PARAMETER(ex);
-
-            throw;
-        }
-        catch(const std::bad_alloc& ex)
-        {
-            UNREFERENCED_PARAMETER(ex);
-
-            WindowsCommon::throw_hr(E_OUTOFMEMORY);
-        }
-        catch(...)
-        {
-            WindowsCommon::throw_hr(E_FAIL);
-        }
     }
 
     return message.wParam;
@@ -154,10 +134,24 @@ void app_run(HINSTANCE instance, int show_command)
 
         assert(!IsWindow(app.m_state.window));
     }
+    // Convert exceptions to a OS native error type for later display.
+    catch(const WindowsCommon::HRESULT_exception& ex)
+    {
+        UNREFERENCED_PARAMETER(ex);
+
+        throw;
+    }
+    catch(const std::bad_alloc& ex)
+    {
+        UNREFERENCED_PARAMETER(ex);
+
+        WindowsCommon::throw_hr(E_OUTOFMEMORY);
+    }
     catch(...)
     {
         // TODO: uninitialize isn't always the correct text.
-        MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
+        //MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
+        WindowsCommon::throw_hr(E_FAIL);
     }
 }
 
