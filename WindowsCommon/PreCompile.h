@@ -4,6 +4,8 @@
 #include <cassert>
 
 // C++ Standard Library.
+#include <array>
+#include <cstdint>
 #include <exception>
 #include <functional>
 
@@ -31,6 +33,9 @@
 
 #include <windows.h>
 #include <strsafe.h>
+
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
 
 #endif  // WIN32
 

@@ -12,7 +12,7 @@
 #endif // _MSC_VER
 
 // C++ Standard Library.
-#define _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES   // M_PI definition.
 #include <array>
 #include <cstdint>
 #include <cmath>
