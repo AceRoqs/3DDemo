@@ -16,6 +16,8 @@ protected:
     virtual LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) NOEXCEPT = 0;
 };
 
+bool dispatch_all_windows_messages(_Out_ MSG* message) NOEXCEPT;
+
 WNDCLASSEX get_default_blank_window_class(_In_ HINSTANCE instance, _In_ WNDPROC window_proc, _In_ PCTSTR window_class_name) NOEXCEPT;
 Scoped_atom register_window_class(const WNDCLASSEX& window_class);
 

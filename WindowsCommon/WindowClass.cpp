@@ -34,6 +34,27 @@ LRESULT CALLBACK Window_procedure::static_window_proc(__in HWND window, UINT mes
     return return_value;
 }
 
+// Returns false if WM_QUIT was posted.
+bool dispatch_all_windows_messages(_Out_ MSG* message) NOEXCEPT
+{
+    // Clear out all the messages before drawing a new frame.
+    BOOL message_exists = PeekMessage(message, nullptr, 0, 0, PM_REMOVE);
+    while(message_exists)
+    {
+        if(WM_QUIT == message->message)
+        {
+            break;
+        }
+
+        ::TranslateMessage(message);
+        DispatchMessage(message);
+
+        message_exists = PeekMessage(message, nullptr, 0, 0, PM_REMOVE);
+    }
+
+    return !message_exists || (WM_QUIT != message->message);
+}
+
 WNDCLASSEX get_default_blank_window_class(_In_ HINSTANCE instance, _In_ WNDPROC window_proc, _In_ PCTSTR window_class_name) NOEXCEPT
 {
     WNDCLASSEX window_class;
