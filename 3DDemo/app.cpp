@@ -14,7 +14,7 @@
 
 static bool s_fWindowed = true;
 
-static int game_message_loop(const WindowsCommon::Input_device& keyboard, const std::vector<CPolygon>& polys, _In_ HDC device_context)
+static int game_message_loop(const WindowsCommon::Input_device& keyboard, const std::vector<CPolygon>& polys)
 {
     Camera camera(0.0f, 0.0f, 1.0f, 0.0f);
     long msec = 0;
@@ -59,7 +59,10 @@ static int game_message_loop(const WindowsCommon::Input_device& keyboard, const 
 
         camera = new_camera;
 
-        draw_list([=](){ SwapBuffers(device_context); }, polys, camera);
+        draw_list(polys, camera);
+
+        const HDC device_context = wglGetCurrentDC();
+        SwapBuffers(device_context);
 
 #ifdef DRAW_FRAMERATE
         dwTicks = ::GetTickCount() - dwTicks;
@@ -121,7 +124,7 @@ void app_run(HINSTANCE instance, int show_command)
         ShowWindow(app.m_state.window, show_command);
         UpdateWindow(app.m_state.window);
 
-        int return_code = game_message_loop(keyboard, polys, app.m_state.device_context);
+        int return_code = game_message_loop(keyboard, polys);
         (return_code);
 
         assert(!IsWindow(app.m_state.window));

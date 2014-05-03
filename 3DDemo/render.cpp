@@ -67,7 +67,6 @@ void initialize_gl_world_data(
 // TODO: add more flushes
 // TODO: modularize into separate functions
 void draw_list(
-    std::function<void(void)> swap_buffers,
     const std::vector<CPolygon>& poly_vector,
     const Camera& camera)
 {
@@ -155,7 +154,7 @@ void draw_list(
     emitter.Update();
     emitter.Draw(camera.m_x, camera.m_y, camera.m_z, camera.m_degrees, 6);
 
-    swap_buffers();
+    //swap_buffers();
 #if 1
     //glFlush();
 #else
