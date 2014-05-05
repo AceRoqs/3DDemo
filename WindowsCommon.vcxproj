@@ -16,12 +16,14 @@
     <ClInclude Include="PreCompile.h" />
     <ClInclude Include="PreCPP11.h" />
     <ClInclude Include="ScopedWindowsTypes.h" />
+    <ClInclude Include="ThreadAffinity.h" />
     <ClInclude Include="Tracing.h" />
     <ClInclude Include="WindowsGL.h" />
     <ClInclude Include="WindowClass.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="InputDevice.cpp" />
+    <ClCompile Include="ThreadAffinity.cpp" />
     <ClCompile Include="Tracing.cpp" />
     <ClCompile Include="HRException.cpp" />
     <ClCompile Include="PreCompile.cpp">
