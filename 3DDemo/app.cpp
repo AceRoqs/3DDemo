@@ -9,6 +9,7 @@
 #include "DirectInputMap.h"
 #include "HRException.h"
 #include "InputDevice.h"
+#include "ThreadAffinity.h"
 #include "Tracing.h"
 #include "WindowsGL.h"
 
@@ -16,6 +17,10 @@ static bool s_fWindowed = true;
 
 static UINT_PTR game_message_loop(const WindowsCommon::Input_device& keyboard, const std::vector<Graphics::Polygon>& polys)
 {
+    // Set thread affinity to the first available processor, so that QPC
+    // will always be done on the same processor.
+    WindowsCommon::lock_thread_to_first_processor();
+
     Camera camera(0.0f, 0.0f, 1.0f, 0.0f);
     long msec = 0;
 
