@@ -22,7 +22,10 @@ static UINT_PTR game_message_loop(const WindowsCommon::Input_device& keyboard, c
     WindowsCommon::lock_thread_to_first_processor();
 
     Camera camera(0.0f, 0.0f, 1.0f, 0.0f);
-    long msec = 0;
+
+    LARGE_INTEGER last_counter = {};
+    LARGE_INTEGER frequency;
+    QueryPerformanceFrequency(&frequency);
 
     MSG message;
     for(;;)
@@ -40,25 +43,32 @@ static UINT_PTR game_message_loop(const WindowsCommon::Input_device& keyboard, c
 
         Camera new_camera = camera;
 
-        // TODO: get number of times from system queue
-        // TODO: this is a bunch of crap
-        const auto tick_count = GetTickCount();
-        const bool first_tick = (msec == 0);
-        const auto ticks = tick_count - msec;
-        // TODO: send data to system queue instead of moving camera
-        msec = tick_count;
+        const bool first_tick = (last_counter.QuadPart == 0);
+
+        // TODO: Push QPC to input action queue.
+        // TODO: Factor code into functions.
+        LARGE_INTEGER current_counter;
+        QueryPerformanceCounter(&current_counter);
+
+        LARGE_INTEGER counter_diff;
+        counter_diff.QuadPart = current_counter.QuadPart - last_counter.QuadPart;
+        last_counter = current_counter;
+
+        counter_diff.QuadPart *= 1000;  // Convert from seconds to milliseconds.
+        const float elapsed_milliseconds = counter_diff.QuadPart / static_cast<float>(frequency.QuadPart);
 
         if(!first_tick)
         {
+            // TODO: Think about whether to do one large update, or several fixed-size updates.
             //for(int i = 0; i < ticks; i+= 16)
             {
-                WindowsCommon::dprintf("tick_count - msec: %d\r\n", ticks);
+                WindowsCommon::dprintf("QPC: %f\r\n", elapsed_milliseconds);
 
                 WindowsCommon::Keyboard_state keyboard_state;
                 keyboard.get_input(&keyboard_state);
 
                 std::list<Action> actions = actions_from_keyboard_state(keyboard_state);
-                new_camera = apply_actions(actions, new_camera, ticks);
+                new_camera = apply_actions(actions, new_camera, elapsed_milliseconds);
             }
         }
 

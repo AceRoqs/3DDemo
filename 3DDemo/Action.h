@@ -13,7 +13,7 @@ enum Action
     Turn_left
 };
 
-struct Camera apply_actions(const std::list<Action>& actions, const struct Camera& camera, DWORD ticks);
+struct Camera apply_actions(const std::list<Action>& actions, const struct Camera& camera, float milliseconds);
 
 #endif
 
