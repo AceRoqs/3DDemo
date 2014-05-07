@@ -1,8 +1,6 @@
 #ifndef TRACING_H
 #define TRACING_H
 
-#include "PreCPP11.h"
-
 namespace WindowsCommon
 {
 

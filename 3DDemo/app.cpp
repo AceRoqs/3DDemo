@@ -6,6 +6,7 @@
 #include "render.h"
 #include "Camera.h"
 #include "Action.h"
+#include "Clock.h"
 #include "DirectInputMap.h"
 #include "HRException.h"
 #include "InputDevice.h"
@@ -19,13 +20,11 @@ static UINT_PTR game_message_loop(const WindowsCommon::Input_device& keyboard, c
 {
     // Set thread affinity to the first available processor, so that QPC
     // will always be done on the same processor.
+    // TODO: Pass clock with keyboard as a paired set of inputs?
     WindowsCommon::lock_thread_to_first_processor();
+    WindowsCommon::Clock clock;
 
     Camera camera(0.0f, 0.0f, 1.0f, 0.0f);
-
-    LARGE_INTEGER last_counter = {};
-    LARGE_INTEGER frequency;
-    QueryPerformanceFrequency(&frequency);
 
     MSG message;
     for(;;)
@@ -43,33 +42,19 @@ static UINT_PTR game_message_loop(const WindowsCommon::Input_device& keyboard, c
 
         Camera new_camera = camera;
 
-        const bool first_tick = (last_counter.QuadPart == 0);
-
         // TODO: Push QPC to input action queue.
-        // TODO: Factor code into functions.
-        LARGE_INTEGER current_counter;
-        QueryPerformanceCounter(&current_counter);
+        const float elapsed_milliseconds = clock.ellapsed_milliseconds();
 
-        LARGE_INTEGER counter_diff;
-        counter_diff.QuadPart = current_counter.QuadPart - last_counter.QuadPart;
-        last_counter = current_counter;
-
-        counter_diff.QuadPart *= 1000;  // Convert from seconds to milliseconds.
-        const float elapsed_milliseconds = counter_diff.QuadPart / static_cast<float>(frequency.QuadPart);
-
-        if(!first_tick)
+        // TODO: Think about whether to do one large update, or several fixed-size updates.
+        //for(int i = 0; i < ticks; i+= 16)
         {
-            // TODO: Think about whether to do one large update, or several fixed-size updates.
-            //for(int i = 0; i < ticks; i+= 16)
-            {
-                WindowsCommon::dprintf("QPC: %f\r\n", elapsed_milliseconds);
+            WindowsCommon::dprintf("QPC: %f\r\n", elapsed_milliseconds);
 
-                WindowsCommon::Keyboard_state keyboard_state;
-                keyboard.get_input(&keyboard_state);
+            WindowsCommon::Keyboard_state keyboard_state;
+            keyboard.get_input(&keyboard_state);
 
-                std::list<Action> actions = actions_from_keyboard_state(keyboard_state);
-                new_camera = apply_actions(actions, new_camera, elapsed_milliseconds);
-            }
+            std::list<Action> actions = actions_from_keyboard_state(keyboard_state);
+            new_camera = apply_actions(actions, new_camera, elapsed_milliseconds);
         }
 
         camera = new_camera;
