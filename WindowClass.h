@@ -1,7 +1,6 @@
 #ifndef WINDOWCLASS_H
 #define WINDOWCLASS_H
 
-#include "PreCPP11.h"
 #include "ScopedWindowsTypes.h"
 
 namespace WindowsCommon
