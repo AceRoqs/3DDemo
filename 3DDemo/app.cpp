@@ -16,14 +16,8 @@
 
 static bool s_fWindowed = true;
 
-static UINT_PTR game_message_loop(const WindowsCommon::Input_device& keyboard, const std::vector<Graphics::Polygon>& polys)
+static UINT_PTR game_message_loop(WindowsCommon::Clock& clock, const WindowsCommon::Input_device& keyboard, const std::vector<Graphics::Polygon>& polys)
 {
-    // Set thread affinity to the first available processor, so that QPC
-    // will always be done on the same processor.
-    // TODO: Pass clock with keyboard as a paired set of inputs?
-    WindowsCommon::lock_thread_to_first_processor();
-    WindowsCommon::Clock clock;
-
     Camera camera(0.0f, 0.0f, 1.0f, 0.0f);
 
     MSG message;
@@ -121,12 +115,17 @@ void app_run(HINSTANCE instance, int show_command)
         initialize_gl_constants();
         initialize_gl_world_data(vertex_formats, texture_coords);
 
-        ShowWindow(app.m_state.window, show_command);
-        UpdateWindow(app.m_state.window);
+        // Set thread affinity to the first available processor, so that QPC
+        // will always be done on the same processor.
+        WindowsCommon::lock_thread_to_first_processor();
+        WindowsCommon::Clock clock;
 
         WindowsCommon::Input_device keyboard(instance, app.m_state.window);
 
-        auto return_code = game_message_loop(keyboard, polys);
+        ShowWindow(app.m_state.window, show_command);
+        UpdateWindow(app.m_state.window);
+
+        auto return_code = game_message_loop(clock, keyboard, polys);
 
         // _tWinMain return code is an int type.
         assert(INT_MAX > return_code);
