@@ -8,13 +8,7 @@
 #include "polygon.h"
 #include "particle.h"
 #include "world.h"
-#include "coord.h"
 #include "Camera.h"
-
-struct QPoint
-{
-    float x,y,z;
-};
 
 struct bezier
 {
@@ -190,9 +184,8 @@ static void BezCurve(
     GLfloat camera_y,
     GLfloat camera_z)
 {
-    // TODO: remove QPoint structure
     const unsigned int PTS = 10;
-    QPoint pts[PTS][PTS];
+    Position_vertex pts[PTS][PTS];
 
     // set level-of-detail
     int lod;
@@ -213,9 +206,9 @@ static void BezCurve(
         {
             for(int u = 0; u < lod; ++u)
             {
-                pts[u][v].x = 0.0;
-                pts[u][v].y = 0.0;
-                pts[u][v].z = 0.0;
+                pts[u][v].aVertex[0] = 0.0;
+                pts[u][v].aVertex[1] = 0.0;
+                pts[u][v].aVertex[2] = 0.0;
                 // TODO: This loop could really be optimized
                 for(int j = 0; j < 3; ++j)
                 {
@@ -237,9 +230,9 @@ static void BezCurve(
                             bezu = 2.0f * (1.0f-(float(u)/(float(lod) - 1.0f))) * (float(u) / (float(lod) - 1.0f));
                         else
                             bezu = (float(u) / (float(lod) - 1.0f)) * (float(u) / (float(lod) - 1.0f));
-                        pts[u][v].x += px * bezv * bezu;
-                        pts[u][v].y += py * bezv * bezu;
-                        pts[u][v].z += pz * bezv * bezu;
+                        pts[u][v].aVertex[0] += px * bezv * bezu;
+                        pts[u][v].aVertex[1] += py * bezv * bezu;
+                        pts[u][v].aVertex[2] += pz * bezv * bezu;
                     }
                 }
             }
@@ -253,13 +246,13 @@ static void BezCurve(
             for(int k = 0; k < lod - 1; ++k)
             {
                 glTexCoord2f(float(k) * 1.0f / (float)lod, (float)l * 1.0f/(float)lod);
-                glVertex3f(pts[k][l].x, pts[k][l].y, pts[k][l].z);
+                glVertex3f(pts[k][l].aVertex[0], pts[k][l].aVertex[1], pts[k][l].aVertex[2]);
                 glTexCoord2f((float)(k+2) * 1.0f/(float)lod , (float)l*1.0f/(float)lod);
-                glVertex3f(pts[k+1][l].x, pts[k+1][l].y, pts[k+1][l].z);
+                glVertex3f(pts[k+1][l].aVertex[0], pts[k+1][l].aVertex[1], pts[k+1][l].aVertex[2]);
                 glTexCoord2f((float)(k+2) * 1.0f/(float)lod, (float)(l+2) * 1.0f/(float)lod);
-                glVertex3f(pts[k+1][l+1].x, pts[k+1][l+1].y, pts[k+1][l+1].z);
+                glVertex3f(pts[k+1][l+1].aVertex[0], pts[k+1][l+1].aVertex[1], pts[k+1][l+1].aVertex[2]);
                 glTexCoord2f((float)k * 1.0f/(float)lod, (float)(l+2) * 1.0f/(float)lod);
-                glVertex3f(pts[k][l+1].x, pts[k][l+1].y, pts[k][l+1].z);
+                glVertex3f(pts[k][l+1].aVertex[0], pts[k][l+1].aVertex[1], pts[k][l+1].aVertex[2]);
             }
         }
 

@@ -1,7 +1,6 @@
 #include "PreCompile.h"
 #include "app.h"
 #include "polygon.h"
-#include "coord.h"
 #include "world.h"
 #include "render.h"
 #include "Camera.h"

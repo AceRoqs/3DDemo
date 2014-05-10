@@ -5,7 +5,6 @@
 #include "PreCompile.h"
 #include "world.h"
 #include "polygon.h"
-#include "coord.h"
 
 // TODO: 2014: This should not be extern.
 const float g_WorldVector[] =

@@ -6,6 +6,16 @@ namespace Graphics
     struct Polygon;
 }
 
+struct Position_vertex
+{
+    GLfloat aVertex[3];
+};
+
+struct TexCoord
+{
+    GLfloat aTexCoord[2];
+};
+
 bool is_point_in_world(float x, float y, float z);
 
 void start_load(
