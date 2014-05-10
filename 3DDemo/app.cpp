@@ -75,18 +75,18 @@ static UINT_PTR game_message_loop(WindowsCommon::Clock& clock, const WindowsComm
     return message.wParam;
 }
 
-class App_window_procedure : public WindowsCommon::WindowGL_window_procedure
+class App_window : public WindowsCommon::OpenGL_window
 {
 public:
-    App_window_procedure(_In_ HINSTANCE instance, bool windowed) :
-        WindowGL_window_procedure(TEXT("3D Demo 1999 (Updated for C++11)"), instance, windowed)
+    App_window(_In_ HINSTANCE instance, bool windowed) :
+        OpenGL_window(TEXT("3D Demo 1999 (Updated for C++11)"), instance, windowed)
     {
     }
 
 protected:
     LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) NOEXCEPT
     {
-        LRESULT return_value = WindowGL_window_procedure::window_proc(window, message, w_param, l_param);
+        LRESULT return_value = OpenGL_window::window_proc(window, message, w_param, l_param);
 
         if(message == WM_DESTROY)
         {
@@ -101,7 +101,7 @@ void app_run(HINSTANCE instance, int show_command)
 {
     try
     {
-        App_window_procedure app(instance, true);
+        App_window app(instance, true);
 
         std::vector<Graphics::Polygon> polys;
         std::vector<Position_vertex> vertex_formats;

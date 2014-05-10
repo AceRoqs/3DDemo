@@ -28,12 +28,11 @@ struct WGL_state
     Scoped_current_context make_current_context;
 };
 
-// TODO: 2014 WindowsGL_window_procedure is more than a window_proc?
-class WindowGL_window_procedure : public Window_procedure
+class OpenGL_window : public Window_procedure
 {
 public:
-    WindowGL_window_procedure(_In_ PCTSTR window_title, _In_ HINSTANCE instance, bool windowed);
-    ~WindowGL_window_procedure();
+    OpenGL_window(_In_ PCTSTR window_title, _In_ HINSTANCE instance, bool windowed);
+    ~OpenGL_window();
 
     WindowsCommon::WGL_state m_state;
 
