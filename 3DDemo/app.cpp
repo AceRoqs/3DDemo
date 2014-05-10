@@ -101,15 +101,14 @@ void app_run(HINSTANCE instance, int show_command)
 {
     try
     {
-        App_window app(instance, true);
-
+        // Start load first, to kick off async reads.
         std::vector<std::string> texture_list;
         std::vector<Graphics::Polygon> polys;
         std::vector<Position_vertex> vertex_formats;
         std::vector<TexCoord> texture_coords;
-
-        // TODO: 2014: start_load before anything else, so that async reads can happen in the background.
         start_load("polydefs.txt", &texture_list, &polys, &vertex_formats, &texture_coords);
+
+        App_window app(instance, true);
 
         // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
         initialize_gl_constants();

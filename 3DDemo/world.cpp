@@ -114,80 +114,49 @@ static void load_world_data(
     is >> cTextures;
 
     unsigned int ii;
-    for(ii = 0; ii < cTextures; ii++)
+    for(ii = 0; ii < cTextures; ++ii)
     {
-        char filename[MAX_PATH];
-        is >> filename;
-        texture_list->push_back(filename);
+        char file_name[MAX_PATH];
+        is >> file_name;
+        texture_list->push_back(file_name);
     }
 
     unsigned int cPolys;
     is >> cPolys;
 
-    Graphics::Polygon poly;
     for(ii = 0; ii < cPolys; ++ii)
     {
+        Graphics::Polygon poly;
         is >> poly;
         polys->push_back(poly);
-    }
 
-    for(ii = 0; ii < cPolys; ii++)
-    {
-        int ix;
-        Position_vertex out_vertex_format;
+        for(auto jj = 0; jj < 4; ++jj)
+        {
+            auto ix = poly.points[jj];
+            Position_vertex out_vertex_format;
+            out_vertex_format.aVertex[0] = g_WorldVector[ix * 3];
+            out_vertex_format.aVertex[1] = g_WorldVector[ix * 3 + 1];
+            out_vertex_format.aVertex[2] = g_WorldVector[ix * 3 + 2];
+            vertex_formats->push_back(out_vertex_format);
 
-        ix = (*polys)[ii].points[0];
-        out_vertex_format.aVertex[0] = g_WorldVector[ix * 3];
-        out_vertex_format.aVertex[1] = g_WorldVector[ix * 3 + 1];
-        out_vertex_format.aVertex[2] = g_WorldVector[ix * 3 + 2];
-        vertex_formats->push_back(out_vertex_format);
-        ix = (*polys)[ii].texture_coordinates[0];
-        TexCoord out_coord;
-        out_coord.aTexCoord[0] = WorldTexture[ix * 2];
-        out_coord.aTexCoord[1] = WorldTexture[ix * 2 + 1];
-        texture_coords->push_back(out_coord);
-
-        ix = (*polys)[ii].points[1];
-        out_vertex_format.aVertex[0] = g_WorldVector[ix * 3];
-        out_vertex_format.aVertex[1] = g_WorldVector[ix * 3 + 1];
-        out_vertex_format.aVertex[2] = g_WorldVector[ix * 3 + 2];
-        vertex_formats->push_back(out_vertex_format);
-        ix = (*polys)[ii].texture_coordinates[1];
-        out_coord.aTexCoord[0] = WorldTexture[ix * 2];
-        out_coord.aTexCoord[1] = WorldTexture[ix * 2 + 1];
-        texture_coords->push_back(out_coord);
-
-        ix = (*polys)[ii].points[2];
-        out_vertex_format.aVertex[0] = g_WorldVector[ix * 3];
-        out_vertex_format.aVertex[1] = g_WorldVector[ix * 3 + 1];
-        out_vertex_format.aVertex[2] = g_WorldVector[ix * 3 + 2];
-        vertex_formats->push_back(out_vertex_format);
-        ix = (*polys)[ii].texture_coordinates[2];
-        out_coord.aTexCoord[0] = WorldTexture[ix * 2];
-        out_coord.aTexCoord[1] = WorldTexture[ix * 2 + 1];
-        texture_coords->push_back(out_coord);
-
-        ix = (*polys)[ii].points[3];
-        out_vertex_format.aVertex[0] = g_WorldVector[ix * 3];
-        out_vertex_format.aVertex[1] = g_WorldVector[ix * 3 + 1];
-        out_vertex_format.aVertex[2] = g_WorldVector[ix * 3 + 2];
-        vertex_formats->push_back(out_vertex_format);
-        ix = (*polys)[ii].texture_coordinates[3];
-        out_coord.aTexCoord[0] = WorldTexture[ix * 2];
-        out_coord.aTexCoord[1] = WorldTexture[ix * 2 + 1];
-        texture_coords->push_back(out_coord);
+            ix = poly.texture_coordinates[jj];
+            TexCoord out_coord;
+            out_coord.aTexCoord[0] = WorldTexture[ix * 2];
+            out_coord.aTexCoord[1] = WorldTexture[ix * 2 + 1];
+            texture_coords->push_back(out_coord);
+        }
     }
 }
 
 void start_load(
-    _In_ char* szFileName,
+    _In_ char* file_name,
     std::vector<std::string>* texture_list,
     std::vector<Graphics::Polygon>* polys,
     std::vector<Position_vertex>* vertex_formats,
     std::vector<TexCoord>* texture_coords)
 {
     std::ifstream fis;
-    fis.open(szFileName);
+    fis.open(file_name);
     if(fis.is_open())
     {
         load_world_data(fis, texture_list, polys, vertex_formats, texture_coords);
