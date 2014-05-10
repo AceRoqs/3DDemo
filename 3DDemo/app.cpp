@@ -21,10 +21,6 @@ static UINT_PTR game_message_loop(WindowsCommon::Clock& clock, const WindowsComm
     MSG message;
     for(;;)
     {
-#ifdef DRAW_FRAMERATE
-        DWORD dwTicks = ::GetTickCount();
-#endif
-
         if(!WindowsCommon::dispatch_all_windows_messages(&message))
         {
             // Renderer and window handle were destroyed in WM_DESTROY.
@@ -45,19 +41,6 @@ static UINT_PTR game_message_loop(WindowsCommon::Clock& clock, const WindowsComm
 
         const HDC device_context = wglGetCurrentDC();
         SwapBuffers(device_context);
-
-#ifdef DRAW_FRAMERATE
-        dwTicks = ::GetTickCount() - dwTicks;
-
-        TCHAR a[] = TEXT("frames/sec:     ");
-        HDC hdc = GetDC(window);
-        ::TextOut(hdc, 0, 0, a, lstrlen(a));
-        _itot_s(DWORD(1.0f / (float(dwTicks) / 1000.0f)), a+12, 5, 10);
-        ::SetBkColor(hdc, 0);
-        ::SetTextColor(hdc, 0xffffff);
-        ::TextOut(hdc, 0, 0, a, lstrlen(a));
-        ReleaseDC(window, hdc);
-#endif
     }
 
     return message.wParam;
@@ -122,6 +105,7 @@ void app_run(HINSTANCE instance, int show_command)
 
         // This would be the legal part of the return code.
         //static_cast<int>(return_code);
+        UNREFERENCED_PARAMETER(return_code);
 
         assert((nullptr == app.m_state.window) && "window handle was never released.");
     }
