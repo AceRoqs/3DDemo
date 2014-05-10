@@ -3,17 +3,29 @@
 
 namespace Graphics
 {
-    struct Polygon;
-}
+
+struct Polygon
+{
+    std::vector<int> points;                // Indices into vertex list (used for load only).
+    std::vector<int> texture_coordinates;   // Indices into texture coordinate list (used for load only).
+    unsigned int texture;                   // Texture ID.
+    unsigned int lightmap;                  // Index into lightmap list.
+
+    Polygon();
+};
+
+} // namespace
+
+std::istream& operator>>(std::istream& is, Graphics::Polygon& polygon);
 
 struct Position_vertex
 {
-    GLfloat aVertex[3];
+    float aVertex[3];
 };
 
 struct TexCoord
 {
-    GLfloat aTexCoord[2];
+    float aTexCoord[2];
 };
 
 bool is_point_in_world(float x, float y, float z);

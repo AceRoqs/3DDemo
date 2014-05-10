@@ -21,9 +21,6 @@
     <ClCompile Include="particle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="polygon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="pcx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -60,9 +57,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="particle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="polygon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pcx.h">

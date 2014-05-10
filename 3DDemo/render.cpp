@@ -5,7 +5,6 @@
 #include "PreCompile.h"
 #include "render.h"
 #include "gltex.h"
-#include "polygon.h"
 #include "particle.h"
 #include "world.h"
 #include "Camera.h"
