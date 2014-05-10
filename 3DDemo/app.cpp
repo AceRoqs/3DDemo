@@ -32,24 +32,15 @@ static UINT_PTR game_message_loop(WindowsCommon::Clock& clock, const WindowsComm
             break;
         }
 
-        Camera new_camera = camera;
-
         // TODO: Push QPC to input action queue.
         const float elapsed_milliseconds = clock.ellapsed_milliseconds();
+        WindowsCommon::dprintf("QPC: %f\r\n", elapsed_milliseconds);
 
-        // TODO: Think about whether to do one large update, or several fixed-size updates.
-        //for(int i = 0; i < ticks; i+= 16)
-        {
-            WindowsCommon::dprintf("QPC: %f\r\n", elapsed_milliseconds);
+        WindowsCommon::Keyboard_state keyboard_state;
+        keyboard.get_input(&keyboard_state);
 
-            WindowsCommon::Keyboard_state keyboard_state;
-            keyboard.get_input(&keyboard_state);
-
-            std::list<Action> actions = actions_from_keyboard_state(keyboard_state);
-            new_camera = apply_actions(actions, new_camera, elapsed_milliseconds);
-        }
-
-        camera = new_camera;
+        std::list<Action> actions = actions_from_keyboard_state(keyboard_state);
+        camera = apply_actions(actions, camera, elapsed_milliseconds);
 
         draw_list(polys, camera);
 
