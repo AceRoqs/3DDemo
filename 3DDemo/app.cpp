@@ -103,17 +103,17 @@ void app_run(HINSTANCE instance, int show_command)
     {
         App_window app(instance, true);
 
+        std::vector<std::string> texture_list;
         std::vector<Graphics::Polygon> polys;
         std::vector<Position_vertex> vertex_formats;
         std::vector<TexCoord> texture_coords;
 
         // TODO: 2014: start_load before anything else, so that async reads can happen in the background.
-        // This cannot happen today, since start_load calls OpenGL to bind textures.
-        start_load("polydefs.txt", &polys, &vertex_formats, &texture_coords);
+        start_load("polydefs.txt", &texture_list, &polys, &vertex_formats, &texture_coords);
 
         // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
         initialize_gl_constants();
-        initialize_gl_world_data(vertex_formats, texture_coords);
+        initialize_gl_world_data(texture_list, vertex_formats, texture_coords);
 
         // Set thread affinity to the first available processor, so that QPC
         // will always be done on the same processor.

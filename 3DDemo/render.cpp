@@ -4,6 +4,7 @@
 //=========================================================================
 #include "PreCompile.h"
 #include "render.h"
+#include "gltex.h"
 #include "polygon.h"
 #include "particle.h"
 #include "world.h"
@@ -54,9 +55,16 @@ void initialize_gl_constants()
 }
 
 void initialize_gl_world_data(
+    const std::vector<std::string>& texture_list,
     const std::vector<Position_vertex>& vertex_formats,
     const std::vector<TexCoord>& texture_coords)
 {
+    // Load all texture data.
+    for(size_t ix = 0; ix < texture_list.size(); ++ix)
+    {
+        bind_file_to_gl_texture(texture_list[ix].c_str(), ix);
+    }
+
     // Enable vertex arrays.
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);

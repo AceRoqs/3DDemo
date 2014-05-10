@@ -6,7 +6,6 @@
 #include "world.h"
 #include "polygon.h"
 #include "coord.h"
-#include "gltex.h"
 
 // TODO: 2014: This should not be extern.
 const float g_WorldVector[] =
@@ -103,9 +102,9 @@ bool is_point_in_world(float x, float y, float z)
     return true;
 }
 
-//---------------------------------------------------------------------------
 static void load_world_data(
     std::istream& is,
+    std::vector<std::string>* texture_list,
     std::vector<Graphics::Polygon>* polys,
     std::vector<Position_vertex>* vertex_formats,
     std::vector<TexCoord>* texture_coords)
@@ -114,37 +113,16 @@ static void load_world_data(
 
     is >> cTextures;
 
-/*
-    block_t block;
-    block.bitmap = nullptr;
-    char sz[100];
-    is >> sz;
-    TGADecodeRGB(sz, &block);
-    HANDLE hFile;
-    hFile = CreateFile("default.bin",
-                       GENERIC_READ | GENERIC_WRITE,
-                       0,
-                       nullptr,
-                       CREATE_NEW,
-                       FILE_ATTRIBUTE_NORMAL,
-                       nullptr);
-    DWORD dw;
-    WriteFile(hFile, block.bitmap, block.xsize * block.ysize * 3, &dw, nullptr);
-    CloseHandle(hFile);
-    delete[] block.bitmap;
-*/
     unsigned int ii;
     for(ii = 0; ii < cTextures; ii++)
     {
         char filename[MAX_PATH];
         is >> filename;
-        bind_file_to_gl_texture(filename, ii);
+        texture_list->push_back(filename);
     }
 
     unsigned int cPolys;
     is >> cPolys;
-
-    //g_paPolys = new(std::nothrow) Polygon[g_cPolys];
 
     Graphics::Polygon poly;
     for(ii = 0; ii < cPolys; ++ii)
@@ -153,19 +131,16 @@ static void load_world_data(
         polys->push_back(poly);
     }
 
-    //g_paVerts = new(std::nothrow) Position_vertex[g_cPolys * 4];
-    //g_paTexCoord = new(std::nothrow) TexCoord[g_cPolys * 4];
-    //*out_vertex_formats = new Position_vertex[cPolys * 4];
-    //*out_coords = new TexCoord[cPolys * 4];
     for(ii = 0; ii < cPolys; ii++)
     {
-        int ix = (*polys)[ii].points[0];
+        int ix;
         Position_vertex out_vertex_format;
+
+        ix = (*polys)[ii].points[0];
         out_vertex_format.aVertex[0] = g_WorldVector[ix * 3];
         out_vertex_format.aVertex[1] = g_WorldVector[ix * 3 + 1];
         out_vertex_format.aVertex[2] = g_WorldVector[ix * 3 + 2];
         vertex_formats->push_back(out_vertex_format);
-
         ix = (*polys)[ii].texture_coordinates[0];
         TexCoord out_coord;
         out_coord.aTexCoord[0] = WorldTexture[ix * 2];
@@ -204,9 +179,9 @@ static void load_world_data(
     }
 }
 
-//---------------------------------------------------------------------------
 void start_load(
     _In_ char* szFileName,
+    std::vector<std::string>* texture_list,
     std::vector<Graphics::Polygon>* polys,
     std::vector<Position_vertex>* vertex_formats,
     std::vector<TexCoord>* texture_coords)
@@ -215,7 +190,7 @@ void start_load(
     fis.open(szFileName);
     if(fis.is_open())
     {
-        load_world_data(fis, polys, vertex_formats, texture_coords);
+        load_world_data(fis, texture_list, polys, vertex_formats, texture_coords);
         fis.close();
     }
 }
