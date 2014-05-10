@@ -51,7 +51,7 @@ WGL_state& WGL_state::operator=(WGL_state&& other) NOEXCEPT
 #endif
 
 // TODO: set window width/height if full screen
-WindowGL_window_procedure::WindowGL_window_procedure(_In_ PCTSTR window_title, _In_ HINSTANCE instance, bool windowed) : m_windowed(windowed)
+OpenGL_window::OpenGL_window(_In_ PCTSTR window_title, _In_ HINSTANCE instance, bool windowed) : m_windowed(windowed)
 {
     const int window_width = 800;
     const int window_height = 600;
@@ -106,7 +106,7 @@ WindowGL_window_procedure::WindowGL_window_procedure(_In_ PCTSTR window_title, _
     m_state.make_current_context = create_current_context(m_state.device_context, m_state.gl_context);
 }
 
-WindowGL_window_procedure::~WindowGL_window_procedure()
+OpenGL_window::~OpenGL_window()
 {
     // TODO: 2014: This is just a placeholder - the fullscreen OpenGL code isn't currently exercised.
     if(!m_windowed)
@@ -115,7 +115,7 @@ WindowGL_window_procedure::~WindowGL_window_procedure()
     }
 }
 
-LRESULT WindowGL_window_procedure::window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) NOEXCEPT
+LRESULT OpenGL_window::window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) NOEXCEPT
 {
     LRESULT return_value = 0;
 
