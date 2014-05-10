@@ -3,7 +3,7 @@
 #include "Camera.h"
 #include "world.h"
 
-Camera apply_actions(const std::list<Action>& actions, const Camera& camera, float milliseconds)
+Camera apply_actions(const std::list<std::pair<float, Action>>& actions, const Camera& camera)
 {
     Camera new_camera = camera;
     float new_x = new_camera.m_x;
@@ -13,11 +13,7 @@ Camera apply_actions(const std::list<Action>& actions, const Camera& camera, flo
     const auto walk_distance_per_tick = 0.045f;
     const auto keyboard_rotational_speed_per_tick = 0.5f;
 
-    const auto walk_distance = walk_distance_per_tick * milliseconds;
     const auto radians_per_degree = static_cast<float>(M_PI * 2.0f / 360.0f);
-    const auto sine = sinf(new_camera.m_degrees * radians_per_degree) * walk_distance;
-    const auto cosine = cosf(new_camera.m_degrees * radians_per_degree) * walk_distance;
-    const auto rotation_degrees = keyboard_rotational_speed_per_tick * milliseconds;
 
     // Accumulate all movement inputs before application.  This will prevent
     // two contractory button presses (e.g. strafe and forward) from bouncing
@@ -28,7 +24,12 @@ Camera apply_actions(const std::list<Action>& actions, const Camera& camera, flo
     // forward motion possible, even while moving laterally.
     for(auto action = actions.cbegin(); action != actions.cend(); ++action)
     {
-        switch(*action)
+        const auto walk_distance = walk_distance_per_tick * action->first;
+        const auto sine = sinf(new_camera.m_degrees * radians_per_degree) * walk_distance;
+        const auto cosine = cosf(new_camera.m_degrees * radians_per_degree) * walk_distance;
+        const auto rotation_degrees = keyboard_rotational_speed_per_tick * action->first;
+
+        switch(action->second)
         {
             case Move_forward:
             {

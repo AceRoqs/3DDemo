@@ -23,16 +23,16 @@ const static struct Action_map
     DIK_RIGHT,   Turn_right,
 };
 
-std::list<Action> actions_from_keyboard_state(const WindowsCommon::Keyboard_state& keyboard_state)
+std::list<std::pair<float, Action>> actions_from_keyboard_state(float ellapsed_milliseconds, const WindowsCommon::Keyboard_state& keyboard_state)
 {
     // TODO: 2014: should this be an input map of all inputs (mouse, keyboard, network, time)
     // rather than an action map?
-    std::list<Action> actions;
+    std::list<std::pair<float, Action>> actions;
     for(int ix = 0; ix < ARRAYSIZE(action_map); ++ix)
     {
         if(keyboard_state[action_map[ix].input])
         {
-            actions.push_back(action_map[ix].action);
+            actions.push_back(std::make_pair(ellapsed_milliseconds, action_map[ix].action));
         }
     }
 
