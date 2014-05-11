@@ -32,14 +32,14 @@ static void generate_grid_texture_rgb(unsigned char* bitmap, int xsize, int ysiz
     }
 }
 
-static void bind_block_to_gl_texture(const block_t& block, unsigned int texture_id)
+static void bind_bitmap_to_gl_texture(const Bitmap& bitmap, unsigned int texture_id)
 {
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    if(block.filtered)
+    if(bitmap.filtered)
     {
         // Bilinear filtering.
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -57,44 +57,44 @@ static void bind_block_to_gl_texture(const block_t& block, unsigned int texture_
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  3,
-                 block.xsize,
-                 block.ysize,
+                 bitmap.xsize,
+                 bitmap.ysize,
                  0,
                  GL_RGB,
                  GL_UNSIGNED_BYTE,
-                 &block.bitmap[0]);
+                 &bitmap.bitmap[0]);
 }
 
-static block_t block_from_file(const char* file_name)
+static Bitmap bitmap_from_file(const char* file_name)
 {
-    block_t block;
+    Bitmap bitmap;
 
     bool use_default_texture = true;
     const int cch = strlen(file_name);
     if((cch >= 4) && (strcmp(file_name + cch - 4, ".pcx") == 0))
     {
-        use_default_texture = !PCXDecodeRGB(file_name, &block);
+        use_default_texture = !PCXDecodeRGB(file_name, &bitmap);
     }
     else if((cch >= 4) && (strcmp(file_name + cch - 4, ".tga") == 0))
     {
-        use_default_texture = !TGADecodeRGB(file_name, &block);
+        use_default_texture = !TGADecodeRGB(file_name, &bitmap);
     }
 
     if(use_default_texture)
     {
-        block.xsize  = 64;
-        block.ysize  = 64;
-        block.filtered = false;
-        block.bitmap.reset(new uint8_t[block.xsize * block.ysize * 3]);
-        generate_grid_texture_rgb(reinterpret_cast<unsigned char*>(&block.bitmap[0]), block.xsize, block.ysize);
+        bitmap.xsize  = 64;
+        bitmap.ysize  = 64;
+        bitmap.filtered = false;
+        bitmap.bitmap.reset(new uint8_t[bitmap.xsize * bitmap.ysize * 3]);
+        generate_grid_texture_rgb(reinterpret_cast<unsigned char*>(&bitmap.bitmap[0]), bitmap.xsize, bitmap.ysize);
     }
 
-    return block;
+    return bitmap;
 }
 
 void bind_file_to_gl_texture(const char* file_name, unsigned int texture_id)
 {
-    block_t block = block_from_file(file_name);
-    bind_block_to_gl_texture(block, texture_id);
+    Bitmap bitmap = bitmap_from_file(file_name);
+    bind_bitmap_to_gl_texture(bitmap, texture_id);
 }
 

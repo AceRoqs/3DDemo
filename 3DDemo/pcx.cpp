@@ -42,7 +42,7 @@ typedef struct
 } ColorRGB;
 #pragma pack(pop)
 
-bool PCXDecodeRGB(const char* filename, block_t* spr)
+bool PCXDecodeRGB(const char* filename, Bitmap* spr)
 {
     FILE* in;
     long total_size;

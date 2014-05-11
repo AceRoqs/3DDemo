@@ -355,7 +355,7 @@ HRESULT TargaSeekToScanlineTable(
 
 bool TGADecodeRGB(
     const char* szFileName,
-    block_t* spr)
+    Bitmap* spr)
 {
     // Open the targa file
     HANDLE hFile;

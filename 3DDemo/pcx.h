@@ -6,7 +6,7 @@
 #ifndef PCX_H
 #define PCX_H
 
-bool PCXDecodeRGB(const char *filename, struct block_t*);
+bool PCXDecodeRGB(const char *filename, struct Bitmap*);
 
 #endif
 

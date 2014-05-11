@@ -5,7 +5,7 @@
 #ifndef TARGA_H
 #define TARGA_H
 
-bool TGADecodeRGB(const char* szFileName, struct block_t* spr);
+bool TGADecodeRGB(const char* szFileName, struct Bitmap* spr);
 
 #endif
 

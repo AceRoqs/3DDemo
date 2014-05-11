@@ -1,14 +1,14 @@
-#ifndef BLOCK_H
-#define BLOCK_H
+#ifndef BITMAP_H
+#define BITMAP_H
 
 // TODO: Move implementations out of header.
-struct block_t
+struct Bitmap
 {
-    block_t() : xsize(0), ysize(0), filtered(false) {}
+    Bitmap() : xsize(0), ysize(0), filtered(false) {}
 // http://stackoverflow.com/questions/70013/how-to-detect-if-im-compiling-code-with-visual-studio-2008
 #if _MSC_VER == 1600 || _MSC_VER == 1700
     // Add default and move constructors as VS2010/2012 doesn't default define a move constructor.
-    block_t(block_t&& other) :
+    Bitmap(Bitmap&& other) :
         bitmap(std::move(other.bitmap)),
         xsize(other.xsize),
         ysize(other.ysize),
@@ -16,7 +16,7 @@ struct block_t
     {
     }
 
-    block_t& operator=(block_t&& other) NOEXCEPT
+    Bitmap& operator=(Bitmap&& other) NOEXCEPT
     {
         // Handle A=A case.
         if(this != &other)
