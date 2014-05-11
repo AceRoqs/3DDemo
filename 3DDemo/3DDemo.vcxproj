@@ -146,7 +146,7 @@
   <ItemGroup>
     <ClInclude Include="Action.h" />
     <ClInclude Include="app.h" />
-    <ClInclude Include="block.h" />
+    <ClInclude Include="Bitmap.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DirectInputMap.h" />
     <ClInclude Include="gltex.h" />

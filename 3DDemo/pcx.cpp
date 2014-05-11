@@ -4,7 +4,7 @@
 //=========================================================================
 #include "PreCompile.h"
 #include "pcx.h"
-#include "block.h"
+#include "Bitmap.h"
 
 struct PCX
 {

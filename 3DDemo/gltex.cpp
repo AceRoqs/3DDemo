@@ -6,7 +6,7 @@
 #include "gltex.h"
 #include "pcx.h"
 #include "targa.h"
-#include "block.h"
+#include "Bitmap.h"
 
 static void generate_grid_texture_rgb(unsigned char* bitmap, int xsize, int ysize)
 {

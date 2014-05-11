@@ -4,7 +4,7 @@
 //=========================================================================
 #include "PreCompile.h"
 #include "targa.h"
-#include "block.h"
+#include "Bitmap.h"
 
 #define TRUEVISION_TARGA "TRUEVISION-TARGA"
 
