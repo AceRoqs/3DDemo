@@ -127,6 +127,7 @@
   <ItemGroup>
     <ClCompile Include="Action.cpp" />
     <ClCompile Include="app.cpp" />
+    <ClCompile Include="Bitmap.cpp" />
     <ClCompile Include="DirectInputMap.cpp" />
     <ClCompile Include="PreCompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
