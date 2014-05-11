@@ -63,12 +63,12 @@ static void bind_block_to_gl_texture(const block_t& block, unsigned int texture_
                  0,
                  GL_RGB,
                  GL_UNSIGNED_BYTE,
-                 block.bitmap);
+                 &block.bitmap[0]);
 }
 
 void bind_file_to_gl_texture(const char* filename, unsigned int texture_id)
 {
-    block_t block = { 0, 0, nullptr };
+    block_t block = { 0, 0 };
 
     bool use_default_texture;
 
@@ -91,12 +91,10 @@ void bind_file_to_gl_texture(const char* filename, unsigned int texture_id)
     {
         block.xsize  = 64;
         block.ysize  = 64;
-        block.bitmap = new(std::nothrow) char[block.xsize * block.ysize * 3];
-        generate_grid_texture_rgb(reinterpret_cast<unsigned char*>(block.bitmap), block.xsize, block.ysize);
+        block.bitmap.reset(new uint8_t[block.xsize * block.ysize * 3]);
+        generate_grid_texture_rgb(reinterpret_cast<unsigned char*>(&block.bitmap[0]), block.xsize, block.ysize);
     }
 
     bind_block_to_gl_texture(block, texture_id, use_default_texture);
-
-    delete[] block.bitmap;
 }
 

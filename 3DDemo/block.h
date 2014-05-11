@@ -4,7 +4,7 @@
 struct block_t
 {
     int xsize, ysize;
-    char *bitmap;
+    std::unique_ptr<uint8_t[]> bitmap;
 };
 
 #endif

@@ -66,11 +66,9 @@ bool PCXDecodeRGB(const char* filename, block_t* spr)
         spr->xsize = pcx.xMax - pcx.xMin + 1;
         spr->ysize = pcx.yMax - pcx.yMin + 1;
         total_size = spr->xsize * spr->ysize * pcx.NPlanes * pcx.bits_per_pixel / 8;
-        if(spr->bitmap != nullptr)
-        {
-            delete[] spr->bitmap;
-        }
-        spr->bitmap = new(std::nothrow) char[total_size];
+
+        // TODO: 2014: Use smart pointer for file handle, so new can throw.
+        spr->bitmap.reset(new(std::nothrow) uint8_t[total_size]);
 
         index = count = run_count = scanline = 0;
         do
@@ -119,8 +117,7 @@ bool PCXDecodeRGB(const char* filename, block_t* spr)
                 picture[i].green = palette[x].green;
                 picture[i].blue = palette[x].blue;
             }
-            delete[] spr->bitmap;
-            spr->bitmap = (char *)picture;
+            spr->bitmap.reset(reinterpret_cast<uint8_t *>(picture));
             fclose(in);
             return true;
         }

@@ -392,13 +392,13 @@ bool TGADecodeRGB(
     // Allocate a temporary bitmap from the stack
     DWORD cbBitmap = tga.cxWidth * tga.cyHeight * (tga.cBitsPerPixel + 7) / 8;
 //    char *pBitmap = (char*)_alloca(cbBitmap);
-    spr->bitmap = new(std::nothrow) char[cbBitmap];
+    spr->bitmap.reset(new(std::nothrow) uint8_t[cbBitmap]);
 
     // Read targa data into temporary area
 //#pragma message("TODO: Pipe through RLE and make sure we are a truecolor bitmap...")
 //#pragma message("TODO: Support transparent part of sprites using targa data")
     DWORD dwRead;
-    ReadFile(hFile, spr->bitmap, cbBitmap, &dwRead, nullptr);
+    ReadFile(hFile, &spr->bitmap[0], cbBitmap, &dwRead, nullptr);
     CloseHandle(hFile);
     hFile = INVALID_HANDLE_VALUE;
 /*
