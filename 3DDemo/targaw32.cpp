@@ -388,6 +388,7 @@ bool TGADecodeRGB(
     //ddsd.dwHeight = tga.cyHeight;
     spr->xsize = tga.cxWidth;
     spr->ysize = tga.cyHeight;
+    spr->filtered = true;
 
     // Allocate a temporary bitmap from the stack
     DWORD cbBitmap = tga.cxWidth * tga.cyHeight * (tga.cBitsPerPixel + 7) / 8;

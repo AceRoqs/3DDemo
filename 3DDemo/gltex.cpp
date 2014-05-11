@@ -32,25 +32,24 @@ static void generate_grid_texture_rgb(unsigned char* bitmap, int xsize, int ysiz
     }
 }
 
-static void bind_block_to_gl_texture(const block_t& block, unsigned int texture_id, bool use_default_texture)
+static void bind_block_to_gl_texture(const block_t& block, unsigned int texture_id)
 {
-    // TODO: 2014: Should not need to pass use_default_texture.  Pass the filtering as part of the block_t.
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    if(use_default_texture)
-    {
-        // Don't filter the default texture.
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    }
-    else
+    if(block.filtered)
     {
         // Bilinear filtering.
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+    else
+    {
+        // Don't filter the texture.
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
@@ -66,29 +65,36 @@ static void bind_block_to_gl_texture(const block_t& block, unsigned int texture_
                  &block.bitmap[0]);
 }
 
-void bind_file_to_gl_texture(const char* filename, unsigned int texture_id)
+static block_t block_from_file(const char* file_name)
 {
-    block_t block = { 0, 0 };
+    block_t block;
 
     bool use_default_texture = true;
-    const int cch = strlen(filename);
-    if((cch >= 4) && (strcmp(filename + cch - 4, ".pcx") == 0))
+    const int cch = strlen(file_name);
+    if((cch >= 4) && (strcmp(file_name + cch - 4, ".pcx") == 0))
     {
-        use_default_texture = !PCXDecodeRGB(filename, &block);
+        use_default_texture = !PCXDecodeRGB(file_name, &block);
     }
-    else if((cch >= 4) && (strcmp(filename + cch - 4, ".tga") == 0))
+    else if((cch >= 4) && (strcmp(file_name + cch - 4, ".tga") == 0))
     {
-        use_default_texture = !TGADecodeRGB(filename, &block);
+        use_default_texture = !TGADecodeRGB(file_name, &block);
     }
 
     if(use_default_texture)
     {
         block.xsize  = 64;
         block.ysize  = 64;
+        block.filtered = false;
         block.bitmap.reset(new uint8_t[block.xsize * block.ysize * 3]);
         generate_grid_texture_rgb(reinterpret_cast<unsigned char*>(&block.bitmap[0]), block.xsize, block.ysize);
     }
 
-    bind_block_to_gl_texture(block, texture_id, use_default_texture);
+    return block;
+}
+
+void bind_file_to_gl_texture(const char* file_name, unsigned int texture_id)
+{
+    block_t block = block_from_file(file_name);
+    bind_block_to_gl_texture(block, texture_id);
 }
 

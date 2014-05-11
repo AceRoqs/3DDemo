@@ -65,6 +65,7 @@ bool PCXDecodeRGB(const char* filename, block_t* spr)
     {
         spr->xsize = pcx.xMax - pcx.xMin + 1;
         spr->ysize = pcx.yMax - pcx.yMin + 1;
+        spr->filtered = true;
         total_size = spr->xsize * spr->ysize * pcx.NPlanes * pcx.bits_per_pixel / 8;
 
         // TODO: 2014: Use smart pointer for file handle, so new can throw.
