@@ -32,35 +32,9 @@ static void generate_grid_texture_rgb(unsigned char* bitmap, int xsize, int ysiz
     }
 }
 
-void bind_file_to_gl_texture(const char* filename, unsigned int texture_id)
+static void bind_block_to_gl_texture(const block_t& block, unsigned int texture_id, bool use_default_texture)
 {
-    block_t block = { 0, 0, nullptr };
-
-    bool use_default_texture;
-
-    // TODO: 2014: Nice buffer read underrun!
-    int cch = strlen(filename);
-    if(strcmp(filename + cch - 4, ".pcx") == 0)
-    {
-        use_default_texture = !PCXDecodeRGB(filename, &block);
-    }
-    else if(strcmp(filename + cch - 4, ".tga") == 0)
-    {
-        use_default_texture = !TGADecodeRGB(filename, &block);
-    }
-    else
-    {
-        use_default_texture = true;
-    }
-
-    if(use_default_texture)
-    {
-        block.xsize  = 64;
-        block.ysize  = 64;
-        block.bitmap = new(std::nothrow) char[block.xsize * block.ysize * 3];
-        generate_grid_texture_rgb(reinterpret_cast<unsigned char*>(block.bitmap), block.xsize, block.ysize);
-    }
-
+    // TODO: 2014: Should not need to pass use_default_texture.  Pass the filtering as part of the block_t.
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -90,6 +64,38 @@ void bind_file_to_gl_texture(const char* filename, unsigned int texture_id)
                  GL_RGB,
                  GL_UNSIGNED_BYTE,
                  block.bitmap);
+}
+
+void bind_file_to_gl_texture(const char* filename, unsigned int texture_id)
+{
+    block_t block = { 0, 0, nullptr };
+
+    bool use_default_texture;
+
+    // TODO: 2014: Nice buffer read underrun!
+    int cch = strlen(filename);
+    if(strcmp(filename + cch - 4, ".pcx") == 0)
+    {
+        use_default_texture = !PCXDecodeRGB(filename, &block);
+    }
+    else if(strcmp(filename + cch - 4, ".tga") == 0)
+    {
+        use_default_texture = !TGADecodeRGB(filename, &block);
+    }
+    else
+    {
+        use_default_texture = true;
+    }
+
+    if(use_default_texture)
+    {
+        block.xsize  = 64;
+        block.ysize  = 64;
+        block.bitmap = new(std::nothrow) char[block.xsize * block.ysize * 3];
+        generate_grid_texture_rgb(reinterpret_cast<unsigned char*>(block.bitmap), block.xsize, block.ysize);
+    }
+
+    bind_block_to_gl_texture(block, texture_id, use_default_texture);
 
     delete[] block.bitmap;
 }
