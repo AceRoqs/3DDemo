@@ -39,18 +39,18 @@ static void bind_block_to_gl_texture(const block_t& block, unsigned int texture_
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     if(use_default_texture)
     {
         // Don't filter the default texture.
-        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
     else
     {
         // Bilinear filtering.
-        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     }
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
@@ -70,21 +70,15 @@ void bind_file_to_gl_texture(const char* filename, unsigned int texture_id)
 {
     block_t block = { 0, 0 };
 
-    bool use_default_texture;
-
-    // TODO: 2014: Nice buffer read underrun!
-    int cch = strlen(filename);
-    if(strcmp(filename + cch - 4, ".pcx") == 0)
+    bool use_default_texture = true;
+    const int cch = strlen(filename);
+    if((cch >= 4) && (strcmp(filename + cch - 4, ".pcx") == 0))
     {
         use_default_texture = !PCXDecodeRGB(filename, &block);
     }
-    else if(strcmp(filename + cch - 4, ".tga") == 0)
+    else if((cch >= 4) && (strcmp(filename + cch - 4, ".tga") == 0))
     {
         use_default_texture = !TGADecodeRGB(filename, &block);
-    }
-    else
-    {
-        use_default_texture = true;
     }
 
     if(use_default_texture)
