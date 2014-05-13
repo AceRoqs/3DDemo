@@ -36,9 +36,9 @@ struct PCX
 #pragma pack(1)
 typedef struct
 {
-    char red;
-    char green;
-    char blue;
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
 } ColorRGB;
 #pragma pack(pop)
 
@@ -92,9 +92,9 @@ bool PCXDecodeRGB(const char* filename, Bitmap* spr)
             {
                 return false;
             }
-            for(int i = 0; i < run_count; ++i)
+            for(int ii = 0; ii < run_count; ++ii)
             {
-                spr->bitmap[index + i] = buffer;
+                spr->bitmap[index + ii] = buffer;
             }
             index += run_count;
             // we ignore the extra padding crap because I've never seen a
@@ -110,13 +110,13 @@ bool PCXDecodeRGB(const char* filename, Bitmap* spr)
         {
             // read in palette
             ColorRGB *picture = new(std::nothrow) ColorRGB[spr->xsize * spr->ysize];
-            for(long i = 0; i < spr->xsize * spr->ysize; ++i)
+            for(unsigned long ii = 0; ii < spr->xsize * spr->ysize; ++ii)
             {
-                unsigned char x = spr->bitmap[i];
+                unsigned char x = spr->bitmap[ii];
 
-                picture[i].red = palette[x].red;
-                picture[i].green = palette[x].green;
-                picture[i].blue = palette[x].blue;
+                picture[ii].red = palette[x].red;
+                picture[ii].green = palette[x].green;
+                picture[ii].blue = palette[x].blue;
             }
             spr->bitmap.reset(reinterpret_cast<uint8_t *>(picture));
             fclose(in);

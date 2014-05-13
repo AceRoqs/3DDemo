@@ -15,8 +15,8 @@ struct Bitmap
 #endif
 
     std::unique_ptr<uint8_t[]> bitmap;
-    int xsize;
-    int ysize;
+    unsigned int xsize;
+    unsigned int ysize;
     bool filtered;
 };
 
