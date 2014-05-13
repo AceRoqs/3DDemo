@@ -24,9 +24,6 @@
     <ClCompile Include="pcx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gltex.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -69,9 +66,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="render.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gltex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PreCompile.h">

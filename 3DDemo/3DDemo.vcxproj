@@ -138,7 +138,6 @@
     <ClCompile Include="render.cpp" />
     <ClCompile Include="pcx.cpp" />
     <ClCompile Include="targaw32.cpp" />
-    <ClCompile Include="gltex.cpp" />
     <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -150,7 +149,6 @@
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DirectInputMap.h" />
-    <ClInclude Include="gltex.h" />
     <ClInclude Include="particle.h" />
     <ClInclude Include="pcx.h" />
     <ClInclude Include="PreCompile.h" />
