@@ -4,6 +4,7 @@
 //=========================================================================
 #include "PreCompile.h"
 #include "world.h"
+#include "Bitmap.h"
 
 // TODO: 2014: This should not be extern.
 const float g_WorldVector[] =
@@ -145,7 +146,7 @@ bool is_point_in_world(float x, float y, float z)
 
 static void load_world_data(
     std::istream& is,
-    std::vector<std::string>* texture_list,
+    std::vector<Bitmap>* texture_list,
     std::vector<Graphics::Polygon>* polys,
     std::vector<Position_vertex>* vertex_formats,
     std::vector<TexCoord>* texture_coords)
@@ -159,7 +160,7 @@ static void load_world_data(
     {
         char file_name[MAX_PATH];
         is >> file_name;
-        texture_list->push_back(file_name);
+        texture_list->push_back(bitmap_from_file(file_name));
     }
 
     unsigned int cPolys;
@@ -191,7 +192,7 @@ static void load_world_data(
 
 void start_load(
     _In_ char* file_name,
-    std::vector<std::string>* texture_list,
+    std::vector<Bitmap>* texture_list,
     std::vector<Graphics::Polygon>* polys,
     std::vector<Position_vertex>* vertex_formats,
     std::vector<TexCoord>* texture_coords)

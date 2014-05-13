@@ -7,6 +7,7 @@
 #include "gltex.h"
 #include "particle.h"
 #include "world.h"
+#include "Bitmap.h"
 #include "Camera.h"
 
 struct bezier
@@ -48,14 +49,14 @@ void initialize_gl_constants()
 }
 
 void initialize_gl_world_data(
-    const std::vector<std::string>& texture_list,
+    const std::vector<Bitmap>& texture_list,
     const std::vector<Position_vertex>& vertex_formats,
     const std::vector<TexCoord>& texture_coords)
 {
     // Load all texture data.
     for(size_t ix = 0; ix < texture_list.size(); ++ix)
     {
-        bind_file_to_gl_texture(texture_list[ix].c_str(), ix);
+        bind_bitmap_to_gl_texture(texture_list[ix], ix);
     }
 
     // Enable vertex arrays.

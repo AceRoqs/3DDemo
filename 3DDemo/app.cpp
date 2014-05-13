@@ -4,6 +4,7 @@
 #include "render.h"
 #include "Camera.h"
 #include "Action.h"
+#include "Bitmap.h"
 #include "Clock.h"
 #include "DirectInputMap.h"
 #include "HRException.h"
@@ -73,7 +74,7 @@ void app_run(HINSTANCE instance, int show_command)
     try
     {
         // Start load first, to kick off async reads.
-        std::vector<std::string> texture_list;
+        std::vector<Bitmap> texture_list;
         std::vector<Graphics::Polygon> polys;
         std::vector<Position_vertex> vertex_formats;
         std::vector<TexCoord> texture_coords;
