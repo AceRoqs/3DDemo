@@ -179,9 +179,9 @@ void initialize_gl_world_data(
 
 // TODO: add more flushes
 // TODO: modularize into separate functions
-static CEmitter emitter;
 void draw_list(
     const std::vector<Graphics::Polygon>& poly_vector,
+    const CEmitter& emitter,
     const Camera& camera)
 {
     glClearDepth(1.0);
@@ -263,9 +263,6 @@ void draw_list(
 
 //    glUnlockArraysEXT();
 //  glDisable(GL_CULL_FACE);
-    emitter.setPosition(-3, 0, -10.5);
-//    emitter.setPosition(0, 0, 0);
-    emitter.Update();
     emitter.Draw(camera, 6);
 
     //swap_buffers();

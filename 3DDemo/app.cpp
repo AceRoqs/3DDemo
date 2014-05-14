@@ -2,6 +2,7 @@
 #include "app.h"
 #include "world.h"
 #include "render.h"
+#include "particle.h"
 #include "Camera.h"
 #include "Action.h"
 #include "Bitmap.h"
@@ -18,6 +19,8 @@ static bool s_fWindowed = true;
 static UINT_PTR game_message_loop(WindowsCommon::Clock& clock, const WindowsCommon::Input_device& keyboard, const std::vector<Graphics::Polygon>& polys)
 {
     Camera camera(0.0f, 0.0f, 1.0f, 0.0f);
+    CEmitter emitter;
+    emitter.setPosition(-3.0f, 0.0f, -10.5f);
 
     MSG message;
     for(;;)
@@ -37,8 +40,9 @@ static UINT_PTR game_message_loop(WindowsCommon::Clock& clock, const WindowsComm
 
         std::list<std::pair<float, Action>> actions = actions_from_keyboard_state(elapsed_milliseconds, keyboard_state);
         camera = apply_actions(actions, camera);
+        emitter.Update();
 
-        draw_list(polys, camera);
+        draw_list(polys, emitter, camera);
 
         const HDC device_context = wglGetCurrentDC();
         SwapBuffers(device_context);
