@@ -28,7 +28,7 @@ public:
     CParticle();
     bool isDead() const;
     void Update();
-    void Draw(float, float, float, float, int) const;
+    void Draw(const struct Camera& camera, int) const;
 
     friend class CEmitter;
 }; // class CParticle
@@ -44,7 +44,7 @@ public:
     CEmitter();
     void setPosition(float, float, float);
     void Update();
-    void Draw(float, float, float, float camera_degrees, int id) const;
+    void Draw(const struct Camera& camera, int id) const;
 }; // class CEmitter
 //-------------------------------------------------------------------------
 

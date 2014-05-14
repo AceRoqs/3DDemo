@@ -4,6 +4,7 @@
 //=========================================================================
 #include "PreCompile.h"
 #include "particle.h"
+#include "Camera.h"
 
 //-------------------------------------------------------------------------
 CParticle::CParticle()
@@ -38,16 +39,16 @@ void CParticle::Update()
     }
 } // CParticle::Update
 //-------------------------------------------------------------------------
-void CParticle::Draw(float camera_x, float camera_y, float camera_z, float camera_degrees, int id) const
+void CParticle::Draw(const Camera& camera, int id) const
 {
     // transform to location
     glLoadIdentity();
-    glRotatef(camera_degrees, 0, 1, 0);
-    glTranslatef(camera_x, camera_y, camera_z);
+    glRotatef(camera.m_degrees, 0, 1, 0);
+    glTranslatef(camera.m_x, camera.m_y, camera.m_z);
     glTranslatef(cur_x, cur_y, cur_z);
 
     // billboard the sprite
-    glRotatef(-camera_degrees, 0, 1, 0);
+    glRotatef(-camera.m_degrees, 0, 1, 0);
 
 //	glColor4f(color.red, color.green, color.blue, color.alpha);
     glColor4f(1,0,0,1);
@@ -120,8 +121,7 @@ void CEmitter::Update()
 } // CEmitter::Update
 //-------------------------------------------------------------------------
 void CEmitter::Draw(
-    float camera_x, float camera_y, float camera_z,
-    float camera_degrees,
+    const Camera& camera,
     int id) const
 {
 //    glLoadIdentity();
@@ -154,7 +154,7 @@ float modelview[16];
     // TODO: this should be SSE
     for(unsigned int i = 0; i < MAXPARTICLES; ++i)
     {
-        m_particles[i].Draw(camera_x, camera_y, camera_z, camera_degrees, id);
+        m_particles[i].Draw(camera, id);
     }
 } // CEmitter::Draw
 

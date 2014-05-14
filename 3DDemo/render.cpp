@@ -20,207 +20,20 @@ const bezier columns[] =
     { 31, 37, 38, 34, 39, 40, 36, 41, 42 }
 };
 
-static CEmitter emitter;
-
-static void BezCurve(GLfloat camera_x, GLfloat camera_y, GLfloat camera_z);
-
-static void bind_bitmap_to_gl_texture(const Bitmap& bitmap, unsigned int texture_id)
-{
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    if(bitmap.filtered)
-    {
-        // Bilinear filtering.
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    }
-    else
-    {
-        // Don't filter the texture.
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    }
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-    glTexImage2D(GL_TEXTURE_2D,
-                 0,
-                 3,
-                 bitmap.xsize,
-                 bitmap.ysize,
-                 0,
-                 GL_RGB,
-                 GL_UNSIGNED_BYTE,
-                 &bitmap.bitmap[0]);
-}
-
-void initialize_gl_constants()
-{
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    const double LEFTCLIP = -0.5;
-    const double RIGHTCLIP = 0.5;
-    const double BOTTOMCLIP = -0.5;
-    const double TOPCLIP = 0.5;
-    const double NEARCLIP = 0.5;
-    const double FARCLIP = 700;
-    glFrustum(LEFTCLIP, RIGHTCLIP, BOTTOMCLIP, TOPCLIP, NEARCLIP, FARCLIP);
-
-    // enable backface culling and hidden surface removal
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CW);
-    glCullFace(GL_BACK);
-
-    glEnable(GL_BLEND);
-}
-
-void initialize_gl_world_data(
-    const std::vector<Bitmap>& texture_list,
-    const std::vector<Position_vertex>& vertex_formats,
-    const std::vector<TexCoord>& texture_coords)
-{
-    // Load all texture data.
-    for(size_t ix = 0; ix < texture_list.size(); ++ix)
-    {
-        bind_bitmap_to_gl_texture(texture_list[ix], ix);
-    }
-
-    // Enable vertex arrays.
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, &vertex_formats[0]);
-    glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
-}
-
-// TODO: add more flushes
-// TODO: modularize into separate functions
-void draw_list(
-    const std::vector<Graphics::Polygon>& poly_vector,
-    const Camera& camera)
-{
-    glClearDepth(1.0);
-    glClear(GL_DEPTH_BUFFER_BIT);
-//    glClearColor(0.0, 0.0, 0.0, 1.0);
-//    glClear(GL_COLOR_BUFFER_BIT);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glRotatef(camera.m_degrees, 0, 1, 0);
-    glTranslatef(camera.m_x, camera.m_y, camera.m_z);
-    // first pass texturing
-    glColor4f(1.0, 1.0, 1.0, 1.0);
-
-    // single loop multi pass textured lighting
-    // this is done is one pass because of visibility
-    // problems on a second light pass once the world is drawn
-    //    glLockArraysEXT(0, 43);
-    for(unsigned int ii = 0; ii < poly_vector.size(); ii++)
-    {
-    glColor4f(1.0, 1.0, 1.0, 1.0);
-        const Graphics::Polygon* iter = &poly_vector[ii];
-        glBindTexture(GL_TEXTURE_2D, iter->texture);
-        glBlendFunc(GL_ONE, GL_ZERO);
-        glDepthFunc(GL_LESS);
-
-        // TODO: Just draw the whole world as one call
-        unsigned char allIndices[4];
-        // TODO11: remove the need for these casts.
-        assert(poly_vector.size() * 4 < 256);
-        allIndices[0] = static_cast<unsigned char>(ii * 4);
-        allIndices[1] = static_cast<unsigned char>(ii * 4 + 1);
-        allIndices[2] = static_cast<unsigned char>(ii * 4 + 2);
-        allIndices[3] = static_cast<unsigned char>(ii * 4 + 3);
-//        glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_BYTE, allIndices);
-        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, allIndices);
-/*
-        glBegin(GL_QUADS);
-        {
-            for(unsigned int i = 0; i < iter->getNumPoints(); ++i)
-            {
-                // TODO: texture coordinates should be an a texture array
-//                glTexCoord2f(WorldTexture[iter->getTexCoord(i) * 2], WorldTexture[iter->getTexCoord(i) * 2 + 1]);
-//                glArrayElement(iter->getPoint(i));
-                glArrayElement(ii * 4 + i);
-            }
-        }
-        glEnd();
-*/
-        if(iter->lightmap == 0)
-        {
-            continue;
-        }
-
-        glDepthFunc(GL_EQUAL);
-        glColor4f(0.0, 0.0, 0.0, 0.25f);
-        glBindTexture(GL_TEXTURE_2D, iter->lightmap);
-//      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
-
-        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, allIndices);
-//        glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_BYTE, allIndices);
-/*
-        glBegin(GL_QUADS);
-        {
-            for(unsigned int i = 0; i < iter->getNumPoints(); ++i)
-            {
-                // TODO: texture coordinates should be an a texture array
-//                glTexCoord2f(WorldTexture[iter->getTexCoord(i) * 2], WorldTexture[iter->getTexCoord(i) * 2 + 1]);
-//                glArrayElement(iter->getPoint(i));
-                glArrayElement(ii * 4 + i);
-            }
-        }
-        glEnd();
-*/
-    }
-
-    BezCurve(camera.m_x, camera.m_y, camera.m_z);
-
-//    glUnlockArraysEXT();
-//  glDisable(GL_CULL_FACE);
-    emitter.setPosition(-3, 0, -10.5);
-//    emitter.setPosition(0, 0, 0);
-    emitter.Update();
-    emitter.Draw(camera.m_x, camera.m_y, camera.m_z, camera.m_degrees, 6);
-
-    //swap_buffers();
-#if 1
-    //glFlush();
-#else
-    //glFinish();
-#endif
-}
-
-//---------------------------------------------------------------------------
-// dist()
-//---------------------------------------------------------------------------
 //distance between camera and (-2,0,-10)
-static float dist(
-    GLfloat camera_x,
-    GLfloat camera_y,
-    GLfloat camera_z)
+static float dist(const Camera& camera)
 {
-    return sqrt(pow(-2 + camera_x,2) + pow(camera_y,2) + pow(-10 + camera_z,2));
+    return sqrt(pow(-2 + camera.m_x, 2) + pow(camera.m_y, 2) + pow(-10 + camera.m_z, 2));
 }
 
-//---------------------------------------------------------------------------
-// BezCurve()
-//---------------------------------------------------------------------------
-static void BezCurve(
-    GLfloat camera_x,
-    GLfloat camera_y,
-    GLfloat camera_z)
+static void BezCurve(const Camera& camera)
 {
     const unsigned int PTS = 10;
     Position_vertex pts[PTS][PTS];
 
     // set level-of-detail
     int lod;
-    lod = (int)(PTS / (dist(camera_x, camera_y, camera_z) * 0.25f));
+    lod = (int)(PTS / (dist(camera) * 0.25f));
 
     if(lod < 2)
     {
@@ -290,4 +103,176 @@ static void BezCurve(
         glEnd();
     } //  for w
 } // BezCurve
+
+static void bind_bitmap_to_gl_texture(const Bitmap& bitmap, unsigned int texture_id)
+{
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    if(bitmap.filtered)
+    {
+        // Bilinear filtering.
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+    else
+    {
+        // Don't filter the texture.
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    }
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 3,
+                 bitmap.xsize,
+                 bitmap.ysize,
+                 0,
+                 GL_RGB,
+                 GL_UNSIGNED_BYTE,
+                 &bitmap.bitmap[0]);
+}
+
+void initialize_gl_constants()
+{
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    const double LEFTCLIP = -0.5;
+    const double RIGHTCLIP = 0.5;
+    const double BOTTOMCLIP = -0.5;
+    const double TOPCLIP = 0.5;
+    const double NEARCLIP = 0.5;
+    const double FARCLIP = 700;
+    glFrustum(LEFTCLIP, RIGHTCLIP, BOTTOMCLIP, TOPCLIP, NEARCLIP, FARCLIP);
+
+    // Enable backface culling and hidden surface removal.
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+
+    glEnable(GL_BLEND);
+}
+
+void initialize_gl_world_data(
+    const std::vector<Bitmap>& texture_list,
+    const std::vector<Position_vertex>& vertex_formats,
+    const std::vector<TexCoord>& texture_coords)
+{
+    // Load all texture data.
+    for(size_t ix = 0; ix < texture_list.size(); ++ix)
+    {
+        bind_bitmap_to_gl_texture(texture_list[ix], ix);
+    }
+
+    // Enable vertex arrays.
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, &vertex_formats[0]);
+    glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
+}
+
+// TODO: add more flushes
+// TODO: modularize into separate functions
+static CEmitter emitter;
+void draw_list(
+    const std::vector<Graphics::Polygon>& poly_vector,
+    const Camera& camera)
+{
+    glClearDepth(1.0);
+    glClear(GL_DEPTH_BUFFER_BIT);
+//    glClearColor(0.0, 0.0, 0.0, 1.0);
+//    glClear(GL_COLOR_BUFFER_BIT);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glRotatef(camera.m_degrees, 0, 1, 0);
+    glTranslatef(camera.m_x, camera.m_y, camera.m_z);
+    // first pass texturing
+    glColor4f(1.0, 1.0, 1.0, 1.0);
+
+    // single loop multi pass textured lighting
+    // this is done is one pass because of visibility
+    // problems on a second light pass once the world is drawn
+    //    glLockArraysEXT(0, 43);
+    for(unsigned int ii = 0; ii < poly_vector.size(); ii++)
+    {
+        glColor4f(1.0, 1.0, 1.0, 1.0);
+        const Graphics::Polygon* iter = &poly_vector[ii];
+        glBindTexture(GL_TEXTURE_2D, iter->texture);
+        glBlendFunc(GL_ONE, GL_ZERO);
+        glDepthFunc(GL_LESS);
+
+        // TODO: Just draw the whole world as one call
+        unsigned char allIndices[4];
+        // TODO11: remove the need for these casts.
+        assert(poly_vector.size() * 4 < 256);
+        allIndices[0] = static_cast<unsigned char>(ii * 4);
+        allIndices[1] = static_cast<unsigned char>(ii * 4 + 1);
+        allIndices[2] = static_cast<unsigned char>(ii * 4 + 2);
+        allIndices[3] = static_cast<unsigned char>(ii * 4 + 3);
+//        glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_BYTE, allIndices);
+        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, allIndices);
+/*
+        glBegin(GL_QUADS);
+        {
+            for(unsigned int i = 0; i < iter->getNumPoints(); ++i)
+            {
+                // TODO: texture coordinates should be an a texture array
+//                glTexCoord2f(WorldTexture[iter->getTexCoord(i) * 2], WorldTexture[iter->getTexCoord(i) * 2 + 1]);
+//                glArrayElement(iter->getPoint(i));
+                glArrayElement(ii * 4 + i);
+            }
+        }
+        glEnd();
+*/
+        if(iter->lightmap == 0)
+        {
+            continue;
+        }
+
+        glDepthFunc(GL_EQUAL);
+        glColor4f(0.0, 0.0, 0.0, 0.25f);
+        glBindTexture(GL_TEXTURE_2D, iter->lightmap);
+//      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
+
+        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, allIndices);
+//        glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_BYTE, allIndices);
+/*
+        glBegin(GL_QUADS);
+        {
+            for(unsigned int i = 0; i < iter->getNumPoints(); ++i)
+            {
+                // TODO: texture coordinates should be an a texture array
+//                glTexCoord2f(WorldTexture[iter->getTexCoord(i) * 2], WorldTexture[iter->getTexCoord(i) * 2 + 1]);
+//                glArrayElement(iter->getPoint(i));
+                glArrayElement(ii * 4 + i);
+            }
+        }
+        glEnd();
+*/
+    }
+
+    BezCurve(camera);
+
+//    glUnlockArraysEXT();
+//  glDisable(GL_CULL_FACE);
+    emitter.setPosition(-3, 0, -10.5);
+//    emitter.setPosition(0, 0, 0);
+    emitter.Update();
+    emitter.Draw(camera, 6);
+
+    //swap_buffers();
+#if 1
+    //glFlush();
+#else
+    //glFinish();
+#endif
+}
 
