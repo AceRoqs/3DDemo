@@ -8,6 +8,7 @@
 #include "world.h"
 #include "Bitmap.h"
 #include "Camera.h"
+#include "LinearAlgebra.h"
 
 struct bezier
 {
@@ -29,7 +30,7 @@ static float dist(const Camera& camera)
 static void BezCurve(const Camera& camera)
 {
     const unsigned int PTS = 10;
-    Position_vertex pts[PTS][PTS];
+    Vector3f pts[PTS][PTS];
 
     // set level-of-detail
     int lod;
@@ -50,9 +51,9 @@ static void BezCurve(const Camera& camera)
         {
             for(int u = 0; u < lod; ++u)
             {
-                pts[u][v].aVertex[0] = 0.0;
-                pts[u][v].aVertex[1] = 0.0;
-                pts[u][v].aVertex[2] = 0.0;
+                pts[u][v].element[0] = 0.0;
+                pts[u][v].element[1] = 0.0;
+                pts[u][v].element[2] = 0.0;
                 // TODO: This loop could really be optimized
                 for(int j = 0; j < 3; ++j)
                 {
@@ -74,9 +75,9 @@ static void BezCurve(const Camera& camera)
                             bezu = 2.0f * (1.0f-(float(u)/(float(lod) - 1.0f))) * (float(u) / (float(lod) - 1.0f));
                         else
                             bezu = (float(u) / (float(lod) - 1.0f)) * (float(u) / (float(lod) - 1.0f));
-                        pts[u][v].aVertex[0] += px * bezv * bezu;
-                        pts[u][v].aVertex[1] += py * bezv * bezu;
-                        pts[u][v].aVertex[2] += pz * bezv * bezu;
+                        pts[u][v].element[0] += px * bezv * bezu;
+                        pts[u][v].element[1] += py * bezv * bezu;
+                        pts[u][v].element[2] += pz * bezv * bezu;
                     }
                 }
             }
@@ -90,13 +91,13 @@ static void BezCurve(const Camera& camera)
             for(int k = 0; k < lod - 1; ++k)
             {
                 glTexCoord2f(float(k) * 1.0f / (float)lod, (float)l * 1.0f/(float)lod);
-                glVertex3f(pts[k][l].aVertex[0], pts[k][l].aVertex[1], pts[k][l].aVertex[2]);
+                glVertex3f(pts[k][l].element[0], pts[k][l].element[1], pts[k][l].element[2]);
                 glTexCoord2f((float)(k+2) * 1.0f/(float)lod , (float)l*1.0f/(float)lod);
-                glVertex3f(pts[k+1][l].aVertex[0], pts[k+1][l].aVertex[1], pts[k+1][l].aVertex[2]);
+                glVertex3f(pts[k+1][l].element[0], pts[k+1][l].element[1], pts[k+1][l].element[2]);
                 glTexCoord2f((float)(k+2) * 1.0f/(float)lod, (float)(l+2) * 1.0f/(float)lod);
-                glVertex3f(pts[k+1][l+1].aVertex[0], pts[k+1][l+1].aVertex[1], pts[k+1][l+1].aVertex[2]);
+                glVertex3f(pts[k+1][l+1].element[0], pts[k+1][l+1].element[1], pts[k+1][l+1].element[2]);
                 glTexCoord2f((float)k * 1.0f/(float)lod, (float)(l+2) * 1.0f/(float)lod);
-                glVertex3f(pts[k][l+1].aVertex[0], pts[k][l+1].aVertex[1], pts[k][l+1].aVertex[2]);
+                glVertex3f(pts[k][l+1].element[0], pts[k][l+1].element[1], pts[k][l+1].element[2]);
             }
         }
 
@@ -161,8 +162,8 @@ void initialize_gl_constants()
 
 void initialize_gl_world_data(
     const std::vector<Bitmap>& texture_list,
-    const std::vector<Position_vertex>& vertex_formats,
-    const std::vector<TexCoord>& texture_coords)
+    const std::vector<Vector3f>& vertex_formats,
+    const std::vector<Vector2f>& texture_coords)
 {
     // Load all texture data.
     for(size_t ix = 0; ix < texture_list.size(); ++ix)

@@ -5,6 +5,7 @@
 #include "PreCompile.h"
 #include "world.h"
 #include "Bitmap.h"
+#include "LinearAlgebra.h"
 
 // TODO: 2014: This should not be extern.
 const float g_WorldVector[] =
@@ -148,8 +149,8 @@ static void load_world_data(
     std::istream& is,
     std::vector<Bitmap>* texture_list,
     std::vector<Graphics::Polygon>* polys,
-    std::vector<Position_vertex>* vertex_formats,
-    std::vector<TexCoord>* texture_coords)
+    std::vector<Vector3f>* vertex_formats,
+    std::vector<Vector2f>* texture_coords)
 {
     unsigned int cTextures;
 
@@ -175,16 +176,16 @@ static void load_world_data(
         for(auto jj = 0; jj < 4; ++jj)
         {
             auto ix = poly.points[jj];
-            Position_vertex out_vertex_format;
-            out_vertex_format.aVertex[0] = g_WorldVector[ix * 3];
-            out_vertex_format.aVertex[1] = g_WorldVector[ix * 3 + 1];
-            out_vertex_format.aVertex[2] = g_WorldVector[ix * 3 + 2];
+            Vector3f out_vertex_format;
+            out_vertex_format.element[0] = g_WorldVector[ix * 3];
+            out_vertex_format.element[1] = g_WorldVector[ix * 3 + 1];
+            out_vertex_format.element[2] = g_WorldVector[ix * 3 + 2];
             vertex_formats->push_back(out_vertex_format);
 
             ix = poly.texture_coordinates[jj];
-            TexCoord out_coord;
-            out_coord.aTexCoord[0] = WorldTexture[ix * 2];
-            out_coord.aTexCoord[1] = WorldTexture[ix * 2 + 1];
+            Vector2f out_coord;
+            out_coord.element[0] = WorldTexture[ix * 2];
+            out_coord.element[1] = WorldTexture[ix * 2 + 1];
             texture_coords->push_back(out_coord);
         }
     }
@@ -194,8 +195,8 @@ void start_load(
     _In_ char* file_name,
     std::vector<Bitmap>* texture_list,
     std::vector<Graphics::Polygon>* polys,
-    std::vector<Position_vertex>* vertex_formats,
-    std::vector<TexCoord>* texture_coords)
+    std::vector<Vector3f>* vertex_formats,
+    std::vector<Vector2f>* texture_coords)
 {
     std::ifstream fis;
     fis.open(file_name);

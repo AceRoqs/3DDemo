@@ -18,24 +18,14 @@ struct Polygon
 
 std::istream& operator>>(std::istream& is, Graphics::Polygon& polygon);
 
-struct Position_vertex
-{
-    float aVertex[3];
-};
-
-struct TexCoord
-{
-    float aTexCoord[2];
-};
-
 bool is_point_in_world(float x, float y, float z);
 
 void start_load(
     _In_ char* file_name,
     std::vector<struct Bitmap>* texture_list,
     std::vector<struct Graphics::Polygon>* polys,
-    std::vector<struct Position_vertex>* vertex_formats,
-    std::vector<struct TexCoord>* texture_coords);
+    std::vector<struct Vector3f>* vertex_formats,
+    std::vector<struct Vector2f>* texture_coords);
 
 extern const float g_WorldVector[];
 
