@@ -22,9 +22,10 @@ const bezier columns[] =
 };
 
 //distance between camera and (-2,0,-10)
+// TODO: Take Vector3f.
 static float dist(const Camera& camera)
 {
-    return sqrt(pow(-2 + camera.m_x, 2) + pow(camera.m_y, 2) + pow(-10 + camera.m_z, 2));
+    return sqrt(pow(-2 + camera.m_position.element[0], 2) + pow(camera.m_position.element[1], 2) + pow(-10 + camera.m_position.element[2], 2));
 }
 
 static void BezCurve(const Camera& camera)
@@ -193,7 +194,7 @@ void draw_list(
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glRotatef(camera.m_degrees, 0, 1, 0);
-    glTranslatef(camera.m_x, camera.m_y, camera.m_z);
+    glTranslatef(camera.m_position.element[0], camera.m_position.element[1], camera.m_position.element[2]);
     // first pass texturing
     glColor4f(1.0, 1.0, 1.0, 1.0);
 

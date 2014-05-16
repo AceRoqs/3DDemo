@@ -121,6 +121,7 @@ std::istream& operator>>(std::istream& is, Graphics::Polygon& polygon)
 }
 
 // Returns true if the point is inside the bounds of all polygons in the world.
+// TODO: Take Vector3f.
 bool is_point_in_world(float x, float y, float z)
 {
     (y);    // unreferenced parameter

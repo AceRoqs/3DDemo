@@ -19,7 +19,7 @@ static bool s_fWindowed = true;
 
 static UINT_PTR game_message_loop(WindowsCommon::Clock& clock, const WindowsCommon::Input_device& keyboard, const std::vector<Graphics::Polygon>& polys)
 {
-    Camera camera(0.0f, 0.0f, 1.0f, 0.0f);
+    Camera camera(Vector3f(0.0f, 0.0f, 1.0f), 0.0f);
     CEmitter emitter;
     emitter.setPosition(-3.0f, 0.0f, -10.5f);
 

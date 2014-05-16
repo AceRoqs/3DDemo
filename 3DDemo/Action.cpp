@@ -6,8 +6,8 @@
 Camera apply_actions(const std::list<std::pair<float, Action>>& actions, const Camera& camera)
 {
     Camera new_camera = camera;
-    float new_x = new_camera.m_x;
-    float new_z = new_camera.m_z;
+    float new_x = new_camera.m_position.element[0];
+    float new_z = new_camera.m_position.element[2];
 
     // These two values can be configurable for gameplay.
     const auto walk_distance_per_tick = 0.045f;
@@ -74,16 +74,16 @@ Camera apply_actions(const std::list<std::pair<float, Action>>& actions, const C
     }
 
     // Testing each coordinate on its own only is correct because each boundary is axis aligned.
-    float updated_x = new_camera.m_x;
-    if(is_point_in_world(new_x, new_camera.m_y, new_camera.m_z))
+    float updated_x = new_camera.m_position.element[0];
+    if(is_point_in_world(new_x, new_camera.m_position.element[1], new_camera.m_position.element[2]))
     {
         updated_x = new_x;
     }
-    if(is_point_in_world(new_camera.m_x, new_camera.m_y, new_z))
+    if(is_point_in_world(new_camera.m_position.element[0], new_camera.m_position.element[1], new_z))
     {
-        new_camera.m_z = new_z;
+        new_camera.m_position.element[2] = new_z;
     }
-    new_camera.m_x = updated_x;
+    new_camera.m_position.element[0] = updated_x;
 
     return new_camera;
 }

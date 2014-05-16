@@ -10,6 +10,19 @@ struct Vector2f
 
 struct Vector3f
 {
+    Vector3f()
+    {
+        // TODO: Zero init?
+    }
+
+    Vector3f(float x, float y, float z)
+    {
+        element[0] = x;
+        element[1] = y;
+        element[2] = z;
+    }
+
+    // TODO: Add x/y/z union.  This is too verbose and error prone.
     float element[3];
 };
 

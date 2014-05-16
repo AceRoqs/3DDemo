@@ -3,15 +3,15 @@
 
 // TODO: namespace
 
+#include "LinearAlgebra.h"
+
 struct Camera
 {
-    Camera(float x, float y, float z, float degrees) : m_x(x), m_y(y), m_z(z), m_degrees(degrees)
+    Camera(const Vector3f& position, float degrees) : m_position(position), m_degrees(degrees)
     {
     }
 
-    float m_x;
-    float m_y;
-    float m_z;
+    Vector3f m_position;
     float m_degrees;
 };
 
