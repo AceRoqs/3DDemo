@@ -44,7 +44,7 @@ void CParticle::Draw(const Camera& camera, int id) const
     // transform to location
     glLoadIdentity();
     glRotatef(camera.m_degrees, 0, 1, 0);
-    glTranslatef(camera.m_position.element[0], camera.m_position.element[1], camera.m_position.element[2]);
+    glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
     glTranslatef(cur_x, cur_y, cur_z);
 
     // billboard the sprite

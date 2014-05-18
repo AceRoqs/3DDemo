@@ -25,7 +25,7 @@ const bezier columns[] =
 // TODO: Take Vector3f.
 static float dist(const Camera& camera)
 {
-    return sqrt(pow(-2 + camera.m_position.element[0], 2) + pow(camera.m_position.element[1], 2) + pow(-10 + camera.m_position.element[2], 2));
+    return sqrt(pow(-2 + camera.m_position.x(), 2) + pow(camera.m_position.y(), 2) + pow(-10 + camera.m_position.z(), 2));
 }
 
 static void BezCurve(const Camera& camera)
@@ -52,9 +52,9 @@ static void BezCurve(const Camera& camera)
         {
             for(int u = 0; u < lod; ++u)
             {
-                pts[u][v].element[0] = 0.0;
-                pts[u][v].element[1] = 0.0;
-                pts[u][v].element[2] = 0.0;
+                pts[u][v].x() = 0.0;
+                pts[u][v].y() = 0.0;
+                pts[u][v].z() = 0.0;
                 // TODO: This loop could really be optimized
                 for(int j = 0; j < 3; ++j)
                 {
@@ -76,9 +76,9 @@ static void BezCurve(const Camera& camera)
                             bezu = 2.0f * (1.0f-(float(u)/(float(lod) - 1.0f))) * (float(u) / (float(lod) - 1.0f));
                         else
                             bezu = (float(u) / (float(lod) - 1.0f)) * (float(u) / (float(lod) - 1.0f));
-                        pts[u][v].element[0] += px * bezv * bezu;
-                        pts[u][v].element[1] += py * bezv * bezu;
-                        pts[u][v].element[2] += pz * bezv * bezu;
+                        pts[u][v].x() += px * bezv * bezu;
+                        pts[u][v].y() += py * bezv * bezu;
+                        pts[u][v].z() += pz * bezv * bezu;
                     }
                 }
             }
@@ -92,13 +92,13 @@ static void BezCurve(const Camera& camera)
             for(int k = 0; k < lod - 1; ++k)
             {
                 glTexCoord2f(float(k) * 1.0f / (float)lod, (float)l * 1.0f/(float)lod);
-                glVertex3f(pts[k][l].element[0], pts[k][l].element[1], pts[k][l].element[2]);
+                glVertex3f(pts[k][l].x(), pts[k][l].y(), pts[k][l].z());
                 glTexCoord2f((float)(k+2) * 1.0f/(float)lod , (float)l*1.0f/(float)lod);
-                glVertex3f(pts[k+1][l].element[0], pts[k+1][l].element[1], pts[k+1][l].element[2]);
+                glVertex3f(pts[k+1][l].x(), pts[k+1][l].y(), pts[k+1][l].z());
                 glTexCoord2f((float)(k+2) * 1.0f/(float)lod, (float)(l+2) * 1.0f/(float)lod);
-                glVertex3f(pts[k+1][l+1].element[0], pts[k+1][l+1].element[1], pts[k+1][l+1].element[2]);
+                glVertex3f(pts[k+1][l+1].x(), pts[k+1][l+1].y(), pts[k+1][l+1].z());
                 glTexCoord2f((float)k * 1.0f/(float)lod, (float)(l+2) * 1.0f/(float)lod);
-                glVertex3f(pts[k][l+1].element[0], pts[k][l+1].element[1], pts[k][l+1].element[2]);
+                glVertex3f(pts[k][l+1].x(), pts[k][l+1].y(), pts[k][l+1].z());
             }
         }
 
@@ -194,7 +194,7 @@ void draw_list(
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glRotatef(camera.m_degrees, 0, 1, 0);
-    glTranslatef(camera.m_position.element[0], camera.m_position.element[1], camera.m_position.element[2]);
+    glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
     // first pass texturing
     glColor4f(1.0, 1.0, 1.0, 1.0);
 

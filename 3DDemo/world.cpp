@@ -178,15 +178,15 @@ static void load_world_data(
         {
             auto ix = poly.points[jj];
             Vector3f out_vertex_format;
-            out_vertex_format.element[0] = g_WorldVector[ix * 3];
-            out_vertex_format.element[1] = g_WorldVector[ix * 3 + 1];
-            out_vertex_format.element[2] = g_WorldVector[ix * 3 + 2];
+            out_vertex_format.x() = g_WorldVector[ix * 3];
+            out_vertex_format.y() = g_WorldVector[ix * 3 + 1];
+            out_vertex_format.z() = g_WorldVector[ix * 3 + 2];
             vertex_formats->push_back(out_vertex_format);
 
             ix = poly.texture_coordinates[jj];
             Vector2f out_coord;
-            out_coord.element[0] = WorldTexture[ix * 2];
-            out_coord.element[1] = WorldTexture[ix * 2 + 1];
+            out_coord.x() = WorldTexture[ix * 2];
+            out_coord.y() = WorldTexture[ix * 2 + 1];
             texture_coords->push_back(out_coord);
         }
     }

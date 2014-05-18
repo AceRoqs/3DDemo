@@ -6,6 +6,31 @@
 struct Vector2f
 {
     float element[2];
+
+    float& operator[](size_t ix)
+    {
+        return element[ix];
+    }
+
+    float& x()
+    {
+        return element[0];
+    }
+
+    float& y()
+    {
+        return element[1];
+    }
+
+    float x() const
+    {
+        return element[0];
+    }
+
+    float y() const
+    {
+        return element[1];
+    }
 };
 
 struct Vector3f
@@ -22,8 +47,42 @@ struct Vector3f
         element[2] = z;
     }
 
-    // TODO: Add x/y/z union.  This is too verbose and error prone.
     float element[3];
+
+    float& operator[](size_t ix)
+    {
+        return element[ix];
+    }
+
+    float& x()
+    {
+        return element[0];
+    }
+
+    float& y()
+    {
+        return element[1];
+    }
+
+    float& z()
+    {
+        return element[2];
+    }
+
+    float x() const
+    {
+        return element[0];
+    }
+
+    float y() const
+    {
+        return element[1];
+    }
+
+    float z() const
+    {
+        return element[2];
+    }
 };
 
 #endif
