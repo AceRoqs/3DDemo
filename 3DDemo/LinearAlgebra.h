@@ -7,83 +7,27 @@ struct Vector2f
 {
     float element[2];
 
-    float& operator[](size_t ix)
-    {
-        return element[ix];
-    }
-
-    float& x()
-    {
-        return element[0];
-    }
-
-    float& y()
-    {
-        return element[1];
-    }
-
-    float x() const
-    {
-        return element[0];
-    }
-
-    float y() const
-    {
-        return element[1];
-    }
+    float& operator[](size_t ix);
+    float& x();
+    float& y();
+    float x() const;
+    float y() const;
 };
 
 struct Vector3f
 {
-    Vector3f()
-    {
-        // TODO: Zero init?
-    }
-
-    Vector3f(float x, float y, float z)
-    {
-        element[0] = x;
-        element[1] = y;
-        element[2] = z;
-    }
-
     float element[3];
 
-    float& operator[](size_t ix)
-    {
-        return element[ix];
-    }
-
-    float& x()
-    {
-        return element[0];
-    }
-
-    float& y()
-    {
-        return element[1];
-    }
-
-    float& z()
-    {
-        return element[2];
-    }
-
-    float x() const
-    {
-        return element[0];
-    }
-
-    float y() const
-    {
-        return element[1];
-    }
-
-    float z() const
-    {
-        return element[2];
-    }
+    float& operator[](size_t ix);
+    float& x();
+    float& y();
+    float& z();
+    float x() const;
+    float y() const;
+    float z() const;
 };
+
+Vector3f make_vector(float x, float y, float z);
 
 #endif
 
