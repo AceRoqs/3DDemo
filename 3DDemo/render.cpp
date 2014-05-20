@@ -21,21 +21,14 @@ const bezier columns[] =
     { 31, 37, 38, 34, 39, 40, 36, 41, 42 }
 };
 
-//distance between camera and (-2,0,-10)
-// TODO: Take Vector3f.
-static float dist(const Camera& camera)
-{
-    return sqrt(pow(-2 + camera.m_position.x(), 2) + pow(camera.m_position.y(), 2) + pow(-10 + camera.m_position.z(), 2));
-}
-
-static void BezCurve(const Camera& camera)
+static void BezCurve(const Camera& camera, const float* world_vector)
 {
     const unsigned int PTS = 10;
     Vector3f pts[PTS][PTS];
 
     // set level-of-detail
     int lod;
-    lod = (int)(PTS / (dist(camera) * 0.25f));
+    lod = (int)(PTS / (point_distance(camera.m_position, make_vector(2, 0, 10)) * 0.25f));
 
     if(lod < 2)
     {
@@ -52,30 +45,45 @@ static void BezCurve(const Camera& camera)
         {
             for(int u = 0; u < lod; ++u)
             {
-                pts[u][v].x() = 0.0;
-                pts[u][v].y() = 0.0;
-                pts[u][v].z() = 0.0;
+                pts[u][v].x() = 0.0f;
+                pts[u][v].y() = 0.0f;
+                pts[u][v].z() = 0.0f;
                 // TODO: This loop could really be optimized
                 for(int j = 0; j < 3; ++j)
                 {
                     for(int k = 0; k < 3; ++k)
                     {
-                        float px = g_WorldVector[(columns[w].ctl_pts[j * 3 + k])*3];
-                        float py = g_WorldVector[(columns[w].ctl_pts[j * 3 + k])*3+1];
-                        float pz = g_WorldVector[(columns[w].ctl_pts[j * 3 + k])*3+2];
                         float bezu, bezv;
+
                         if(j == 0)
-                            bezv = (1.0f-(float(v)/(float(lod) - 1.0f))) * (1.0f-(float(v)/(float(lod) - 1.0f)));
+                        {
+                            bezv = (1.0f - (v / (lod - 1.0f))) * (1.0f-(v / (lod - 1.0f)));
+                        }
                         else if(j == 1)
-                            bezv = 2.0f * (1.0f-(float(v)/(float(lod) - 1.0f))) * (float(v) / (float(lod) - 1.0f));
+                        {
+                            bezv = 2.0f * (1.0f - (v / (lod - 1.0f))) * (v / (lod - 1.0f));
+                        }
                         else
-                            bezv = (float(v) / (float(lod) - 1.0f)) * (float(v) / (float(lod) - 1.0f));
+                        {
+                            bezv = (v / (lod - 1.0f)) * (v / (lod - 1.0f));
+                        }
+
                         if(k == 0)
-                            bezu = (1.0f-(float(u)/(float(lod) - 1.0f))) * (1.0f-(float(u)/(float(lod) - 1.0f)));
+                        {
+                            bezu = (1.0f - (u / (lod - 1.0f))) * (1.0f - (u / (lod - 1.0f)));
+                        }
                         else if(k == 1)
-                            bezu = 2.0f * (1.0f-(float(u)/(float(lod) - 1.0f))) * (float(u) / (float(lod) - 1.0f));
+                        {
+                            bezu = 2.0f * (1.0f - (u / (lod - 1.0f))) * (u / (lod - 1.0f));
+                        }
                         else
-                            bezu = (float(u) / (float(lod) - 1.0f)) * (float(u) / (float(lod) - 1.0f));
+                        {
+                            bezu = (u / (lod - 1.0f)) * (u / (lod - 1.0f));
+                        }
+
+                        const float px = world_vector[(columns[w].ctl_pts[j * 3 + k])*3];
+                        const float py = world_vector[(columns[w].ctl_pts[j * 3 + k])*3+1];
+                        const float pz = world_vector[(columns[w].ctl_pts[j * 3 + k])*3+2];
                         pts[u][v].x() += px * bezv * bezu;
                         pts[u][v].y() += py * bezv * bezu;
                         pts[u][v].z() += pz * bezv * bezu;
@@ -86,23 +94,24 @@ static void BezCurve(const Camera& camera)
 
         glBlendFunc(GL_ONE, GL_ZERO);
         glBindTexture(GL_TEXTURE_2D, 2);
+
         glBegin(GL_QUADS);
         for(int l = 0; l < lod - 1; ++l)
         {
             for(int k = 0; k < lod - 1; ++k)
             {
-                glTexCoord2f(float(k) * 1.0f / (float)lod, (float)l * 1.0f/(float)lod);
+                glTexCoord2f(k * 1.0f / lod, l * 1.0f / lod);
                 glVertex3f(pts[k][l].x(), pts[k][l].y(), pts[k][l].z());
-                glTexCoord2f((float)(k+2) * 1.0f/(float)lod , (float)l*1.0f/(float)lod);
+                glTexCoord2f((k+2) * 1.0f / lod , l*1.0f / lod);
                 glVertex3f(pts[k+1][l].x(), pts[k+1][l].y(), pts[k+1][l].z());
-                glTexCoord2f((float)(k+2) * 1.0f/(float)lod, (float)(l+2) * 1.0f/(float)lod);
+                glTexCoord2f((k+2) * 1.0f / lod, (l+2) * 1.0f / lod);
                 glVertex3f(pts[k+1][l+1].x(), pts[k+1][l+1].y(), pts[k+1][l+1].z());
-                glTexCoord2f((float)k * 1.0f/(float)lod, (float)(l+2) * 1.0f/(float)lod);
+                glTexCoord2f(k * 1.0f / lod, (l+2) * 1.0f / lod);
                 glVertex3f(pts[k][l+1].x(), pts[k][l+1].y(), pts[k][l+1].z());
             }
         }
-
         glEnd();
+
     } //  for w
 } // BezCurve
 
@@ -261,7 +270,7 @@ void draw_list(
 */
     }
 
-    BezCurve(camera);
+    BezCurve(camera, g_WorldVector);
 
 //    glUnlockArraysEXT();
 //  glDisable(GL_CULL_FACE);

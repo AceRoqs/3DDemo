@@ -31,5 +31,7 @@ struct Vector3f
 
 Vector3f make_vector(float x, float y, float z);
 
+float point_distance(const Vector3f& p1, const Vector3f& p2);
+
 #endif
 
