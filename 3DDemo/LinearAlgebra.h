@@ -10,6 +10,7 @@ struct Vector2f
     float& operator[](size_t ix);
     float& x();
     float& y();
+
     float x() const;
     float y() const;
 };
@@ -22,6 +23,7 @@ struct Vector3f
     float& x();
     float& y();
     float& z();
+
     float x() const;
     float y() const;
     float z() const;
