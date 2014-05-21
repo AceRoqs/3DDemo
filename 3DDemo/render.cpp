@@ -15,78 +15,81 @@ struct bezier
     int ctl_pts[9];
 };
 
-const bezier columns[] =
+const bezier patches[] =
 {
     { 29, 30, 31, 32, 33, 34,  0, 35, 36 },
     { 31, 37, 38, 34, 39, 40, 36, 41, 42 }
 };
 
+// http://en.wikipedia.org/wiki/B%C3%A9zier_curve
+// B0(t) = (1-t)^2
+// B1(t) = 2(1-t)t
+// B2(t) = t^2
+// t = [0..1]
+static float bezier_quadratic_basis(unsigned int index, float t)
+{
+    float basis;
+    if(index == 0)
+    {
+        basis = (1.0f - t) * (1.0f - t);
+    }
+    else if(index == 1)
+    {
+        basis = 2.0f * (1.0f - t) * t;
+    }
+    else
+    {
+        assert(index == 2);
+        basis = t * t;
+    }
+
+    return basis;
+}
+
 static void BezCurve(const Camera& camera, const float* world_vector)
 {
-    const unsigned int PTS = 10;
-    Vector3f pts[PTS][PTS];
+    const int PTS = 10;
 
-    // set level-of-detail
-    int lod;
-    lod = (int)(PTS / (point_distance(camera.m_position, make_vector(2, 0, 10)) * 0.25f));
+    // Set level-of-detail.
+    int lod = (int)(PTS * 4 / (point_distance(camera.m_position, make_vector(2, 0, 10))));
 
-    if(lod < 2)
-    {
-        lod = 2;    // minimum level of detail
-    }
-    if(lod > PTS)
-    {
-        lod = PTS;  // maximum level of detail
-    }
+    lod = std::min(std::max(2, lod), PTS);
 
-    for(int w = 0; w < 2; ++w)
+    for(size_t current_patch = 0; current_patch < ARRAYSIZE(patches); ++current_patch)
     {
+        // Q(u,v) = sum[i=0..2]sum[j=0..2] Bi(u)Bj(v)Pij
+        Vector3f pts[PTS][PTS]; // Q.
+
+        // Generate all of the points.
         for(int v = 0; v < lod; ++v)
         {
             for(int u = 0; u < lod; ++u)
             {
-                pts[u][v].x() = 0.0f;
-                pts[u][v].y() = 0.0f;
-                pts[u][v].z() = 0.0f;
-                // TODO: This loop could really be optimized
+                Vector3f& point = pts[u][v];
+                point.x() = 0.0f;
+                point.y() = 0.0f;
+                point.z() = 0.0f;
+
+                // Range [0..1].
+                const float t_u = u / (lod - 1.0f);
+                const float t_v = v / (lod - 1.0f);
+
+                // Calculate the u,v point of the patch using three control points in each (u/v) direction.
                 for(int j = 0; j < 3; ++j)
                 {
-                    for(int k = 0; k < 3; ++k)
+                    const float basis_v = bezier_quadratic_basis(j, t_v);
+
+                    for(int i = 0; i < 3; ++i)
                     {
-                        float bezu, bezv;
+                        const float basis = bezier_quadratic_basis(i, t_u) * basis_v;
 
-                        if(j == 0)
-                        {
-                            bezv = (1.0f - (v / (lod - 1.0f))) * (1.0f-(v / (lod - 1.0f)));
-                        }
-                        else if(j == 1)
-                        {
-                            bezv = 2.0f * (1.0f - (v / (lod - 1.0f))) * (v / (lod - 1.0f));
-                        }
-                        else
-                        {
-                            bezv = (v / (lod - 1.0f)) * (v / (lod - 1.0f));
-                        }
-
-                        if(k == 0)
-                        {
-                            bezu = (1.0f - (u / (lod - 1.0f))) * (1.0f - (u / (lod - 1.0f)));
-                        }
-                        else if(k == 1)
-                        {
-                            bezu = 2.0f * (1.0f - (u / (lod - 1.0f))) * (u / (lod - 1.0f));
-                        }
-                        else
-                        {
-                            bezu = (u / (lod - 1.0f)) * (u / (lod - 1.0f));
-                        }
-
-                        const float px = world_vector[(columns[w].ctl_pts[j * 3 + k])*3];
-                        const float py = world_vector[(columns[w].ctl_pts[j * 3 + k])*3+1];
-                        const float pz = world_vector[(columns[w].ctl_pts[j * 3 + k])*3+2];
-                        pts[u][v].x() += px * bezv * bezu;
-                        pts[u][v].y() += py * bezv * bezu;
-                        pts[u][v].z() += pz * bezv * bezu;
+                        const size_t world_vector_index = patches[current_patch].ctl_pts[j * 3 + i] * 3;
+                        const float Px = world_vector[world_vector_index];
+                        const float Py = world_vector[world_vector_index + 1];
+                        const float Pz = world_vector[world_vector_index + 2];
+                        point.x() += Px * basis;
+                        point.y() += Py * basis;
+                        point.z() += Pz * basis;
                     }
                 }
             }
@@ -100,9 +103,11 @@ static void BezCurve(const Camera& camera, const float* world_vector)
         {
             for(int k = 0; k < lod - 1; ++k)
             {
+                // TODO: 2014: Make pts one dimensional, otherwise the drawing is compile time
+                // tied to the size of the array.
                 glTexCoord2f(k * 1.0f / lod, l * 1.0f / lod);
                 glVertex3f(pts[k][l].x(), pts[k][l].y(), pts[k][l].z());
-                glTexCoord2f((k+2) * 1.0f / lod , l*1.0f / lod);
+                glTexCoord2f((k+2) * 1.0f / lod , l * 1.0f / lod);
                 glVertex3f(pts[k+1][l].x(), pts[k+1][l].y(), pts[k+1][l].z());
                 glTexCoord2f((k+2) * 1.0f / lod, (l+2) * 1.0f / lod);
                 glVertex3f(pts[k+1][l+1].x(), pts[k+1][l+1].y(), pts[k+1][l+1].z());
@@ -111,8 +116,7 @@ static void BezCurve(const Camera& camera, const float* world_vector)
             }
         }
         glEnd();
-
-    } //  for w
+    } //  for current_patch
 } // BezCurve
 
 static void bind_bitmap_to_gl_texture(const Bitmap& bitmap, unsigned int texture_id)

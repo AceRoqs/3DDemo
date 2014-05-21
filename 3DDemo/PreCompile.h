@@ -1,6 +1,11 @@
 #ifndef PRECOMPILE_H
 #define PRECOMPILE_H
 
+// Prevent <windows.h> from defining min/max which is different from <algorithm>.
+// Must be included before headers that include WinDef.h.
+// http://support.microsoft.com/kb/143208
+#define NOMINMAX
+
 #include <cassert>
 
 #ifdef _MSC_VER
@@ -14,6 +19,7 @@
 // C++ Standard Library.
 #define _USE_MATH_DEFINES   // M_PI definition.
 #include <array>
+#include <algorithm>
 #include <cstdint>
 #include <cmath>
 #include <memory>
