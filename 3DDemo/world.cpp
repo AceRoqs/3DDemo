@@ -100,24 +100,20 @@ std::istream& operator>>(std::istream& is, Graphics::Polygon& polygon)
 }
 
 // Returns true if the point is inside the bounds of all polygons in the world.
-// TODO: Take Vector3f.
-bool is_point_in_world(float x, float y, float z)
+bool is_point_in_world(const Vector3f& point)
 {
-    (y);    // unreferenced parameter
-
-//    return true;
-    // TODO: finishme
-    if(x < -9.0 || x > 9.0)
+    // TODO: Use the world geometry to determine this.
+    if(point.x() < -9.0 || point.x() > 9.0)
     {
         return false;
     }
-    if(z < 1.0 || z > 19.0)
+    if(point.z() < 1.0 || point.z() > 19.0)
     {
         return false;
     }
-    if(z < 11.0)
+    if(point.z() < 11.0)
     {
-        if(x < -1.25 || x > 1.25)
+        if(point.x() < -1.25 || point.x() > 1.25)
         {
             return false;
         }
@@ -157,10 +153,24 @@ static void load_world_data(
         {
             // TODO: 2014: Bounds check constant arrays.
             auto ix = poly.points[jj];
-            vertices->push_back(world_vertices[ix]);
+            if(ix < ARRAYSIZE(world_vertices))
+            {
+                vertices->push_back(world_vertices[ix]);
+            }
+            else
+            {
+                throw std::exception();
+            }
 
             ix = poly.texture_coordinates[jj];
-            texture_coords->push_back(world_texture_coords[ix]);
+            if(ix < ARRAYSIZE(world_texture_coords))
+            {
+                texture_coords->push_back(world_texture_coords[ix]);
+            }
+            else
+            {
+                throw std::exception();
+            }
         }
     }
 }

@@ -18,7 +18,7 @@ struct Polygon
 
 std::istream& operator>>(std::istream& is, Graphics::Polygon& polygon);
 
-bool is_point_in_world(float x, float y, float z);
+bool is_point_in_world(const struct Vector3f& point);
 
 void start_load(
     _In_ char* file_name,
