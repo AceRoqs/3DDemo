@@ -15,10 +15,29 @@ struct bezier
     int ctl_pts[9];
 };
 
-const bezier patches[] =
+static const Vector3f bezier_control_points[] =
 {
-    { 29, 30, 31, 32, 33, 34,  0, 35, 36 },
-    { 31, 37, 38, 34, 39, 40, 36, 41, 42 }
+    { -2, 0, -10 },     // 0
+    { -2, 0, -11 },     // 1
+    { -3, 0, -11 },     // 2
+    { -2,-1, -10 },     // 3
+    { -2,-1, -11 },     // 4
+    { -3,-1, -11 },     // 5
+    { -2,-2, -10 },     // 6
+    { -2,-2, -11 },     // 7
+    { -3,-2, -11 },     // 8
+    { -4, 0, -11 },     // 9
+    { -4, 0, -10 },     // 10
+    { -4,-1, -11 },     // 11
+    { -4,-1, -10 },     // 12
+    { -4,-2, -11 },     // 13
+    { -4,-2, -10 },     // 14
+};
+
+static const bezier patches[] =
+{
+    { 0,  1,  2,  3,  4,  5,  6,  7,  8 },
+    { 2,  9, 10,  5, 11, 12,  8, 13, 14 },
 };
 
 // http://en.wikipedia.org/wiki/B%C3%A9zier_curve
@@ -46,7 +65,8 @@ static float bezier_quadratic_basis(unsigned int index, float t)
     return basis;
 }
 
-static void BezCurve(const Camera& camera, const float* world_vector)
+// TODO: 2014: It would make much more sense to do this in a compute shader to generate the data where they are used.
+static void BezCurve(const Camera& camera, const Vector3f* control_points)
 {
     const int PTS = 10;
 
@@ -83,10 +103,10 @@ static void BezCurve(const Camera& camera, const float* world_vector)
                     {
                         const float basis = bezier_quadratic_basis(i, t_u) * basis_v;
 
-                        const size_t world_vector_index = patches[current_patch].ctl_pts[j * 3 + i] * 3;
-                        const float Px = world_vector[world_vector_index];
-                        const float Py = world_vector[world_vector_index + 1];
-                        const float Pz = world_vector[world_vector_index + 2];
+                        const size_t bezier_control_point = patches[current_patch].ctl_pts[j * 3 + i];
+                        const float Px = control_points[bezier_control_point].x();
+                        const float Py = control_points[bezier_control_point].y();
+                        const float Pz = control_points[bezier_control_point].z();
                         point.x() += Px * basis;
                         point.y() += Py * basis;
                         point.z() += Pz * basis;
@@ -176,7 +196,7 @@ void initialize_gl_constants()
 
 void initialize_gl_world_data(
     const std::vector<Bitmap>& texture_list,
-    const std::vector<Vector3f>& vertex_formats,
+    const std::vector<Vector3f>& vertices,
     const std::vector<Vector2f>& texture_coords)
 {
     // Load all texture data.
@@ -188,7 +208,7 @@ void initialize_gl_world_data(
     // Enable vertex arrays.
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, &vertex_formats[0]);
+    glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
     glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
 }
 
@@ -274,7 +294,7 @@ void draw_list(
 */
     }
 
-    BezCurve(camera, g_WorldVector);
+    BezCurve(camera, bezier_control_points);
 
 //    glUnlockArraysEXT();
 //  glDisable(GL_CULL_FACE);

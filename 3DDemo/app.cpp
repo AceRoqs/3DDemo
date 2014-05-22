@@ -81,15 +81,15 @@ void app_run(HINSTANCE instance, int show_command)
         // Start load first, to kick off async reads.
         std::vector<Bitmap> texture_list;
         std::vector<Graphics::Polygon> polys;
-        std::vector<Vector3f> vertex_formats;
+        std::vector<Vector3f> vertices;
         std::vector<Vector2f> texture_coords;
-        start_load("polydefs.txt", &texture_list, &polys, &vertex_formats, &texture_coords);
+        start_load("polydefs.txt", &texture_list, &polys, &vertices, &texture_coords);
 
         App_window app(instance, true);
 
         // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
         initialize_gl_constants();
-        initialize_gl_world_data(texture_list, vertex_formats, texture_coords);
+        initialize_gl_world_data(texture_list, vertices, texture_coords);
 
         // Set thread affinity to the first available processor, so that QPC
         // will always be done on the same processor.

@@ -24,10 +24,8 @@ void start_load(
     _In_ char* file_name,
     std::vector<struct Bitmap>* texture_list,
     std::vector<struct Graphics::Polygon>* polys,
-    std::vector<struct Vector3f>* vertex_formats,
+    std::vector<struct Vector3f>* vertices,
     std::vector<struct Vector2f>* texture_coords);
-
-extern const float g_WorldVector[];
 
 #endif
 
