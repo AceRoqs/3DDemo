@@ -66,17 +66,10 @@ static float bezier_quadratic_basis(unsigned int index, float t)
 }
 
 // TODO: 2014: It would make much more sense to do this in a compute shader to generate the data where they are used.
-static void BezCurve(const Camera& camera, const Vector3f* control_points, const bezier& patch)
+const unsigned int PTS = 10;
+static void BezCurve(const Vector3f* control_points, const bezier& patch, unsigned int lod, _Out_ Vector3f* pts)
 {
-    const unsigned int PTS = 10;
-
-    // Set level-of-detail.
-    unsigned int lod = (unsigned int)(PTS * 4 / (point_distance(camera.m_position, make_vector(2, 0, 10))));
-
-    lod = std::min(std::max(2u, lod), PTS);
-
     // Q(u,v) = sum[i=0..2]sum[j=0..2] Bi(u)Bj(v)Pij
-    Vector3f pts[PTS * PTS]; // Q.
 
     // Generate all of the points.
     for(unsigned int v = 0; v < lod; ++v)
@@ -108,7 +101,10 @@ static void BezCurve(const Camera& camera, const Vector3f* control_points, const
             }
         }
     }
+} // BezCurve
 
+void BezCurve2(unsigned int lod, const Vector3f* pts)
+{
     glBlendFunc(GL_ONE, GL_ZERO);
     glBindTexture(GL_TEXTURE_2D, 2);
 
@@ -119,10 +115,10 @@ static void BezCurve(const Camera& camera, const Vector3f* control_points, const
     {
         for(unsigned int k = 0; k < lod - 1; ++k)
         {
-            Vector3f& p1 = pts[l * PTS + k];
-            Vector3f& p2 = pts[l * PTS + k + 1];
-            Vector3f& p3 = pts[(l + 1)* PTS + k + 1];
-            Vector3f& p4 = pts[(l + 1)* PTS + k];
+            const Vector3f& p1 = pts[l * PTS + k];
+            const Vector3f& p2 = pts[l * PTS + k + 1];
+            const Vector3f& p3 = pts[(l + 1)* PTS + k + 1];
+            const Vector3f& p4 = pts[(l + 1)* PTS + k];
 
             glTexCoord2f(k * scale, l * scale);
             glVertex3f(p1.x(), p1.y(), p1.z());
@@ -138,7 +134,7 @@ static void BezCurve(const Camera& camera, const Vector3f* control_points, const
         }
     }
     glEnd();
-} // BezCurve
+}
 
 static void bind_bitmap_to_gl_texture(const Bitmap& bitmap, unsigned int texture_id)
 {
@@ -295,8 +291,14 @@ void draw_list(
 */
     }
 
-    BezCurve(camera, bezier_control_points, patches[0]);
-    BezCurve(camera, bezier_control_points, patches[1]);
+    // Set level-of-detail.
+    unsigned int lod = (unsigned int)(PTS * 4 / (point_distance(camera.m_position, make_vector(2, 0, 10))));
+    lod = std::min(std::max(2u, lod), PTS);
+    Vector3f pts[PTS * PTS]; // Q.
+    BezCurve(bezier_control_points, patches[0], lod, pts);
+    BezCurve2(lod, pts);
+    BezCurve(bezier_control_points, patches[1], lod, pts);
+    BezCurve2(lod, pts);
 
 //    glUnlockArraysEXT();
 //  glDisable(GL_CULL_FACE);
