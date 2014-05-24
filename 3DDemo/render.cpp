@@ -103,10 +103,10 @@ static void BezCurve(const Vector3f* control_points, const bezier& patch, unsign
     }
 } // BezCurve
 
-void BezCurve2(unsigned int lod, const Vector3f* pts)
+void BezCurve2(unsigned int lod, const Vector3f* pts, unsigned int texture_id)
 {
     glBlendFunc(GL_ONE, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D, 2);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
 
     const float scale = 1.0f / lod;
 
@@ -296,9 +296,9 @@ void draw_list(
     lod = std::min(std::max(2u, lod), PTS);
     Vector3f pts[PTS * PTS]; // Q.
     BezCurve(bezier_control_points, patches[0], lod, pts);
-    BezCurve2(lod, pts);
+    BezCurve2(lod, pts, 2);
     BezCurve(bezier_control_points, patches[1], lod, pts);
-    BezCurve2(lod, pts);
+    BezCurve2(lod, pts, 2);
 
 //    glUnlockArraysEXT();
 //  glDisable(GL_CULL_FACE);
