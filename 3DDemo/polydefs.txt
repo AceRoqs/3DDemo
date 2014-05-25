@@ -1,7 +1,7 @@
 8
 data\clouds.pcx
 data\wallglow.pcx
-data\road.pcx
+data\rgbw.tga
 data\light2.pcx
 data\light1.pcx
 data\light3.pcx
