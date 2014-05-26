@@ -67,21 +67,22 @@ static float bezier_quadratic_basis(unsigned int index, float t)
 
 // TODO: 2014: It would make much more sense to do this in a compute shader to generate the data where they are used.
 const unsigned int PTS = 10;
-static void BezCurve(const Vector3f* control_points, const bezier& patch, unsigned int lod, _Out_ Vector3f* pts)
+static std::vector<Vector3f> BezCurve(const Vector3f* control_points, const bezier& patch, unsigned int patch_count)
 {
     // Q(u,v) = sum[i=0..2]sum[j=0..2] Bi(u)Bj(v)Pij
+    std::vector<Vector3f> pts(PTS * PTS);
 
     // Generate all of the points.
-    for(unsigned int v = 0; v < lod; ++v)
+    for(unsigned int v = 0; v < patch_count + 1; ++v)
     {
-        for(unsigned int u = 0; u < lod; ++u)
+        for(unsigned int u = 0; u < patch_count + 1; ++u)
         {
             Vector3f& point = pts[v * PTS + u];
             point = make_vector(0.0f, 0.0f, 0.0f);
 
             // Range [0..1].
-            const float t_u = u / (lod - 1.0f);
-            const float t_v = v / (lod - 1.0f);
+            const float t_u = u / static_cast<float>(patch_count);
+            const float t_v = v / static_cast<float>(patch_count);
 
             // Calculate the u,v point of the patch using three control points in each (u/v) direction.
             for(unsigned int j = 0; j < 3; ++j)
@@ -101,19 +102,21 @@ static void BezCurve(const Vector3f* control_points, const bezier& patch, unsign
             }
         }
     }
+
+    return pts;
 } // BezCurve
 
-void BezCurve2(unsigned int lod, const Vector3f* pts, unsigned int texture_id)
+void draw_patch(const std::vector<Vector3f>& pts, unsigned int patch_count, unsigned int texture_id)
 {
     glBlendFunc(GL_ONE, GL_ZERO);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
-    const float scale = 1.0f / lod;
+    const float scale = 1.0f / (patch_count + 1);
 
     glBegin(GL_QUADS);
-    for(unsigned int l = 0; l < lod - 1; ++l)
+    for(unsigned int l = 0; l < patch_count; ++l)
     {
-        for(unsigned int k = 0; k < lod - 1; ++k)
+        for(unsigned int k = 0; k < patch_count; ++k)
         {
             const Vector3f& p1 = pts[l * PTS + k];
             const Vector3f& p2 = pts[l * PTS + k + 1];
@@ -292,13 +295,12 @@ void draw_list(
     }
 
     // Set level-of-detail.
-    unsigned int lod = (unsigned int)(PTS * 4 / (point_distance(camera.m_position, make_vector(2, 0, 10))));
-    lod = std::min(std::max(2u, lod), PTS);
-    Vector3f pts[PTS * PTS]; // Q.
-    BezCurve(bezier_control_points, patches[0], lod, pts);
-    BezCurve2(lod, pts, 2);
-    BezCurve(bezier_control_points, patches[1], lod, pts);
-    BezCurve2(lod, pts, 2);
+    unsigned int patch_count = (unsigned int)(PTS * 4 / (point_distance(camera.m_position, make_vector(2, 0, 10)))) - 1;
+    patch_count = std::min(std::max(1u, patch_count), PTS - 1);
+    std::vector<Vector3f> pts = BezCurve(bezier_control_points, patches[0], patch_count);
+    draw_patch(pts, patch_count, 2);
+    pts = BezCurve(bezier_control_points, patches[1], patch_count);
+    draw_patch(pts, patch_count, 2);
 
 //    glUnlockArraysEXT();
 //  glDisable(GL_CULL_FACE);
