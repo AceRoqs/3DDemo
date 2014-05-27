@@ -6,7 +6,6 @@
 #include "particle.h"
 #include "Camera.h"
 
-//-------------------------------------------------------------------------
 CParticle::CParticle()
 {
     cur_x = cur_y = cur_z = pre_x = pre_y = pre_z =	vel_x = vel_y = vel_z =	0.0f;
@@ -15,18 +14,23 @@ CParticle::CParticle()
     color.alpha = 1.0;
     final_color.red = final_color.blue = final_color.green = 0.0;
     final_color.alpha = 1.0;
-} // CParticle::CParticle
-//-------------------------------------------------------------------------
+}
+
 bool CParticle::isDead() const
 {
     return (life == 0);
-} // CParticle::isDead
-//-------------------------------------------------------------------------
-void CParticle::Update()
+}
+
+void CParticle::Update(float elapsed_milliseconds)
 {
-    if(life) --life;
-    
+    UNREFERENCED_PARAMETER(elapsed_milliseconds);   // TODO: 2014: Temp: Use this to calculate positions.
+
     if(life)
+    {
+        --life;
+    }
+
+    if(life > 0)
     {
         pre_x = cur_x;
         pre_y = cur_y;
@@ -37,8 +41,8 @@ void CParticle::Update()
         cur_z += vel_z;
 // TODO: update color
     }
-} // CParticle::Update
-//-------------------------------------------------------------------------
+}
+
 void CParticle::Draw(const Camera& camera, int id) const
 {
     // transform to location
@@ -77,13 +81,13 @@ void CParticle::Draw(const Camera& camera, int id) const
         glTexCoord2f(0.0, 1.0);
         glVertex3d(+ 0.25, + 0.25, 0);
     glEnd();
-} // CParticle::Draw
-//-------------------------------------------------------------------------
+}
+
 CEmitter::CEmitter()
 {
     m_cur_x = m_cur_y = m_cur_z = 0.0;
-} // CEmitter::CEmitter
-//-------------------------------------------------------------------------
+}
+
 void CEmitter::CreateParticle(unsigned int index)
 {
     m_particles[index].pre_x = m_particles[index].cur_x = m_cur_x +((float)rand() / float(RAND_MAX) / 2.0f) - 0.25f;
@@ -101,25 +105,27 @@ void CEmitter::CreateParticle(unsigned int index)
     m_particles[index].final_color.green = 0.0;
     m_particles[index].final_color.blue = 0.0;
     m_particles[index].final_color.alpha = 1.0;
-} // CEmitter::CreateParticle
-//-------------------------------------------------------------------------
+}
+
 void CEmitter::setPosition(float x, float y, float z)
 {
     m_cur_x = x;
     m_cur_y = y;
     m_cur_z = z;
-} // CEmitter::setPosition
-//-------------------------------------------------------------------------
-void CEmitter::Update()
+}
+
+void CEmitter::Update(float elapsed_milliseconds)
 {
-    for(unsigned int i = 0; i < MAXPARTICLES; ++i)
+    for(unsigned int ii = 0; ii < MAXPARTICLES; ++ii)
     {
-        m_particles[i].Update();
-        if(m_particles[i].isDead())
-            CreateParticle(i);
+        m_particles[ii].Update(elapsed_milliseconds);
+        if(m_particles[ii].isDead())
+        {
+            CreateParticle(ii);
+        }
     }
-} // CEmitter::Update
-//-------------------------------------------------------------------------
+}
+
 void CEmitter::Draw(
     const Camera& camera,
     int id) const
@@ -156,5 +162,5 @@ float modelview[16];
     {
         m_particles[i].Draw(camera, id);
     }
-} // CEmitter::Draw
+}
 

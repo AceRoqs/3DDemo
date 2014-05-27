@@ -9,12 +9,11 @@ const unsigned int MAXPARTICLES = 50;
 
 class CEmitter;
 
-//-------------------------------------------------------------------------
 struct color4_t
 {
     float red, green, blue, alpha;
-}; // struct color4_t
-//-------------------------------------------------------------------------
+};
+
 class CParticle
 {
     float cur_x, cur_y, cur_z;  // current position
@@ -27,12 +26,12 @@ class CParticle
 public:
     CParticle();
     bool isDead() const;
-    void Update();
+    void Update(float elapsed_milliseconds);
     void Draw(const struct Camera& camera, int) const;
 
     friend class CEmitter;
-}; // class CParticle
-//-------------------------------------------------------------------------
+};
+
 class CEmitter
 {
     float m_cur_x, m_cur_y, m_cur_z;
@@ -43,10 +42,9 @@ class CEmitter
 public:
     CEmitter();
     void setPosition(float, float, float);
-    void Update();
+    void Update(float elapsed_milliseconds);
     void Draw(const struct Camera& camera, int id) const;
-}; // class CEmitter
-//-------------------------------------------------------------------------
+};
 
 #endif
 
