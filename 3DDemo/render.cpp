@@ -66,18 +66,20 @@ static float bezier_quadratic_basis(unsigned int index, float t)
 }
 
 // TODO: 2014: It would make much more sense to do this in a compute shader to generate the data where they are used.
-const unsigned int PTS = 10;
+const unsigned int MAX_GENERATED_POINTS = 10;
 static std::vector<Vector3f> BezCurve(const Vector3f* control_points, const bezier& patch, unsigned int patch_count)
 {
     // Q(u,v) = sum[i=0..2]sum[j=0..2] Bi(u)Bj(v)Pij
-    std::vector<Vector3f> pts(PTS * PTS);
+    std::vector<Vector3f> pts(MAX_GENERATED_POINTS * MAX_GENERATED_POINTS);
+
+    const auto control_point_count = patch_count + 1;
 
     // Generate all of the points.
-    for(unsigned int v = 0; v < patch_count + 1; ++v)
+    for(unsigned int v = 0; v < control_point_count; ++v)
     {
-        for(unsigned int u = 0; u < patch_count + 1; ++u)
+        for(unsigned int u = 0; u < control_point_count; ++u)
         {
-            Vector3f& point = pts[v * PTS + u];
+            Vector3f& point = pts[v * MAX_GENERATED_POINTS + u];
             point = make_vector(0.0f, 0.0f, 0.0f);
 
             // Range [0..1].
@@ -118,10 +120,10 @@ void draw_patch(const std::vector<Vector3f>& pts, unsigned int patch_count, unsi
     {
         for(unsigned int k = 0; k < patch_count; ++k)
         {
-            const Vector3f& p1 = pts[l * PTS + k];
-            const Vector3f& p2 = pts[l * PTS + k + 1];
-            const Vector3f& p3 = pts[(l + 1)* PTS + k + 1];
-            const Vector3f& p4 = pts[(l + 1)* PTS + k];
+            const Vector3f& p1 = pts[l * MAX_GENERATED_POINTS + k];
+            const Vector3f& p2 = pts[l * MAX_GENERATED_POINTS + k + 1];
+            const Vector3f& p3 = pts[(l + 1)* MAX_GENERATED_POINTS + k + 1];
+            const Vector3f& p4 = pts[(l + 1)* MAX_GENERATED_POINTS + k];
 
             glTexCoord2f(k * scale, l * scale);
             glVertex3f(p1.x(), p1.y(), p1.z());
@@ -295,8 +297,8 @@ void draw_list(
     }
 
     // Set level-of-detail.
-    unsigned int patch_count = (unsigned int)(PTS * 4 / (point_distance(camera.m_position, make_vector(2, 0, 10)))) - 1;
-    patch_count = std::min(std::max(1u, patch_count), PTS - 1);
+    unsigned int patch_count = (unsigned int)(MAX_GENERATED_POINTS * 4 / (point_distance(camera.m_position, make_vector(2, 0, 10)))) - 1;
+    patch_count = std::min(std::max(1u, patch_count), MAX_GENERATED_POINTS - 1);
     std::vector<Vector3f> pts = BezCurve(bezier_control_points, patches[0], patch_count);
     draw_patch(pts, patch_count, 2);
     pts = BezCurve(bezier_control_points, patches[1], patch_count);

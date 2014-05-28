@@ -1,19 +1,23 @@
-//=========================================================================
-// Copyright (c) 1999 Toby Jones. All rights reserved.
-// Purpose: CParticle class
-//=========================================================================
 #include "PreCompile.h"
 #include "particle.h"
 #include "Camera.h"
 
+const unsigned int MAX_PARTICLES = 50;
+
 CParticle::CParticle()
 {
-    cur_x = cur_y = cur_z = pre_x = pre_y = pre_z =	vel_x = vel_y = vel_z =	0.0f;
+    current_position = make_vector(0.0f, 0.0f, 0.0f);
+    previous_position = make_vector(0.0f, 0.0f, 0.0f);
+    current_velocity = make_vector(0.0f, 0.0f, 0.0f);
     life = 0;
-    color.red = color.blue = color.green = 0.0;
-    color.alpha = 1.0;
-    final_color.red = final_color.blue = final_color.green = 0.0;
-    final_color.alpha = 1.0;
+    color.red = 0.0f;
+    color.blue = 0.0f;
+    color.green = 0.0f;
+    color.alpha = 1.0f;
+    final_color.red = 0.0f;
+    final_color.blue = 0.0f;
+    final_color.green = 0.0f;
+    final_color.alpha = 1.0f;
 }
 
 bool CParticle::isDead() const
@@ -32,31 +36,29 @@ void CParticle::Update(float elapsed_milliseconds)
 
     if(life > 0)
     {
-        pre_x = cur_x;
-        pre_y = cur_y;
-        pre_z = cur_z;
+        previous_position = current_position;
 
-        cur_x += vel_x;
-        cur_y += vel_y;
-        cur_z += vel_z;
+        current_position.x() += current_velocity.x();
+        current_position.y() += current_velocity.y();
+        current_position.z() += current_velocity.z();
 // TODO: update color
     }
 }
 
-void CParticle::Draw(const Camera& camera, int id) const
+void CParticle::Draw(const Camera& camera, unsigned int texture_id) const
 {
     // transform to location
     glLoadIdentity();
     glRotatef(camera.m_degrees, 0, 1, 0);
     glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
-    glTranslatef(cur_x, cur_y, cur_z);
+    glTranslatef(current_position.x(), current_position.y(), current_position.z());
 
     // billboard the sprite
     glRotatef(-camera.m_degrees, 0, 1, 0);
 
 //	glColor4f(color.red, color.green, color.blue, color.alpha);
     glColor4f(1,0,0,1);
-    glBindTexture(GL_TEXTURE_2D, id);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
 //	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //	glBlendFunc(GL_ONE, GL_ZERO);
     glBlendFunc(GL_ONE, GL_ONE);
@@ -73,29 +75,29 @@ void CParticle::Draw(const Camera& camera, int id) const
         glVertex3d(cur_x + 0.25, cur_y + 0.25, cur_z);
 */
         glTexCoord2f(0.0, 0.0);
-        glVertex3d(0.25, - 0.25, 0);
+        glVertex3d(0.25, -0.25, 0);
         glTexCoord2f(1.0, 0.0);
-        glVertex3d(- 0.25, - 0.25, 0);
+        glVertex3d(-0.25, -0.25, 0);
         glTexCoord2f(1.0, 1.0);
-        glVertex3d(- 0.25, + 0.25, 0);
+        glVertex3d(-0.25, 0.25, 0);
         glTexCoord2f(0.0, 1.0);
-        glVertex3d(+ 0.25, + 0.25, 0);
+        glVertex3d(0.25, 0.25, 0);
     glEnd();
 }
 
-CEmitter::CEmitter()
+CEmitter::CEmitter(const Vector3f& position) : m_particles(MAX_PARTICLES)
 {
-    m_cur_x = m_cur_y = m_cur_z = 0.0;
+    m_current_position = position;
 }
 
 void CEmitter::CreateParticle(unsigned int index)
 {
-    m_particles[index].pre_x = m_particles[index].cur_x = m_cur_x +((float)rand() / float(RAND_MAX) / 2.0f) - 0.25f;
-    m_particles[index].pre_y = m_particles[index].cur_y = m_cur_y;
-    m_particles[index].pre_z = m_particles[index].cur_z = m_cur_z;
-    m_particles[index].vel_x = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
-    m_particles[index].vel_y = ((float)rand() / float(RAND_MAX)) / 10.0f;
-    m_particles[index].vel_z = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
+    m_particles[index].previous_position.x() = m_particles[index].current_position.x() = m_current_position.x() +((float)rand() / float(RAND_MAX) / 2.0f) - 0.25f;
+    m_particles[index].previous_position.y() = m_particles[index].current_position.y() = m_current_position.y();
+    m_particles[index].previous_position.z() = m_particles[index].current_position.z() = m_current_position.z();
+    m_particles[index].current_velocity.x() = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
+    m_particles[index].current_velocity.y() = ((float)rand() / float(RAND_MAX)) / 10.0f;
+    m_particles[index].current_velocity.z() = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
     m_particles[index].life = int(((float)rand() / float(RAND_MAX)) * 15.0);
     m_particles[index].color.red = 1.0;
     m_particles[index].color.green = 0.0;
@@ -107,16 +109,9 @@ void CEmitter::CreateParticle(unsigned int index)
     m_particles[index].final_color.alpha = 1.0;
 }
 
-void CEmitter::setPosition(float x, float y, float z)
-{
-    m_cur_x = x;
-    m_cur_y = y;
-    m_cur_z = z;
-}
-
 void CEmitter::Update(float elapsed_milliseconds)
 {
-    for(unsigned int ii = 0; ii < MAXPARTICLES; ++ii)
+    for(unsigned int ii = 0; ii < MAX_PARTICLES; ++ii)
     {
         m_particles[ii].Update(elapsed_milliseconds);
         if(m_particles[ii].isDead())
@@ -126,9 +121,7 @@ void CEmitter::Update(float elapsed_milliseconds)
     }
 }
 
-void CEmitter::Draw(
-    const Camera& camera,
-    int id) const
+void CEmitter::Draw(const Camera& camera, unsigned int texture_id) const
 {
 //    glLoadIdentity();
 //    glRotatef(camera_degrees, 0, 1, 0);
@@ -158,9 +151,9 @@ float modelview[16];
     glLoadMatrixf(modelview);
 */
     // TODO: this should be SSE
-    for(unsigned int i = 0; i < MAXPARTICLES; ++i)
+    for(unsigned int ii = 0; ii < MAX_PARTICLES; ++ii)
     {
-        m_particles[i].Draw(camera, id);
+        m_particles[ii].Draw(camera, texture_id);
     }
 }
 

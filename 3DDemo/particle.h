@@ -1,13 +1,7 @@
-//=========================================================================
-// Copyright (c) 1999-2003 Toby Jones. All rights reserved.
-// Purpose: CParticle class
-//=========================================================================
 #ifndef PARTICLE_H
 #define PARTICLE_H
 
-const unsigned int MAXPARTICLES = 50;
-
-class CEmitter;
+#include "LinearAlgebra.h"
 
 struct color4_t
 {
@@ -16,9 +10,9 @@ struct color4_t
 
 class CParticle
 {
-    float cur_x, cur_y, cur_z;  // current position
-    float pre_x, pre_y, pre_z;  // previous position
-    float vel_x, vel_y, vel_z;  // current velocity
+    Vector3f current_position;
+    Vector3f previous_position;
+    Vector3f current_velocity;
     unsigned int life;          // amount of time remaining
     color4_t color;             // current color
     color4_t final_color;       // color to fade to
@@ -27,23 +21,22 @@ public:
     CParticle();
     bool isDead() const;
     void Update(float elapsed_milliseconds);
-    void Draw(const struct Camera& camera, int) const;
+    void Draw(const struct Camera& camera, unsigned int texture_id) const;
 
     friend class CEmitter;
 };
 
 class CEmitter
 {
-    float m_cur_x, m_cur_y, m_cur_z;
-    CParticle m_particles[MAXPARTICLES];
+    Vector3f m_current_position;
+    std::vector<CParticle> m_particles;
 
-    void CreateParticle(unsigned int);
+    void CreateParticle(unsigned int index);
 
 public:
-    CEmitter();
-    void setPosition(float, float, float);
+    CEmitter(const Vector3f& position);
     void Update(float elapsed_milliseconds);
-    void Draw(const struct Camera& camera, int id) const;
+    void Draw(const struct Camera& camera, unsigned int texture_id) const;
 };
 
 #endif
