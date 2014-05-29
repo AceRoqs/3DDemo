@@ -69,10 +69,10 @@ static float bezier_quadratic_basis(unsigned int index, float t)
 const unsigned int MAX_GENERATED_POINTS = 10;
 static std::vector<Vector3f> BezCurve(const Vector3f* control_points, const bezier& patch, unsigned int patch_count)
 {
+    const auto control_point_count = patch_count + 1;
+
     // Q(u,v) = sum[i=0..2]sum[j=0..2] Bi(u)Bj(v)Pij
     std::vector<Vector3f> pts(MAX_GENERATED_POINTS * MAX_GENERATED_POINTS);
-
-    const auto control_point_count = patch_count + 1;
 
     // Generate all of the points.
     for(unsigned int v = 0; v < control_point_count; ++v)
@@ -96,7 +96,7 @@ static std::vector<Vector3f> BezCurve(const Vector3f* control_points, const bezi
                     const float basis = bezier_quadratic_basis(i, t_u) * basis_v;
 
                     const size_t bezier_control_point = patch.ctl_pts[j * 3 + i];
-                    const auto P = control_points[bezier_control_point];
+                    const Vector3f P = control_points[bezier_control_point];
                     point.x() += P.x() * basis;
                     point.y() += P.y() * basis;
                     point.z() += P.z() * basis;
@@ -110,10 +110,10 @@ static std::vector<Vector3f> BezCurve(const Vector3f* control_points, const bezi
 
 void draw_patch(const std::vector<Vector3f>& pts, unsigned int patch_count, unsigned int texture_id)
 {
+    const float scale = 1.0f / patch_count;
+
     glBlendFunc(GL_ONE, GL_ZERO);
     glBindTexture(GL_TEXTURE_2D, texture_id);
-
-    const float scale = 1.0f / (patch_count + 1);
 
     glBegin(GL_QUADS);
     for(unsigned int l = 0; l < patch_count; ++l)
@@ -122,19 +122,19 @@ void draw_patch(const std::vector<Vector3f>& pts, unsigned int patch_count, unsi
         {
             const Vector3f& p1 = pts[l * MAX_GENERATED_POINTS + k];
             const Vector3f& p2 = pts[l * MAX_GENERATED_POINTS + k + 1];
-            const Vector3f& p3 = pts[(l + 1)* MAX_GENERATED_POINTS + k + 1];
-            const Vector3f& p4 = pts[(l + 1)* MAX_GENERATED_POINTS + k];
+            const Vector3f& p3 = pts[(l + 1) * MAX_GENERATED_POINTS + k + 1];
+            const Vector3f& p4 = pts[(l + 1) * MAX_GENERATED_POINTS + k];
 
             glTexCoord2f(k * scale, l * scale);
             glVertex3f(p1.x(), p1.y(), p1.z());
 
-            glTexCoord2f((k+2) * scale, l * scale);
+            glTexCoord2f((k+1) * scale, l * scale);
             glVertex3f(p2.x(), p2.y(), p2.z());
 
-            glTexCoord2f((k+2) * scale, (l+2) * scale);
+            glTexCoord2f((k+1) * scale, (l+1) * scale);
             glVertex3f(p3.x(), p3.y(), p3.z());
 
-            glTexCoord2f(k * scale, (l+2) * scale);
+            glTexCoord2f(k * scale, (l+1) * scale);
             glVertex3f(p4.x(), p4.y(), p4.z());
         }
     }
