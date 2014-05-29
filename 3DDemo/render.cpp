@@ -10,9 +10,10 @@
 #include "Camera.h"
 #include "LinearAlgebra.h"
 
-struct bezier
+const unsigned int quadratic_bezier_control_point_count = 3;
+struct bezier_patch
 {
-    int ctl_pts[9];
+    unsigned int control_point_indices[quadratic_bezier_control_point_count * quadratic_bezier_control_point_count];
 };
 
 static const Vector3f bezier_control_points[] =
@@ -34,7 +35,7 @@ static const Vector3f bezier_control_points[] =
     { -4,-2, -10 },     // 14
 };
 
-static const bezier patches[] =
+static const bezier_patch patches[] =
 {
     { 0,  1,  2,  3,  4,  5,  6,  7,  8 },
     { 2,  9, 10,  5, 11, 12,  8, 13, 14 },
@@ -66,51 +67,51 @@ static float bezier_quadratic_basis(unsigned int index, float t)
 }
 
 // TODO: 2014: It would make much more sense to do this in a compute shader to generate the data where they are used.
-const unsigned int MAX_GENERATED_POINTS = 10;
-static std::vector<Vector3f> BezCurve(const Vector3f* control_points, const bezier& patch, unsigned int patch_count)
+static std::vector<Vector3f> generate_quadratic_bezier_quads(const Vector3f* control_points, const bezier_patch& patch, unsigned int patch_count)
 {
-    const auto control_point_count = patch_count + 1;
+    const auto curve_vertex_count = patch_count + 1;
 
     // Q(u,v) = sum[i=0..2]sum[j=0..2] Bi(u)Bj(v)Pij
-    std::vector<Vector3f> pts(MAX_GENERATED_POINTS * MAX_GENERATED_POINTS);
+    std::vector<Vector3f> vertices(curve_vertex_count * curve_vertex_count);
 
     // Generate all of the points.
-    for(unsigned int v = 0; v < control_point_count; ++v)
+    for(unsigned int v = 0; v < curve_vertex_count; ++v)
     {
-        for(unsigned int u = 0; u < control_point_count; ++u)
+        for(unsigned int u = 0; u < curve_vertex_count; ++u)
         {
-            Vector3f& point = pts[v * MAX_GENERATED_POINTS + u];
-            point = make_vector(0.0f, 0.0f, 0.0f);
+            Vector3f& vertex = vertices[v * curve_vertex_count + u];
+            vertex = make_vector(0.0f, 0.0f, 0.0f);
 
             // Range [0..1].
             const float t_u = u / static_cast<float>(patch_count);
             const float t_v = v / static_cast<float>(patch_count);
 
             // Calculate the u,v point of the patch using three control points in each (u/v) direction.
-            for(unsigned int j = 0; j < 3; ++j)
+            for(unsigned int j = 0; j < quadratic_bezier_control_point_count; ++j)
             {
                 const float basis_v = bezier_quadratic_basis(j, t_v);
 
-                for(unsigned int i = 0; i < 3; ++i)
+                for(unsigned int i = 0; i < quadratic_bezier_control_point_count; ++i)
                 {
                     const float basis = bezier_quadratic_basis(i, t_u) * basis_v;
 
-                    const size_t bezier_control_point = patch.ctl_pts[j * 3 + i];
-                    const Vector3f P = control_points[bezier_control_point];
-                    point.x() += P.x() * basis;
-                    point.y() += P.y() * basis;
-                    point.z() += P.z() * basis;
+                    const size_t control_point_index = patch.control_point_indices[j * quadratic_bezier_control_point_count + i];
+                    const Vector3f P = control_points[control_point_index];
+                    vertex.x() += P.x() * basis;
+                    vertex.y() += P.y() * basis;
+                    vertex.z() += P.z() * basis;
                 }
             }
         }
     }
 
-    return pts;
-} // BezCurve
+    return vertices;
+}
 
-void draw_patch(const std::vector<Vector3f>& pts, unsigned int patch_count, unsigned int texture_id)
+void draw_patch(const std::vector<Vector3f>& vertices, unsigned int patch_count, unsigned int texture_id)
 {
     const float scale = 1.0f / patch_count;
+    const auto curve_vertex_count = patch_count + 1;
 
     glBlendFunc(GL_ONE, GL_ZERO);
     glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -120,21 +121,21 @@ void draw_patch(const std::vector<Vector3f>& pts, unsigned int patch_count, unsi
     {
         for(unsigned int k = 0; k < patch_count; ++k)
         {
-            const Vector3f& p1 = pts[l * MAX_GENERATED_POINTS + k];
-            const Vector3f& p2 = pts[l * MAX_GENERATED_POINTS + k + 1];
-            const Vector3f& p3 = pts[(l + 1) * MAX_GENERATED_POINTS + k + 1];
-            const Vector3f& p4 = pts[(l + 1) * MAX_GENERATED_POINTS + k];
+            const Vector3f& p1 = vertices[l * curve_vertex_count + k];
+            const Vector3f& p2 = vertices[l * curve_vertex_count + k + 1];
+            const Vector3f& p3 = vertices[(l + 1) * curve_vertex_count + k + 1];
+            const Vector3f& p4 = vertices[(l + 1) * curve_vertex_count + k];
 
             glTexCoord2f(k * scale, l * scale);
             glVertex3f(p1.x(), p1.y(), p1.z());
 
-            glTexCoord2f((k+1) * scale, l * scale);
+            glTexCoord2f((k + 1) * scale, l * scale);
             glVertex3f(p2.x(), p2.y(), p2.z());
 
-            glTexCoord2f((k+1) * scale, (l+1) * scale);
+            glTexCoord2f((k + 1) * scale, (l + 1) * scale);
             glVertex3f(p3.x(), p3.y(), p3.z());
 
-            glTexCoord2f(k * scale, (l+1) * scale);
+            glTexCoord2f(k * scale, (l + 1) * scale);
             glVertex3f(p4.x(), p4.y(), p4.z());
         }
     }
@@ -297,12 +298,13 @@ void draw_list(
     }
 
     // Set level-of-detail.
+    const unsigned int MAX_GENERATED_POINTS = 10;
     unsigned int patch_count = (unsigned int)(MAX_GENERATED_POINTS * 4 / (point_distance(camera.m_position, make_vector(2, 0, 10)))) - 1;
-    patch_count = std::min(std::max(1u, patch_count), MAX_GENERATED_POINTS - 1);
-    std::vector<Vector3f> pts = BezCurve(bezier_control_points, patches[0], patch_count);
-    draw_patch(pts, patch_count, 2);
-    pts = BezCurve(bezier_control_points, patches[1], patch_count);
-    draw_patch(pts, patch_count, 2);
+    patch_count = std::min(std::max(2u, patch_count), MAX_GENERATED_POINTS - 1);
+    std::vector<Vector3f> vertices = generate_quadratic_bezier_quads(bezier_control_points, patches[0], patch_count);
+    draw_patch(vertices, patch_count, 2);
+    vertices = generate_quadratic_bezier_quads(bezier_control_points, patches[1], patch_count);
+    draw_patch(vertices, patch_count, 2);
 
 //    glUnlockArraysEXT();
 //  glDisable(GL_CULL_FACE);
