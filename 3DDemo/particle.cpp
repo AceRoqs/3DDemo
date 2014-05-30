@@ -38,9 +38,7 @@ void CParticle::Update(float elapsed_milliseconds)
     {
         previous_position = current_position;
 
-        current_position.x() += current_velocity.x();
-        current_position.y() += current_velocity.y();
-        current_position.z() += current_velocity.z();
+        current_position += current_velocity;
 // TODO: update color
     }
 }

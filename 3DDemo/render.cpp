@@ -96,10 +96,7 @@ static std::vector<Vector3f> generate_quadratic_bezier_quads(const Vector3f* con
                     const float basis = bezier_quadratic_basis(i, t_u) * basis_v;
 
                     const size_t control_point_index = patch.control_point_indices[j * quadratic_bezier_control_point_count + i];
-                    const Vector3f P = control_points[control_point_index];
-                    vertex.x() += P.x() * basis;
-                    vertex.y() += P.y() * basis;
-                    vertex.z() += P.z() * basis;
+                    vertex += control_points[control_point_index] * basis;
                 }
             }
         }
