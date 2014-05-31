@@ -14,10 +14,12 @@ static Particle update_particle(Particle& particle, const Vector3f& emitter_posi
     if(is_particle_alive(particle))
     {
         particle.life -= elapsed_milliseconds;
+        // TODO: 2014: Velocity update should be a function of elapsed_milliseconds.
         particle.position += particle.velocity;
     }
     else
     {
+        // TODO: 2014: Clean this up.
         particle.position.x() = emitter_position.x() + ((float)rand() / float(RAND_MAX) / 2.0f) - 0.25f;
         particle.position.y() = emitter_position.y();
         particle.position.z() = emitter_position.z();

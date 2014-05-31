@@ -103,6 +103,7 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
     glEnd();
 }
 
+// TODO: 2014: Drawing should be done against a vertex/index array.
 static void draw_emitter(const Emitter& emitter, const Camera& camera, unsigned int texture_id)
 {
     std::for_each(emitter.cbegin(), emitter.cend(), [&, texture_id](const Particle& particle)
