@@ -10,14 +10,6 @@ CParticle::CParticle()
     previous_position = make_vector(0.0f, 0.0f, 0.0f);
     current_velocity = make_vector(0.0f, 0.0f, 0.0f);
     life = 0;
-    color.red = 0.0f;
-    color.blue = 0.0f;
-    color.green = 0.0f;
-    color.alpha = 1.0f;
-    final_color.red = 0.0f;
-    final_color.blue = 0.0f;
-    final_color.green = 0.0f;
-    final_color.alpha = 1.0f;
 }
 
 bool CParticle::isDead() const
@@ -39,7 +31,6 @@ void CParticle::Update(float elapsed_milliseconds)
         previous_position = current_position;
 
         current_position += current_velocity;
-// TODO: update color
     }
 }
 
@@ -54,7 +45,6 @@ void CParticle::Draw(const Camera& camera, unsigned int texture_id) const
     // billboard the sprite
     glRotatef(-camera.m_degrees, 0.0f, 1.0f, 0.0f);
 
-//  glColor4f(color.red, color.green, color.blue, color.alpha);
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 //  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -97,14 +87,6 @@ void CEmitter::CreateParticle(unsigned int index)
     m_particles[index].current_velocity.y() = ((float)rand() / float(RAND_MAX)) / 10.0f;
     m_particles[index].current_velocity.z() = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
     m_particles[index].life = int(((float)rand() / float(RAND_MAX)) * 15.0f);
-    m_particles[index].color.red = 1.0f;
-    m_particles[index].color.green = 0.0f;
-    m_particles[index].color.blue = 0.0f;
-    m_particles[index].color.alpha = 1.0f;
-    m_particles[index].final_color.red = 1.0f;
-    m_particles[index].final_color.green = 0.0f;
-    m_particles[index].final_color.blue = 0.0f;
-    m_particles[index].final_color.alpha = 1.0f;
 }
 
 void CEmitter::Update(float elapsed_milliseconds)

@@ -3,19 +3,12 @@
 
 #include "LinearAlgebra.h"
 
-struct color4_t
-{
-    float red, green, blue, alpha;
-};
-
 class CParticle
 {
     Vector3f current_position;
     Vector3f previous_position;
     Vector3f current_velocity;
     unsigned int life;          // amount of time remaining
-    color4_t color;             // current color
-    color4_t final_color;       // color to fade to
 
 public:
     CParticle();
