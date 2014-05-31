@@ -8,7 +8,7 @@ class CParticle
     Vector3f current_position;
     Vector3f previous_position;
     Vector3f current_velocity;
-    unsigned int life;          // amount of time remaining
+    float life;                 // Amount of time remaining in milliseconds.
 
 public:
     CParticle();

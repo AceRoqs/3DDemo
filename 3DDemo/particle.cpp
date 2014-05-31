@@ -4,29 +4,23 @@
 
 const unsigned int MAX_PARTICLES = 50;
 
-CParticle::CParticle()
+CParticle::CParticle() : life(0.0f)
 {
     current_position = make_vector(0.0f, 0.0f, 0.0f);
     previous_position = make_vector(0.0f, 0.0f, 0.0f);
     current_velocity = make_vector(0.0f, 0.0f, 0.0f);
-    life = 0;
 }
 
 bool CParticle::isDead() const
 {
-    return (life == 0);
+    return !(life > 0.0f);
 }
 
 void CParticle::Update(float elapsed_milliseconds)
 {
-    UNREFERENCED_PARAMETER(elapsed_milliseconds);   // TODO: 2014: Temp: Use this to calculate positions.
+    life -= elapsed_milliseconds;
 
-    if(life)
-    {
-        --life;
-    }
-
-    if(life > 0)
+    if(life > 0.0f)
     {
         previous_position = current_position;
 
@@ -78,7 +72,7 @@ void CEmitter::CreateParticle(unsigned int index)
     m_particles[index].current_velocity.x() = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
     m_particles[index].current_velocity.y() = ((float)rand() / float(RAND_MAX)) / 10.0f;
     m_particles[index].current_velocity.z() = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
-    m_particles[index].life = int(((float)rand() / float(RAND_MAX)) * 15.0f);
+    m_particles[index].life = (((float)rand() / float(RAND_MAX)) * 20.0f);
 }
 
 void CEmitter::Update(float elapsed_milliseconds)
