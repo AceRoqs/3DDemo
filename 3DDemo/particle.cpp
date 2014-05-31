@@ -51,25 +51,17 @@ void CParticle::Draw(const Camera& camera, unsigned int texture_id) const
 //  glBlendFunc(GL_ONE, GL_ZERO);
     glBlendFunc(GL_ONE, GL_ONE);
     glBegin(GL_QUADS);
-//  glBegin(GL_LINE_LOOP);
-/*
         glTexCoord2f(0.0f, 0.0f);
-        glVertex3d(cur_x + 0.25f, cur_y - 0.25f, cur_z);
+        glVertex3f(0.25f, -0.25f, 0.0f);
+
         glTexCoord2f(1.0f, 0.0f);
-        glVertex3d(cur_x - 0.25f, cur_y - 0.25f, cur_z);
+        glVertex3f(-0.25f, -0.25f, 0.0f);
+
         glTexCoord2f(1.0f, 1.0f);
-        glVertex3d(cur_x - 0.25f, cur_y + 0.25f, cur_z);
+        glVertex3f(-0.25f, 0.25f, 0.0f);
+
         glTexCoord2f(0.0f, 1.0f);
-        glVertex3d(cur_x + 0.25f, cur_y + 0.25f, cur_z);
-*/
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3d(0.25, -0.25, 0.0);
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3d(-0.25, -0.25, 0.0);
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3d(-0.25, 0.25, 0.0);
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3d(0.25, 0.25, 0.0);
+        glVertex3f(0.25f, 0.25f, 0.0f);
     glEnd();
 }
 
