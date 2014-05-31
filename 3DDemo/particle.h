@@ -3,19 +3,11 @@
 
 #include "LinearAlgebra.h"
 
-class Particle
+struct Particle
 {
     Vector3f m_position;
     Vector3f m_velocity;
     float m_life;           // Amount of time remaining in milliseconds.
-
-public:
-    Particle();
-    Particle(const Vector3f& position);
-    bool isDead() const;
-    void Update(float elapsed_milliseconds);
-
-    Vector3f position() const;
 };
 
 class Emitter
@@ -25,7 +17,7 @@ class Emitter
 
 public:
     Emitter(const Vector3f& position);
-    void Update(float elapsed_milliseconds);
+    void update(float elapsed_milliseconds);
 
     size_t get_particle_count() const;
     Vector3f get_particle_position(size_t index) const;

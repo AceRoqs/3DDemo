@@ -40,7 +40,7 @@ static UINT_PTR game_message_loop(WindowsCommon::Clock& clock, const WindowsComm
 
         std::list<std::pair<float, Action>> actions = actions_from_keyboard_state(elapsed_milliseconds, keyboard_state);
         camera = apply_actions(actions, camera);
-        emitter.Update(elapsed_milliseconds);
+        emitter.update(elapsed_milliseconds);
 
         draw_list(polys, emitter, camera);
 
