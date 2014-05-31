@@ -6,7 +6,6 @@
 class CParticle
 {
     Vector3f current_position;
-    Vector3f previous_position;
     Vector3f current_velocity;
     float life;                 // Amount of time remaining in milliseconds.
 

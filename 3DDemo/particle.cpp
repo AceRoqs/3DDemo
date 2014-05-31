@@ -7,7 +7,6 @@ const unsigned int MAX_PARTICLES = 50;
 CParticle::CParticle() : life(0.0f)
 {
     current_position = make_vector(0.0f, 0.0f, 0.0f);
-    previous_position = make_vector(0.0f, 0.0f, 0.0f);
     current_velocity = make_vector(0.0f, 0.0f, 0.0f);
 }
 
@@ -22,8 +21,6 @@ void CParticle::Update(float elapsed_milliseconds)
 
     if(life > 0.0f)
     {
-        previous_position = current_position;
-
         current_position += current_velocity;
     }
 }
@@ -66,9 +63,9 @@ CEmitter::CEmitter(const Vector3f& position) : m_particles(MAX_PARTICLES)
 
 void CEmitter::CreateParticle(unsigned int index)
 {
-    m_particles[index].previous_position.x() = m_particles[index].current_position.x() = m_current_position.x() +((float)rand() / float(RAND_MAX) / 2.0f) - 0.25f;
-    m_particles[index].previous_position.y() = m_particles[index].current_position.y() = m_current_position.y();
-    m_particles[index].previous_position.z() = m_particles[index].current_position.z() = m_current_position.z();
+    m_particles[index].current_position.x() = m_current_position.x() +((float)rand() / float(RAND_MAX) / 2.0f) - 0.25f;
+    m_particles[index].current_position.y() = m_current_position.y();
+    m_particles[index].current_position.z() = m_current_position.z();
     m_particles[index].current_velocity.x() = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
     m_particles[index].current_velocity.y() = ((float)rand() / float(RAND_MAX)) / 10.0f;
     m_particles[index].current_velocity.z() = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
