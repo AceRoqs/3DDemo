@@ -26,7 +26,6 @@ class CEmitter
 public:
     CEmitter(const Vector3f& position);
     void Update(float elapsed_milliseconds);
-    void Draw(const struct Camera& camera, unsigned int texture_id) const;
 
     size_t get_particle_count() const;
     Vector3f get_particle_position(size_t index) const;

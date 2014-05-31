@@ -68,6 +68,52 @@ static void draw_patch(const std::vector<Vector3f>& vertices, unsigned int patch
     glEnd();
 }
 
+static void draw_billboard(const Camera& camera, const Vector3f& position, float size, unsigned int texture_id)
+{
+    // Transform to location.
+    glLoadIdentity();
+    glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
+    glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
+    glTranslatef(position.x(), position.y(), position.z());
+
+    // Billboard the sprite.
+    glRotatef(-camera.m_degrees, 0.0f, 1.0f, 0.0f);
+
+    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+//  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//  glBlendFunc(GL_ONE, GL_ZERO);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBegin(GL_QUADS);
+    {
+        const float half_size = size / 2.0f;
+
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(half_size, -half_size, 0.0f);
+
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(-half_size, -half_size, 0.0f);
+
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(-half_size, half_size, 0.0f);
+
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(half_size, half_size, 0.0f);
+    }
+    glEnd();
+}
+
+static void draw_emitter(const CEmitter& emitter, const Camera& camera, unsigned int texture_id)
+{
+    const size_t particle_count = emitter.get_particle_count();
+
+    for(size_t index = 0; index < particle_count; ++index)
+    {
+        const Vector3f position = emitter.get_particle_position(index);
+        draw_billboard(camera, position, 0.5f, texture_id);
+    }
+}
+
 static void bind_bitmap_to_gl_texture(const Bitmap& bitmap, unsigned int texture_id)
 {
     glEnable(GL_TEXTURE_2D);
@@ -234,7 +280,7 @@ void draw_list(
 
 //    glUnlockArraysEXT();
 //  glDisable(GL_CULL_FACE);
-    emitter.Draw(camera, 6);
+    draw_emitter(emitter, camera, 6);
 
     //swap_buffers();
 #if 1
