@@ -105,13 +105,10 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
 
 static void draw_emitter(const Emitter& emitter, const Camera& camera, unsigned int texture_id)
 {
-    const size_t particle_count = emitter.get_particle_count();
-
-    for(size_t index = 0; index < particle_count; ++index)
+    std::for_each(emitter.cbegin(), emitter.cend(), [&, texture_id](const Particle& particle)
     {
-        const Vector3f position = emitter.get_particle_position(index);
-        draw_billboard(camera, position, 0.5f, texture_id);
-    }
+        draw_billboard(camera, particle.position, 0.5f, texture_id);
+    });
 }
 
 static void bind_bitmap_to_gl_texture(const Bitmap& bitmap, unsigned int texture_id)
