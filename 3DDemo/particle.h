@@ -5,16 +5,17 @@
 
 class CParticle
 {
-    Vector3f position;
-    Vector3f velocity;
-    float life;             // Amount of time remaining in milliseconds.
+    Vector3f m_position;
+    Vector3f m_velocity;
+    float m_life;           // Amount of time remaining in milliseconds.
 
 public:
     CParticle();
+    CParticle(const Vector3f& position);
     bool isDead() const;
     void Update(float elapsed_milliseconds);
 
-    friend class CEmitter;
+    Vector3f position() const;
 };
 
 class CEmitter

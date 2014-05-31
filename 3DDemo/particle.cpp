@@ -5,25 +5,42 @@
 const unsigned int MAX_PARTICLES = 50;
 
 CParticle::CParticle() :
-    life(0.0f),
-    position(make_vector(0.0f, 0.0f, 0.0f)),
-    velocity(make_vector(0.0f, 0.0f, 0.0f))
+    m_life(0.0f),
+    m_position(make_vector(0.0f, 0.0f, 0.0f)),
+    m_velocity(make_vector(0.0f, 0.0f, 0.0f))
 {
+}
+
+CParticle::CParticle(const Vector3f& position)
+{
+    m_position.x() = position.x() + ((float)rand() / float(RAND_MAX) / 2.0f) - 0.25f;
+    m_position.y() = position.y();
+    m_position.z() = position.z();
+    m_velocity.x() = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
+    m_velocity.y() = ((float)rand() / float(RAND_MAX)) / 10.0f;
+    m_velocity.z() = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
+    m_life = (((float)rand() / float(RAND_MAX)) * 20.0f);
 }
 
 bool CParticle::isDead() const
 {
-    return !(life > 0.0f);
+    return !(m_life > 0.0f);
 }
 
 void CParticle::Update(float elapsed_milliseconds)
 {
-    if(life > 0.0f)
+    if(m_life > 0.0f)
     {
-        life -= elapsed_milliseconds;
-        position += velocity;
+        m_life -= elapsed_milliseconds;
+        m_position += m_velocity;
     }
 }
+
+Vector3f CParticle::position() const
+{
+    return m_position;
+}
+
 
 static void draw_billboard(const Camera& camera, const Vector3f& position, float size, unsigned int texture_id)
 {
@@ -68,13 +85,7 @@ CEmitter::CEmitter(const Vector3f& position) :
 
 void CEmitter::CreateParticle(unsigned int index)
 {
-    m_particles[index].position.x() = m_position.x() +((float)rand() / float(RAND_MAX) / 2.0f) - 0.25f;
-    m_particles[index].position.y() = m_position.y();
-    m_particles[index].position.z() = m_position.z();
-    m_particles[index].velocity.x() = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
-    m_particles[index].velocity.y() = ((float)rand() / float(RAND_MAX)) / 10.0f;
-    m_particles[index].velocity.z() = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
-    m_particles[index].life = (((float)rand() / float(RAND_MAX)) * 20.0f);
+    new(&m_particles[index]) CParticle(m_position);
 }
 
 void CEmitter::Update(float elapsed_milliseconds)
@@ -92,9 +103,9 @@ void CEmitter::Update(float elapsed_milliseconds)
 void CEmitter::Draw(const Camera& camera, unsigned int texture_id) const
 {
     // TODO: this should be SSE
-    for(unsigned int ii = 0; ii < MAX_PARTICLES; ++ii)
+    for(unsigned int ii = 0; ii < m_particles.size(); ++ii)
     {
-        draw_billboard(camera, m_particles[ii].position, 0.5f, texture_id);
+        draw_billboard(camera, m_particles[ii].position(), 0.5f, texture_id);
     }
 }
 
