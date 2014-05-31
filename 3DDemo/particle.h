@@ -3,28 +3,28 @@
 
 #include "LinearAlgebra.h"
 
-class CParticle
+class Particle
 {
     Vector3f m_position;
     Vector3f m_velocity;
     float m_life;           // Amount of time remaining in milliseconds.
 
 public:
-    CParticle();
-    CParticle(const Vector3f& position);
+    Particle();
+    Particle(const Vector3f& position);
     bool isDead() const;
     void Update(float elapsed_milliseconds);
 
     Vector3f position() const;
 };
 
-class CEmitter
+class Emitter
 {
-    std::vector<CParticle> m_particles;
+    std::vector<Particle> m_particles;
     Vector3f m_position;
 
 public:
-    CEmitter(const Vector3f& position);
+    Emitter(const Vector3f& position);
     void Update(float elapsed_milliseconds);
 
     size_t get_particle_count() const;

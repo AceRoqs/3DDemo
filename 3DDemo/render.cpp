@@ -103,7 +103,7 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
     glEnd();
 }
 
-static void draw_emitter(const CEmitter& emitter, const Camera& camera, unsigned int texture_id)
+static void draw_emitter(const Emitter& emitter, const Camera& camera, unsigned int texture_id)
 {
     const size_t particle_count = emitter.get_particle_count();
 
@@ -191,7 +191,7 @@ void initialize_gl_world_data(
 // TODO: modularize into separate functions
 void draw_list(
     const std::vector<Graphics::Polygon>& poly_vector,
-    const CEmitter& emitter,
+    const Emitter& emitter,
     const Camera& camera)
 {
     glClearDepth(1.0);

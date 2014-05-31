@@ -4,14 +4,14 @@
 
 const unsigned int MAX_PARTICLES = 50;
 
-CParticle::CParticle() :
+Particle::Particle() :
     m_life(0.0f),
     m_position(make_vector(0.0f, 0.0f, 0.0f)),
     m_velocity(make_vector(0.0f, 0.0f, 0.0f))
 {
 }
 
-CParticle::CParticle(const Vector3f& position)
+Particle::Particle(const Vector3f& position)
 {
     m_position.x() = position.x() + ((float)rand() / float(RAND_MAX) / 2.0f) - 0.25f;
     m_position.y() = position.y();
@@ -22,12 +22,12 @@ CParticle::CParticle(const Vector3f& position)
     m_life = (((float)rand() / float(RAND_MAX)) * 20.0f);
 }
 
-bool CParticle::isDead() const
+bool Particle::isDead() const
 {
     return !(m_life > 0.0f);
 }
 
-void CParticle::Update(float elapsed_milliseconds)
+void Particle::Update(float elapsed_milliseconds)
 {
     if(m_life > 0.0f)
     {
@@ -36,26 +36,26 @@ void CParticle::Update(float elapsed_milliseconds)
     }
 }
 
-Vector3f CParticle::position() const
+Vector3f Particle::position() const
 {
     return m_position;
 }
 
 
-CEmitter::CEmitter(const Vector3f& position) :
+Emitter::Emitter(const Vector3f& position) :
     m_particles(MAX_PARTICLES),
     m_position(position)
 {
 }
 
-void CEmitter::Update(float elapsed_milliseconds)
+void Emitter::Update(float elapsed_milliseconds)
 {
     // TODO: this should be SSE
     for(unsigned int index = 0; index < MAX_PARTICLES; ++index)
     {
         if(m_particles[index].isDead())
         {
-            new(&m_particles[index]) CParticle(m_position);
+            new(&m_particles[index]) Particle(m_position);
         }
         else
         {
@@ -64,12 +64,12 @@ void CEmitter::Update(float elapsed_milliseconds)
     }
 }
 
-size_t CEmitter::get_particle_count() const
+size_t Emitter::get_particle_count() const
 {
     return m_particles.size();
 }
 
-Vector3f CEmitter::get_particle_position(size_t index) const
+Vector3f Emitter::get_particle_position(size_t index) const
 {
     return m_particles[index].position();
 }
