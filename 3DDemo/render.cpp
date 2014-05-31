@@ -26,7 +26,7 @@ static const Vector3f bezier_control_points[] =
     { -4.0f,-2.0f, -10.0f },    // 14
 };
 
-static const bezier_patch patches[] =
+static const Bezier_patch patches[] =
 {
     { { bezier_control_points }, 0,  1,  2,  3,  4,  5,  6,  7,  8 },
     { { bezier_control_points }, 2,  9, 10,  5, 11, 12,  8, 13, 14 },
