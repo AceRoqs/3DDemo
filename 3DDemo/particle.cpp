@@ -83,29 +83,40 @@ CEmitter::CEmitter(const Vector3f& position) :
 {
 }
 
-void CEmitter::CreateParticle(unsigned int index)
-{
-    new(&m_particles[index]) CParticle(m_position);
-}
-
 void CEmitter::Update(float elapsed_milliseconds)
 {
+    // TODO: this should be SSE
     for(unsigned int ii = 0; ii < MAX_PARTICLES; ++ii)
     {
-        m_particles[ii].Update(elapsed_milliseconds);
         if(m_particles[ii].isDead())
         {
-            CreateParticle(ii);
+            new(&m_particles[index]) CParticle(m_position);
+        }
+        else
+        {
+            m_particles[ii].Update(elapsed_milliseconds);
         }
     }
 }
 
 void CEmitter::Draw(const Camera& camera, unsigned int texture_id) const
 {
-    // TODO: this should be SSE
-    for(unsigned int ii = 0; ii < m_particles.size(); ++ii)
+    const size_t particle_count = get_particle_count();
+
+    for(size_t index = 0; index < particle_count; ++index)
     {
-        draw_billboard(camera, m_particles[ii].position(), 0.5f, texture_id);
+        const Vector3f position = get_particle_position(index);
+        draw_billboard(camera, position, 0.5f, texture_id);
     }
+}
+
+size_t CEmitter::get_particle_count() const
+{
+    return m_particles.size();
+}
+
+Vector3f CEmitter::get_particle_position(size_t index) const
+{
+    return m_particles[index].position();
 }
 
