@@ -9,21 +9,21 @@
 
 static const Vector3f bezier_control_points[] =
 {
-    { -2, 0, -10 },     // 0
-    { -2, 0, -11 },     // 1
-    { -3, 0, -11 },     // 2
-    { -2,-1, -10 },     // 3
-    { -2,-1, -11 },     // 4
-    { -3,-1, -11 },     // 5
-    { -2,-2, -10 },     // 6
-    { -2,-2, -11 },     // 7
-    { -3,-2, -11 },     // 8
-    { -4, 0, -11 },     // 9
-    { -4, 0, -10 },     // 10
-    { -4,-1, -11 },     // 11
-    { -4,-1, -10 },     // 12
-    { -4,-2, -11 },     // 13
-    { -4,-2, -10 },     // 14
+    { -2.0f, 0.0f, -10.0f },    // 0
+    { -2.0f, 0.0f, -11.0f },    // 1
+    { -3.0f, 0.0f, -11.0f },    // 2
+    { -2.0f,-1.0f, -10.0f },    // 3
+    { -2.0f,-1.0f, -11.0f },    // 4
+    { -3.0f,-1.0f, -11.0f },    // 5
+    { -2.0f,-2.0f, -10.0f },    // 6
+    { -2.0f,-2.0f, -11.0f },    // 7
+    { -3.0f,-2.0f, -11.0f },    // 8
+    { -4.0f, 0.0f, -11.0f },    // 9
+    { -4.0f, 0.0f, -10.0f },    // 10
+    { -4.0f,-1.0f, -11.0f },    // 11
+    { -4.0f,-1.0f, -10.0f },    // 12
+    { -4.0f,-2.0f, -11.0f },    // 13
+    { -4.0f,-2.0f, -10.0f },    // 14
 };
 
 static const bezier_patch patches[] =
@@ -150,15 +150,15 @@ void draw_list(
 {
     glClearDepth(1.0);
     glClear(GL_DEPTH_BUFFER_BIT);
-//    glClearColor(0.0, 0.0, 0.0, 1.0);
+//    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 //    glClear(GL_COLOR_BUFFER_BIT);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glRotatef(camera.m_degrees, 0, 1, 0);
+    glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
     glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
     // first pass texturing
-    glColor4f(1.0, 1.0, 1.0, 1.0);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     // single loop multi pass textured lighting
     // this is done is one pass because of visibility
@@ -166,7 +166,7 @@ void draw_list(
     //    glLockArraysEXT(0, 43);
     for(unsigned int ii = 0; ii < poly_vector.size(); ii++)
     {
-        glColor4f(1.0, 1.0, 1.0, 1.0);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         const Graphics::Polygon* iter = &poly_vector[ii];
         glBindTexture(GL_TEXTURE_2D, iter->texture);
         glBlendFunc(GL_ONE, GL_ZERO);
@@ -201,7 +201,7 @@ void draw_list(
         }
 
         glDepthFunc(GL_EQUAL);
-        glColor4f(0.0, 0.0, 0.0, 0.25f);
+        glColor4f(0.0f, 0.0f, 0.0f, 0.25f);
         glBindTexture(GL_TEXTURE_2D, iter->lightmap);
 //      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
@@ -225,7 +225,7 @@ void draw_list(
 
     // Set level-of-detail.
     const unsigned int MAX_GENERATED_POINTS = 10;
-    unsigned int patch_count = (unsigned int)(MAX_GENERATED_POINTS * 4 / (point_distance(camera.m_position, make_vector(2, 0, 10)))) - 1;
+    unsigned int patch_count = (unsigned int)(MAX_GENERATED_POINTS * 4 / (point_distance(camera.m_position, make_vector(2.0f, 0.0f, 10.0f)))) - 1;
     patch_count = std::min(std::max(2u, patch_count), MAX_GENERATED_POINTS - 1);
     std::vector<Vector3f> vertices = generate_quadratic_bezier_quads(patches[0], patch_count);
     draw_patch(vertices, patch_count, 2);
