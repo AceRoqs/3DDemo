@@ -19,14 +19,21 @@ static Particle update_particle(Particle& particle, const Vector3f& emitter_posi
     }
     else
     {
+        // NOTE: If update_particle is moved back to a class, it may make sense to
+        // make the generator a member, instead of re-seeding it on each update.
+        std::random_device seed;
+        std::default_random_engine generator(seed());
+        std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
+
         // TODO: 2014: Clean this up.
-        particle.position.x() = emitter_position.x() + ((float)rand() / float(RAND_MAX) / 2.0f) - 0.25f;
-        particle.position.y() = emitter_position.y();
-        particle.position.z() = emitter_position.z();
-        particle.velocity.x() = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
-        particle.velocity.y() = ((float)rand() / float(RAND_MAX)) / 10.0f;
-        particle.velocity.z() = 0.027f - ((float)rand() / float(RAND_MAX)) / 18.0f;
-        particle.life = (((float)rand() / float(RAND_MAX)) * 20.0f);
+        particle.position = emitter_position;
+        particle.position.x() += distribution(generator) / 2.0f - 0.25f;
+
+        particle.velocity.x() = 0.027f + distribution(generator) / -18.0f;
+        particle.velocity.y() = distribution(generator) / 10.0f;
+        particle.velocity.z() = 0.027f + distribution(generator) / -18.0f;
+
+        particle.life = distribution(generator) * 20.0f;
     }
 
     return particle;

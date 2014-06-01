@@ -23,6 +23,7 @@
 #include <cstdint>
 #include <cmath>
 #include <memory>
+#include <random>
 #include <functional>
 #include <iostream>
 #include <fstream>
