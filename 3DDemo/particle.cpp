@@ -26,7 +26,6 @@ static Particle update_particle(Particle& particle, const Vector3f& emitter_posi
         std::default_random_engine generator(seed());
         std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 
-        // TODO: 2014: Clean this up.
         particle.position = emitter_position;
         particle.position.x() += distribution(generator) / 2.0f - 0.25f;
 
