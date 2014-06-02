@@ -11,11 +11,10 @@ static bool is_particle_alive(const Particle& particle)
 
 static Particle update_particle(Particle& particle, const Vector3f& emitter_position, float elapsed_milliseconds)
 {
+    particle.life -= elapsed_milliseconds;
     if(is_particle_alive(particle))
     {
-        particle.life -= elapsed_milliseconds;
-        // TODO: 2014: Velocity update should be a function of elapsed_milliseconds.
-        particle.position += particle.velocity;
+        particle.position += particle.velocity * elapsed_milliseconds;
     }
     else
     {
@@ -29,11 +28,11 @@ static Particle update_particle(Particle& particle, const Vector3f& emitter_posi
         particle.position = emitter_position;
         particle.position.x() += distribution(generator) / 2.0f - 0.25f;
 
-        particle.velocity.x() = 0.027f + distribution(generator) / -18.0f;
-        particle.velocity.y() = distribution(generator) / 10.0f;
-        particle.velocity.z() = 0.027f + distribution(generator) / -18.0f;
+        particle.velocity.x() = 0.0016f + distribution(generator) / -250.0f;
+        particle.velocity.y() = distribution(generator) / 130.0f;
+        particle.velocity.z() = 0.0016f + distribution(generator) / -250.0f;
 
-        particle.life = distribution(generator) * 20.0f;
+        particle.life = distribution(generator) * 150.0f;
     }
 
     return particle;
