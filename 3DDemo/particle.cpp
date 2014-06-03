@@ -9,8 +9,10 @@ static bool is_particle_alive(const Particle& particle)
     return particle.life > 0.0f;
 }
 
-static Particle update_particle(Particle& particle, const Vector3f& emitter_position, float elapsed_milliseconds)
+static Particle update_particle(const Particle& current_particle, const Vector3f& emitter_position, float elapsed_milliseconds)
 {
+    Particle particle = current_particle;
+
     // Decrement life first.  If the elapsed_milliseconds is larger than the life, then the
     // calculated velocity and position will be significantly outside the expected bounds.
     particle.life -= elapsed_milliseconds;
@@ -52,7 +54,7 @@ Emitter::Emitter(const Vector3f& position) :
 
 void Emitter::update(float elapsed_milliseconds)
 {
-    const auto update = [&, elapsed_milliseconds](Particle& particle) -> Particle
+    const auto update = [&, elapsed_milliseconds](const Particle& particle) -> Particle
     {
         return update_particle(particle, m_position, elapsed_milliseconds);
     };
