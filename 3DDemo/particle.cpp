@@ -27,11 +27,11 @@ static Particle update_particle(Particle& particle, const Vector3f& emitter_posi
         std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 
         particle.position = emitter_position;
-        particle.position.x() += distribution(generator) / 2.0f - 0.25f;
+        particle.position.x() += distribution(generator) * 0.5f - 0.25f;
 
-        particle.velocity.x() = 0.0016f + distribution(generator) / -250.0f;
-        particle.velocity.y() = distribution(generator) / 130.0f;
-        particle.velocity.z() = 0.0016f + distribution(generator) / -250.0f;
+        particle.velocity.x() = distribution(generator) * -0.004f + 0.0016f;
+        particle.velocity.y() = distribution(generator) *  0.008f + 0.0f;
+        particle.velocity.z() = distribution(generator) * -0.004f + 0.0016f;
 
         particle.life = distribution(generator) * 150.0f;
     }
