@@ -2,14 +2,16 @@
 #include "particle.h"
 #include "Camera.h"
 
-const unsigned int MAX_PARTICLES = 50;
-
 static bool is_particle_alive(const Particle& particle)
 {
     return particle.life > 0.0f;
 }
 
-static Particle update_particle(const Particle& current_particle, const Vector3f& emitter_position, float elapsed_milliseconds)
+static Particle update_particle(
+    const Particle& current_particle,
+    const Vector3f& emitter_position,
+    const Particle_descriptor& descriptor,
+    float elapsed_milliseconds)
 {
     Particle particle = current_particle;
 
@@ -29,22 +31,26 @@ static Particle update_particle(const Particle& current_particle, const Vector3f
         std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 
         particle.position = emitter_position;
-        particle.position.x() += distribution(generator) * 0.5f - 0.25f;
+        particle.position.x() += distribution(generator) * descriptor.position_x_scale + descriptor.position_x_bias;
+        particle.position.y() += distribution(generator) * descriptor.position_y_scale + descriptor.position_y_bias;
+        particle.position.z() += distribution(generator) * descriptor.position_z_scale + descriptor.position_z_bias;
 
-        particle.velocity.x() = distribution(generator) * -0.004f + 0.0016f;
-        particle.velocity.y() = distribution(generator) *  0.008f + 0.0f;
-        particle.velocity.z() = distribution(generator) * -0.004f + 0.0016f;
+        particle.velocity.x() = distribution(generator) * descriptor.velocity_x_scale + descriptor.velocity_x_bias;
+        particle.velocity.y() = distribution(generator) * descriptor.velocity_y_scale + descriptor.velocity_y_bias;
+        particle.velocity.z() = distribution(generator) * descriptor.velocity_z_scale + descriptor.velocity_z_bias;
 
-        particle.life = distribution(generator) * 150.0f;
+        particle.life = distribution(generator) * descriptor.life;
     }
 
     return particle;
 }
 
-Emitter::Emitter(const Vector3f& position) :
-    m_particles(MAX_PARTICLES),
+Emitter::Emitter(const Vector3f& position, unsigned int particle_count, const Particle_descriptor& descriptor) :
+    m_descriptor(descriptor),
+    m_particles(particle_count),
     m_position(position)
 {
+
     std::for_each(std::begin(m_particles), std::end(m_particles), [](Particle& particle)
     {
         // The rest of the structure is uninitialized.
@@ -56,7 +62,7 @@ void Emitter::update(float elapsed_milliseconds)
 {
     const auto update = [&, elapsed_milliseconds](const Particle& particle) -> Particle
     {
-        return update_particle(particle, m_position, elapsed_milliseconds);
+        return update_particle(particle, m_position, m_descriptor, elapsed_milliseconds);
     };
 
     // TODO: 2014: Consider a SSE version.

@@ -17,10 +17,31 @@
 
 static bool s_fWindowed = true;
 
+static const Particle_descriptor particle_descriptor =
+{
+    // Position.
+    0.5f,       // x scale.
+    -0.25f,     // x bias.
+    0.0f,       // y scale.
+    0.0f,       // y bias.
+    0.0f,       // z scale.
+    0.0f,       // z bias.
+
+    // Velocity.
+    -0.004f,    // x scale.
+    0.0016f,    // x bias.
+    0.008f,     // y scale.
+    0.0f,       // y bias.
+    -0.004f,    // z scale.
+    0.0016f,    // z bias.
+
+    150.0f,     // life.
+};
+
 static UINT_PTR game_message_loop(WindowsCommon::Clock& clock, const WindowsCommon::Input_device& keyboard, const std::vector<Graphics::Polygon>& polys)
 {
     Camera camera(make_vector(0.0f, 0.0f, 1.0f), 0.0f);
-    Emitter emitter(make_vector(-3.0f, 0.0f, -10.5f));
+    Emitter emitter(make_vector(-3.0f, 0.0f, -10.5f), 50, particle_descriptor);
 
     MSG message;
     for(;;)
