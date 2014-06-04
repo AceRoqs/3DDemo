@@ -5,6 +5,7 @@
 #include "particle.h"
 #include "Camera.h"
 #include "Action.h"
+#include "Bezier.h"
 #include "Bitmap.h"
 #include "Clock.h"
 #include "DirectInputMap.h"
@@ -38,6 +39,31 @@ static const Particle_descriptor particle_descriptor =
     150.0f,     // life.
 };
 
+static const Vector3f bezier_control_points[] =
+{
+    { -2.0f, 0.0f, -10.0f },    // 0
+    { -2.0f, 0.0f, -11.0f },    // 1
+    { -3.0f, 0.0f, -11.0f },    // 2
+    { -2.0f,-1.0f, -10.0f },    // 3
+    { -2.0f,-1.0f, -11.0f },    // 4
+    { -3.0f,-1.0f, -11.0f },    // 5
+    { -2.0f,-2.0f, -10.0f },    // 6
+    { -2.0f,-2.0f, -11.0f },    // 7
+    { -3.0f,-2.0f, -11.0f },    // 8
+    { -4.0f, 0.0f, -11.0f },    // 9
+    { -4.0f, 0.0f, -10.0f },    // 10
+    { -4.0f,-1.0f, -11.0f },    // 11
+    { -4.0f,-1.0f, -10.0f },    // 12
+    { -4.0f,-2.0f, -11.0f },    // 13
+    { -4.0f,-2.0f, -10.0f },    // 14
+};
+
+static const Bezier_patch patches[] =
+{
+    { { bezier_control_points }, 0,  1,  2,  3,  4,  5,  6,  7,  8 },
+    { { bezier_control_points }, 2,  9, 10,  5, 11, 12,  8, 13, 14 },
+};
+
 static UINT_PTR game_message_loop(WindowsCommon::Clock& clock, const WindowsCommon::Input_device& keyboard, const std::vector<Graphics::Polygon>& polys)
 {
     Camera camera(make_vector(0.0f, 0.0f, 1.0f), 0.0f);
@@ -61,9 +87,17 @@ static UINT_PTR game_message_loop(WindowsCommon::Clock& clock, const WindowsComm
 
         std::list<std::pair<float, Action>> actions = actions_from_keyboard_state(elapsed_milliseconds, keyboard_state);
         camera = apply_actions(actions, camera);
+
+        // Set level-of-detail.
+        const unsigned int MAX_GENERATED_POINTS = 10;
+        unsigned int patch_count = (unsigned int)(MAX_GENERATED_POINTS * 4 / (point_distance(camera.m_position, make_vector(2.0f, 0.0f, 10.0f)))) - 1;
+        patch_count = std::min(std::max(2u, patch_count), MAX_GENERATED_POINTS - 1);
+        std::vector<Vector3f> vertices = generate_quadratic_bezier_quads(patches[0], patch_count);
+        std::vector<Vector3f> vertices2 = generate_quadratic_bezier_quads(patches[1], patch_count);
+
         emitter.update(elapsed_milliseconds);
 
-        draw_list(polys, emitter, camera);
+        draw_list(polys, vertices, vertices2, patch_count, 2, emitter, camera);
 
         const HDC device_context = wglGetCurrentDC();
         SwapBuffers(device_context);

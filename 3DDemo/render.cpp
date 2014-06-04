@@ -7,31 +7,6 @@
 #include "Camera.h"
 #include "LinearAlgebra.h"
 
-static const Vector3f bezier_control_points[] =
-{
-    { -2.0f, 0.0f, -10.0f },    // 0
-    { -2.0f, 0.0f, -11.0f },    // 1
-    { -3.0f, 0.0f, -11.0f },    // 2
-    { -2.0f,-1.0f, -10.0f },    // 3
-    { -2.0f,-1.0f, -11.0f },    // 4
-    { -3.0f,-1.0f, -11.0f },    // 5
-    { -2.0f,-2.0f, -10.0f },    // 6
-    { -2.0f,-2.0f, -11.0f },    // 7
-    { -3.0f,-2.0f, -11.0f },    // 8
-    { -4.0f, 0.0f, -11.0f },    // 9
-    { -4.0f, 0.0f, -10.0f },    // 10
-    { -4.0f,-1.0f, -11.0f },    // 11
-    { -4.0f,-1.0f, -10.0f },    // 12
-    { -4.0f,-2.0f, -11.0f },    // 13
-    { -4.0f,-2.0f, -10.0f },    // 14
-};
-
-static const Bezier_patch patches[] =
-{
-    { { bezier_control_points }, 0,  1,  2,  3,  4,  5,  6,  7,  8 },
-    { { bezier_control_points }, 2,  9, 10,  5, 11, 12,  8, 13, 14 },
-};
-
 // Vertices is a two dimensional array of patch vertices.  generate_quadratic_bezier_quads() creates the expected output.
 // TODO: 2014: This isn't very cache friendly, as the array isn't read in-order.  Vertex/Index arrays would also be an improvement.
 static void draw_patch(const std::vector<Vector3f>& vertices, unsigned int patch_count, unsigned int texture_id)
@@ -188,9 +163,13 @@ void initialize_gl_world_data(
 // TODO: add more flushes
 // TODO: modularize into separate functions
 void draw_list(
-    const std::vector<Graphics::Polygon>& poly_vector,
-    const Emitter& emitter,
-    const Camera& camera)
+    const std::vector<struct Graphics::Polygon>& poly_vector,
+    const std::vector<Vector3f>& vertices,
+    const std::vector<Vector3f>& vertices2,
+    unsigned int patch_count,
+    unsigned int patch_texture_id,
+    const class Emitter& emitter,
+    const struct Camera& camera)
 {
     glClearDepth(1.0);
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -267,14 +246,8 @@ void draw_list(
 */
     }
 
-    // Set level-of-detail.
-    const unsigned int MAX_GENERATED_POINTS = 10;
-    unsigned int patch_count = (unsigned int)(MAX_GENERATED_POINTS * 4 / (point_distance(camera.m_position, make_vector(2.0f, 0.0f, 10.0f)))) - 1;
-    patch_count = std::min(std::max(2u, patch_count), MAX_GENERATED_POINTS - 1);
-    std::vector<Vector3f> vertices = generate_quadratic_bezier_quads(patches[0], patch_count);
-    draw_patch(vertices, patch_count, 2);
-    vertices = generate_quadratic_bezier_quads(patches[1], patch_count);
-    draw_patch(vertices, patch_count, 2);
+    draw_patch(vertices, patch_count, patch_texture_id);
+    draw_patch(vertices2, patch_count, patch_texture_id);
 
 //    glUnlockArraysEXT();
 //  glDisable(GL_CULL_FACE);
