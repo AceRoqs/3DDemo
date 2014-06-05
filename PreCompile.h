@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <exception>
 #include <functional>
+#include <string>
 #include <vector>
 
 // Windows API.

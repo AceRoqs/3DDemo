@@ -42,6 +42,7 @@ static std::vector<std::string> get_opengl_extensions()
     if(extensions_string != nullptr)
     {
         extensions = tokenize_string(extensions_string, " ");
+        std::sort(std::begin(extensions), std::end(extensions));
     }
 
     return extensions;
