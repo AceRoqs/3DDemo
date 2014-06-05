@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <exception>
 #include <functional>
+#include <vector>
 
 // Windows API.
 #ifdef WIN32
