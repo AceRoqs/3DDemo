@@ -1,10 +1,72 @@
 #include "PreCompile.h"
 #include "WindowsGL.h"      // Pick up forward declarations to ensure correctness.
 #include "HRException.h"
+#include "Tracing.h"
 #include "WindowClass.h"
 
 namespace WindowsCommon
 {
+
+static std::vector<std::string> tokenize_string(_In_z_ const char* str, _In_z_ const char* delimiters)
+{
+    std::vector<std::string> tokens;
+
+    const char* begin = str;
+    const char* end = str + strlen(str);
+    const char* delimiters_end = delimiters + strlen(delimiters);
+
+    const char* iter;
+    while((iter = std::find_first_of(begin, end, delimiters, delimiters_end)) != end)
+    {
+        tokens.push_back(std::string(begin, iter - begin));
+        begin = iter + 1;
+    }
+
+    // Handle case where delimiter is not in string (usually the final token).
+    if(begin < end)
+    {
+        tokens.push_back(std::string(begin));
+    }
+
+    return tokens;
+}
+
+static std::vector<std::string> get_opengl_extensions()
+{
+    // The VMware OpenGL Mesa driver includes an extra space on the end of the string.
+    // The tokenizer works either way, but this appears to be work around bugy tokenizers that
+    // miss the final OpenGL extension string.
+    const char* extensions_string = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+
+    std::vector<std::string> extensions;
+    if(extensions_string != nullptr)
+    {
+        extensions = tokenize_string(extensions_string, " ");
+    }
+
+    return extensions;
+}
+
+static void dprintf_gl_strings()
+{
+#ifndef NDEBUG
+    const char* vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+    WindowsCommon::dprintf("OpenGL vendor: %s\n", vendor != nullptr ? vendor : "");
+
+    const char* renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+    WindowsCommon::dprintf("OpenGL renderer: %s\n", renderer != nullptr ? renderer : "");
+
+    const char* version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+    WindowsCommon::dprintf("OpenGL version: %s\n", version != nullptr ? version : "");
+
+    auto extensions = get_opengl_extensions();
+    WindowsCommon::dprintf("OpenGL extensions:\n");
+    std::for_each(extensions.cbegin(), extensions.cend(), [](const std::string& extension)
+    {
+        WindowsCommon::dprintf("%s\n", extension.c_str());
+    });
+#endif
+}
 
 static bool is_window_32bits_per_pixel(_In_ HWND window)
 {
@@ -104,6 +166,8 @@ OpenGL_window::OpenGL_window(_In_ PCTSTR window_title, _In_ HINSTANCE instance, 
     m_state.device_context = get_device_context(m_state.window);
     m_state.gl_context = create_gl_context(m_state.device_context);
     m_state.make_current_context = create_current_context(m_state.device_context, m_state.gl_context);
+
+    dprintf_gl_strings();
 }
 
 OpenGL_window::~OpenGL_window()
