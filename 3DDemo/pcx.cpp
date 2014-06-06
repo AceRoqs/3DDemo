@@ -32,16 +32,6 @@ struct PCX
    int8_t  filler[54];          // Padding to 128 bytes
 };
 
-#pragma pack(push)
-#pragma pack(1)
-typedef struct
-{
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
-} ColorRGB;
-#pragma pack(pop)
-
 bool PCXDecodeRGB(const char* filename, Bitmap* spr)
 {
     FILE* in;
@@ -49,7 +39,7 @@ bool PCXDecodeRGB(const char* filename, Bitmap* spr)
     int count, scanline;
     unsigned char buffer;
     PCX pcx;
-    ColorRGB palette[256];
+    Color_rgb palette[256];
 
     int index, run_count;
 
@@ -109,7 +99,7 @@ bool PCXDecodeRGB(const char* filename, Bitmap* spr)
         if(fread(palette, 1, 768, in) == 768)
         {
             // read in palette
-            ColorRGB *picture = new(std::nothrow) ColorRGB[spr->xsize * spr->ysize];
+            Color_rgb* picture = new(std::nothrow) Color_rgb[spr->xsize * spr->ysize];
             for(unsigned long ii = 0; ii < spr->xsize * spr->ysize; ++ii)
             {
                 unsigned char x = spr->bitmap[ii];
