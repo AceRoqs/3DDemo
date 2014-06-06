@@ -6,10 +6,10 @@ namespace Graphics
 
 struct Polygon
 {
-    std::vector<int> points;                // Indices into vertex list (used for load only).
-    std::vector<int> texture_coordinates;   // Indices into texture coordinate list (used for load only).
-    unsigned int texture;                   // Texture ID.
-    unsigned int lightmap;                  // Index into lightmap list.
+    std::vector<unsigned int> vertex_indices;       // Indices into vertex list (used for load only).
+    std::vector<unsigned int> texture_coordinates;  // Indices into texture coordinate list (used for load only).
+    unsigned int texture;                           // Texture ID.
+    unsigned int lightmap;                          // Index into lightmap list.
 
     Polygon();
 };

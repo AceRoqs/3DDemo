@@ -1,7 +1,3 @@
-//=========================================================================
-// Copyright (c) 2003 Toby Jones. All rights reserved.
-// Purpose: View information for world
-//=========================================================================
 #include "PreCompile.h"
 #include "world.h"
 #include "Bitmap.h"
@@ -70,26 +66,26 @@ Polygon::Polygon() :
 std::istream& operator>>(std::istream& is, Graphics::Polygon& polygon)
 {
     // Clear and realloc vectors.
-    std::vector<int>().swap(polygon.points);
-    std::vector<int>().swap(polygon.texture_coordinates);
+    std::vector<unsigned int>().swap(polygon.vertex_indices);
+    std::vector<unsigned int>().swap(polygon.texture_coordinates);
 
     unsigned int num_points;
     is >> num_points;
     if(num_points > 0)
     {
-        polygon.points.reserve(num_points);
+        polygon.vertex_indices.reserve(num_points);
         polygon.texture_coordinates.reserve(num_points);
 
         for(unsigned int ix = 0; ix < num_points; ++ix)
         {
-            int point;
-            is >> point;
-            polygon.points.push_back(point);
+            unsigned int vertex_indices;
+            is >> vertex_indices;
+            polygon.vertex_indices.push_back(vertex_indices);
         }
 
         for(unsigned int ix = 0; ix < num_points; ++ix)
         {
-            int texture_coordinate;
+            unsigned int texture_coordinate;
             is >> texture_coordinate;
             polygon.texture_coordinates.push_back(texture_coordinate);
         }
@@ -152,7 +148,7 @@ static void load_world_data(
         for(auto jj = 0; jj < 4; ++jj)
         {
             // TODO: 2014: Bounds check constant arrays.
-            auto ix = poly.points[jj];
+            auto ix = poly.vertex_indices[jj];
             if(ix < ARRAYSIZE(world_vertices))
             {
                 vertices->push_back(world_vertices[ix]);
