@@ -64,7 +64,7 @@ static const Bezier_patch patches[] =
     { { bezier_control_points }, 2,  9, 10,  5, 11, 12,  8, 13, 14 },
 };
 
-static UINT_PTR game_message_loop(WindowsCommon::Clock& clock, const WindowsCommon::Input_device& keyboard, const std::vector<Graphics::Polygon>& polys)
+static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, const WindowsCommon::Input_device& keyboard)
 {
     Camera camera(make_vector(0.0f, 0.0f, 1.0f), 0.0f);
     Emitter emitter(make_vector(-3.0f, 0.0f, -10.5f), 50, particle_descriptor);
@@ -97,7 +97,7 @@ static UINT_PTR game_message_loop(WindowsCommon::Clock& clock, const WindowsComm
 
         emitter.update(elapsed_milliseconds);
 
-        draw_list(polys, vertices, vertices2, patch_count, 2, emitter, camera);
+        draw_list(map, vertices, vertices2, patch_count, 2, emitter, camera);
 
         const HDC device_context = wglGetCurrentDC();
         SwapBuffers(device_context);
@@ -134,10 +134,9 @@ void app_run(HINSTANCE instance, int show_command)
     {
         // Start load first, to kick off async reads.
         std::vector<Bitmap> texture_list;
-        std::vector<Graphics::Polygon> polys;
         std::vector<Vector3f> vertices;
         std::vector<Vector2f> texture_coords;
-        start_load("polydefs.txt", &texture_list, &polys, &vertices, &texture_coords);
+        Map map = start_load("polydefs.txt", &texture_list, &vertices, &texture_coords);
 
         App_window app(instance, true);
 
@@ -155,7 +154,7 @@ void app_run(HINSTANCE instance, int show_command)
         ShowWindow(app.m_state.window, show_command);
         UpdateWindow(app.m_state.window);
 
-        auto return_code = game_message_loop(clock, keyboard, polys);
+        auto return_code = game_message_loop(map, clock, keyboard);
 
         // _tWinMain return code is an int type.
         assert(INT_MAX > return_code);

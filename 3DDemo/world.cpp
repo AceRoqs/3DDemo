@@ -117,15 +117,13 @@ bool is_point_in_world(const Vector3f& point)
     return true;
 }
 
-static void load_world_data(
+static Map load_world_data(
     std::istream& is,
     std::vector<Bitmap>* texture_list,
-    std::vector<Graphics::Polygon>* polys,
     std::vector<Vector3f>* vertices,
     std::vector<Vector2f>* texture_coords)
 {
     unsigned int cTextures;
-
     is >> cTextures;
 
     unsigned int ii;
@@ -139,11 +137,12 @@ static void load_world_data(
     unsigned int cPolys;
     is >> cPolys;
 
+    Map map;
     for(ii = 0; ii < cPolys; ++ii)
     {
         Graphics::Polygon poly;
         is >> poly;
-        polys->push_back(poly);
+        map.world_mesh.push_back(poly);
 
         for(auto jj = 0; jj < 4; ++jj)
         {
@@ -169,21 +168,23 @@ static void load_world_data(
             }
         }
     }
+
+    return map;
 }
 
-void start_load(
+Map start_load(
     _In_ char* file_name,
     std::vector<Bitmap>* texture_list,
-    std::vector<Graphics::Polygon>* polys,
     std::vector<Vector3f>* vertices,
     std::vector<Vector2f>* texture_coords)
 {
     std::ifstream fis;
     fis.open(file_name);
-    if(fis.is_open())
+    if(!fis.is_open())
     {
-        load_world_data(fis, texture_list, polys, vertices, texture_coords);
-        fis.close();
+        throw std::exception();
     }
+
+    return load_world_data(fis, texture_list, vertices, texture_coords);
 }
 

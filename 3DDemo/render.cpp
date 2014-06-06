@@ -163,7 +163,7 @@ void initialize_gl_world_data(
 // TODO: add more flushes
 // TODO: modularize into separate functions
 void draw_list(
-    const std::vector<struct Graphics::Polygon>& poly_vector,
+    const Map& map,
     const std::vector<Vector3f>& vertices,
     const std::vector<Vector3f>& vertices2,
     unsigned int patch_count,
@@ -187,10 +187,10 @@ void draw_list(
     // this is done is one pass because of visibility
     // problems on a second light pass once the world is drawn
     //    glLockArraysEXT(0, 43);
-    for(unsigned int ii = 0; ii < poly_vector.size(); ii++)
+    for(unsigned int ii = 0; ii < map.world_mesh.size(); ii++)
     {
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        const Graphics::Polygon* iter = &poly_vector[ii];
+        const Graphics::Polygon* iter = &map.world_mesh[ii];
         glBindTexture(GL_TEXTURE_2D, iter->texture);
         glBlendFunc(GL_ONE, GL_ZERO);
         glDepthFunc(GL_LESS);
@@ -198,7 +198,7 @@ void draw_list(
         // TODO: Just draw the whole world as one call
         unsigned char allIndices[4];
         // TODO11: remove the need for these casts.
-        assert(poly_vector.size() * 4 < 256);
+        assert(map.world_mesh.size() * 4 < 256);
         allIndices[0] = static_cast<unsigned char>(ii * 4);
         allIndices[1] = static_cast<unsigned char>(ii * 4 + 1);
         allIndices[2] = static_cast<unsigned char>(ii * 4 + 2);
