@@ -64,6 +64,28 @@ static void generate_grid_texture_rgb(unsigned char* bitmap, int xsize, int ysiz
 
 Bitmap bitmap_from_file(_In_ const char* file_name)
 {
+#ifdef USE_NEW_READERS
+    std::ifstream file(file_name, std::ios::binary);
+    file.seekg(0, std::ios::end);
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    // TODO: zero inits.
+    // TODO: truncates size.
+    std::vector<uint8_t> buffer(static_cast<size_t>(size));
+    file.read(reinterpret_cast<char*>(buffer.data()), size);
+
+    const int cch = strlen(file_name);
+    if((cch >= 4) && (strcmp(file_name + cch - 4, ".pcx") == 0))
+    {
+        return decode_bitmap_from_pcx_memory(buffer.data(), static_cast<size_t>(size));
+    }
+    else if((cch >= 4) && (strcmp(file_name + cch - 4, ".tga") == 0))
+    {
+        return decode_bitmap_from_tga_memory(buffer.data(), static_cast<size_t>(size));
+    }
+    throw std::exception();
+#else
     Bitmap bitmap;
 
     bool use_default_texture = true;
@@ -87,5 +109,6 @@ Bitmap bitmap_from_file(_In_ const char* file_name)
     }
 
     return bitmap;
+#endif
 }
 

@@ -1,44 +1,148 @@
-//=========================================================================
-// Copyright (c) 2003 Toby Jones. All rights reserved.
-// Purpose: Implementation of PCX decoding routines
-//=========================================================================
 #include "PreCompile.h"
 #include "pcx.h"
 #include "Bitmap.h"
 
-struct PCX
+static enum PCX_manufacturer { PCX_magic = 10 };
+static enum PCX_version
 {
-   int8_t  manufacturer;        // 10 = ZSoft PCX
-   int8_t  version;             // 0 = v2.5 of PC Paintbrush
-                                // 2 = v2.8 w/ palette info
-                                // 3 = v2.8 w/o palette info
-                                // 4 = PC Paintbrush for windows
-                                // 5 = v3.0+ of PC Painbrush
-   int8_t  encoding;            // 1 = RLE
-   int8_t  bits_per_pixel;      // (per plane) 1, 2, 4, or 8
-   int16_t xMin;
-   int16_t yMin;
-   int16_t xMax;
-   int16_t yMax;
-   int16_t HDpi;                // Horizontal resolution in dots per inch
-   int16_t VDpi;                // Vertical resolution in dots per inch
-   int8_t  colormap[48];
-   int8_t  reserved;            // Should be 0
-   int8_t  NPlanes;             // Number of color planes
-   int16_t bytes_per_line;      // bytes per scan line plane, must be even
-   int16_t palette_info;        // 1 = Color/BW, 2 = Grayscale
-   int16_t Hscreen_size;        // Horizontal screen size in pixels
-   int16_t Vscreen_size;        // Vertical screen size in pixels
-   int8_t  filler[54];          // Padding to 128 bytes
+    PC_Paintbrush_2_5 = 0,          // PC Paintbrush 2.5.
+    PC_Paintbrush_2_8_palette = 2,  // PC Paintbrush 2.8 with palette info.
+    PC_Paintbrush_2_8 = 3,          // PC Paintbrush 2.8 without palette info.
+    PC_Paintbrush_Windows = 4,      // PC Paintbrush for Windows.
+    PC_Paintbrush_3 = 5,            // PC Paintbrush 3.0+.
 };
+static enum PCX_encoding { RLE_encoding = 1 };
 
+#pragma pack(push)
+#pragma pack(1)
+struct PCX_header
+{
+    uint8_t  manufacturer;              // PCX_manufacturer.
+    uint8_t  version;                   // PCX_version.
+    uint8_t  encoding;                  // PCX_encoding.
+    uint8_t  bits_per_pixel;            // Bits per pixel per plane - 1, 2, 4, or 8.
+    uint16_t min_x;                     // Minimum X value - usually zero.
+    uint16_t min_y;                     // Minimum Y value - usually zero.
+    uint16_t max_x;                     // Maximum X value.
+    uint16_t max_y;                     // Maximum Y value.
+    uint16_t horizontal_dpi;            // Horizontal resolution in dots per inch.
+    uint16_t vertical_dpi;              // Vertical resolution in dots per inch.
+    uint8_t  color_map[48];             // EGA color palette.
+    uint8_t  reserved;                  // Should be zero.
+    uint8_t  color_plane_count;         // Number of color planes.
+    uint16_t bytes_per_line;            // bytes per scan line plane, must be even.
+    uint16_t palette_info;              // 1 = Color/BW, 2 = Grayscale.
+    uint16_t horizontal_screen_size;    // Horizontal screen size in pixels.
+    uint16_t vertical_screen_size;      // Vertical screen size in pixels.
+    uint8_t  filler[54];                // Padding to 128 bytes.
+};
+#pragma pack(pop)
+
+#ifdef USE_NEW_READERS
+static void validate_pcx_header(_In_ const PCX_header* header)
+{
+    if(header->manufacturer != PCX_magic)
+    {
+        throw std::exception();
+    }
+
+    if(header->encoding != RLE_encoding)
+    {
+        throw std::exception();
+    }
+
+    if(header->min_x >= header->max_x)
+    {
+        throw std::exception();
+    }
+
+    if(header->min_y >= header->max_y)
+    {
+        throw std::exception();
+    }
+
+    if((header->color_plane_count != 1) && (header->color_plane_count != 3))
+    {
+        throw std::exception();
+    }
+
+    if(header->bits_per_pixel != 8)
+    {
+        throw std::exception();
+    }
+}
+
+// TODO: 2014: SAL.
+Bitmap decode_bitmap_from_pcx_memory(const uint8_t* file, size_t size)
+{
+    if(size < sizeof(PCX_header))
+    {
+        throw std::exception();
+    }
+
+    const PCX_header* header = reinterpret_cast<const PCX_header*>(file);
+    validate_pcx_header(header);
+
+    const Color_rgb* palette = reinterpret_cast<const Color_rgb*>(file + size - sizeof(Color_rgb) * 256);
+    if(size < sizeof(PCX_header) + sizeof(Color_rgb) * 256)
+    {
+        // TODO: need to support non-palette PCX.
+        throw std::exception();
+    }
+
+    Bitmap bitmap;
+    bitmap.xsize = static_cast<unsigned int>(header->max_x) - header->min_x + 1;
+    bitmap.ysize = static_cast<unsigned int>(header->max_y) - header->min_y + 1;
+    bitmap.filtered = true;
+
+    // uncompressed_size does not account for palette expansion.
+    const unsigned int uncompressed_size = header->bytes_per_line * bitmap.ysize;
+
+    bitmap.bitmap.reserve(uncompressed_size * sizeof(Color_rgb));
+
+    const uint8_t* color_pointer = file + sizeof(PCX_header);
+    unsigned int index = 0;
+    do
+    {
+        // TODO: if last byte is not RLE, color_pointer + 1 is incorrect.
+        if(color_pointer + 1 >= reinterpret_cast<const uint8_t*>(palette))
+        {
+            throw std::exception();
+        }
+
+        unsigned int run_count = 1;
+        if(*color_pointer >= 192)
+        {
+            run_count = *color_pointer - 192;
+            ++color_pointer;
+        }
+
+        if(index + run_count > uncompressed_size)
+        {
+            throw std::exception();
+        }
+
+        // MSVC complains that fill_n is insecure.
+        //std::fill_n(&bitmap.bitmap[index], run_count, palette[*color_pointer]);
+        for(unsigned int ii = 0; ii < run_count; ++ii)
+        {
+            bitmap.bitmap.push_back(palette[*color_pointer]);
+        }
+
+        ++color_pointer;
+        index += run_count;
+    } while(index < uncompressed_size);
+
+    return bitmap;
+}
+#else
 bool PCXDecodeRGB(const char* filename, Bitmap* spr)
 {
     FILE* in;
     long total_size;
     int count, scanline;
     unsigned char buffer;
-    PCX pcx;
+    PCX_header pcx;
     Color_rgb palette[256];
 
     int index, run_count;
@@ -53,10 +157,10 @@ bool PCXDecodeRGB(const char* filename, Bitmap* spr)
     }
     if(fread(&pcx, 1, sizeof(pcx), in) == sizeof(pcx))
     {
-        spr->xsize = pcx.xMax - pcx.xMin + 1;
-        spr->ysize = pcx.yMax - pcx.yMin + 1;
+        spr->xsize = pcx.max_x - pcx.min_x + 1;
+        spr->ysize = pcx.max_y - pcx.min_y + 1;
         spr->filtered = true;
-        total_size = spr->xsize * spr->ysize * pcx.NPlanes * pcx.bits_per_pixel / 8;
+        total_size = spr->xsize * spr->ysize * pcx.color_plane_count * pcx.bits_per_pixel / 8;
 
         // TODO: 2014: Use smart pointer for file handle, so new can throw.
         spr->bitmap.reset(new(std::nothrow) uint8_t[total_size]);
@@ -116,4 +220,5 @@ bool PCXDecodeRGB(const char* filename, Bitmap* spr)
     fclose(in);
     return false;
 }
+#endif
 

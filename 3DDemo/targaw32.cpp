@@ -1,7 +1,3 @@
-//=========================================================================
-// Copyright (c) 2000-2003 Toby Jones. All rights reserved.
-// Purpose: Targa manipulation routines
-//=========================================================================
 #include "PreCompile.h"
 #include "targa.h"
 #include "Bitmap.h"
@@ -11,7 +7,7 @@
 #pragma pack(push)
 #pragma pack(1)
 
-typedef struct
+struct TGA_header
 {
     int8_t    cbIDfield;
     int8_t    eColorMapType;
@@ -25,7 +21,7 @@ typedef struct
     int16_t   cyHeight;
     int8_t    cBitsPerPixel;
     int8_t    eImageDescriptorBits;
-} targa_t;
+};
 
 typedef struct
 {
@@ -80,6 +76,54 @@ typedef struct
 
 #pragma pack(pop)
 
+#ifdef USE_NEW_READERS
+void validate_tga_header(_In_ const TGA_header* header)
+{
+    if(header->eImageType != 2 && header->eImageType != 10)
+    {
+        throw std::exception();
+    }
+
+    // TODO: validate all used fields.
+}
+
+Bitmap decode_bitmap_from_tga_memory(const uint8_t* file, size_t size)
+{
+    if(size < sizeof(TGA_header))
+    {
+        throw std::exception();
+    }
+
+    const TGA_header* header = reinterpret_cast<const TGA_header*>(file);
+    validate_tga_header(header);
+
+    Bitmap bitmap;
+    bitmap.xsize = header->cxWidth;
+    bitmap.ysize = header->cyHeight;
+    bitmap.filtered = true;
+
+    // TODO: overflow.
+    DWORD cbBitmap = header->cxWidth * header->cyHeight * (header->cBitsPerPixel + 7) / 8;
+    const int pixel_count = cbBitmap / sizeof(Color_rgb);
+    bitmap.bitmap.resize(pixel_count);
+
+    // TODO: turn into function.
+    LONG off = sizeof(TGA_header) +
+               header->cbIDfield +
+               header->wColorMapLength * (header->cbColorMapEntrySize + 7) / 8;
+
+    // TODO: can be shorter.
+    // TODO: prevent read overrun past size.
+
+    // MSVC complains that std::copy is insecure.
+    //std::copy(reinterpret_cast<const Color_rgb*>(&file[off]), reinterpret_cast<const Color_rgb*>(&file[off]) + pixel_count, &bitmap.bitmap[0]);
+    memcpy(&bitmap.bitmap[0], file + off, pixel_count * sizeof(Color_rgb));
+
+    return bitmap;
+}
+
+#else
+
 #pragma warning(push, 4)
 #pragma warning(disable:4127) // disable "conditional expression is constant"
 
@@ -87,7 +131,7 @@ typedef struct
 // NOTE: file pointer is moved
 HRESULT TargaReadHeader(
     HANDLE hFile,
-    targa_t* ptga)
+    TGA_header* ptga)
 {
     HRESULT hr;
     do
@@ -101,7 +145,7 @@ HRESULT TargaReadHeader(
         DWORD cbRead;   // WARNING: never checked!!!
         BOOL fOk = ReadFile(hFile,
                             ptga,
-                            sizeof(targa_t),
+                            sizeof(*ptga),
                             &cbRead,
                             nullptr);
 
@@ -249,7 +293,7 @@ HRESULT TargaSeekToID(
     HANDLE hFile)
 {
     HRESULT hr;
-    if(SetFilePointer(hFile, sizeof(targa_t), nullptr, FILE_BEGIN) == 0xFFFFFFFF)
+    if(SetFilePointer(hFile, sizeof(TGA_header), nullptr, FILE_BEGIN) == 0xFFFFFFFF)
     {
         hr = GetLastError();
     }
@@ -263,9 +307,9 @@ HRESULT TargaSeekToID(
 //---------------------------------------------------------------------------
 HRESULT TargaSeekToColorMap(
     HANDLE hFile,
-    targa_t* ptga)
+    TGA_header* ptga)
 {
-    LONG off = sizeof(targa_t) + ptga->cbIDfield;
+    LONG off = sizeof(*ptga) + ptga->cbIDfield;
 
     HRESULT hr;
     if(SetFilePointer(hFile, off, nullptr, FILE_BEGIN) == 0xFFFFFFFF)
@@ -282,9 +326,9 @@ HRESULT TargaSeekToColorMap(
 //---------------------------------------------------------------------------
 HRESULT TargaSeekToImage(
     HANDLE hFile,
-    targa_t* ptga)
+    TGA_header* ptga)
 {
-    LONG off = sizeof(targa_t) +
+    LONG off = sizeof(*ptga) +
                ptga->cbIDfield +
                ptga->wColorMapLength * (ptga->cbColorMapEntrySize + 7) / 8;
 
@@ -370,7 +414,7 @@ bool TGADecodeRGB(
         return false;
 
     // Read in targa info
-    targa_t tga;
+    TGA_header tga;
     HRESULT hr = TargaReadHeader(hFile, &tga);
     if(SUCCEEDED(hr))
         hr = TargaSeekToImage(hFile, &tga);
@@ -463,4 +507,6 @@ bool TGADecodeRGB(
 }
 
 #pragma warning(pop)
+
+#endif
 
