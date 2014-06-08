@@ -40,7 +40,7 @@ struct Bitmap
     bool filtered;
 };
 
-Bitmap bitmap_from_file(_In_ const char* file_name);
+Bitmap bitmap_from_file(_In_z_ const char* file_name);
 
 #endif
 

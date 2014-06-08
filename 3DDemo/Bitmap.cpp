@@ -38,11 +38,14 @@ Bitmap& Bitmap::operator=(Bitmap&& other) NOEXCEPT
 #error This compiler may autodefine the default move constructor.
 #endif
 
-static void generate_grid_texture_rgb(unsigned char* bitmap, int xsize, int ysize)
+static void generate_grid_texture_rgb(
+    _Out_cap_(xsize * ysize) uint8_t* bitmap,
+    unsigned int xsize,
+    unsigned int ysize) NOEXCEPT
 {
-    for(auto iy = 0; iy < ysize; ++iy)
+    for(unsigned int iy = 0; iy < ysize; ++iy)
     {
-        for(auto ix = 0; ix < xsize; ++ix)
+        for(unsigned int ix = 0; ix < xsize; ++ix)
         {
             if((ix < (xsize / 2)) ^ (iy >= (ysize / 2)))
             {
@@ -62,7 +65,7 @@ static void generate_grid_texture_rgb(unsigned char* bitmap, int xsize, int ysiz
     }
 }
 
-Bitmap bitmap_from_file(_In_ const char* file_name)
+Bitmap bitmap_from_file(_In_z_ const char* file_name)
 {
 #ifdef USE_NEW_READERS
     std::ifstream file(file_name, std::ios::binary);

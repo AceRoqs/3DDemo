@@ -31,7 +31,7 @@ std::istream& operator>>(std::istream& is, Graphics::Polygon& polygon);
 bool is_point_in_world(const struct Vector3f& point);
 
 Map start_load(
-    _In_ char* file_name,
+    _In_z_ const char* file_name,
     std::vector<struct Bitmap>* texture_list,
     std::vector<struct Vector3f>* vertices,
     std::vector<struct Vector2f>* texture_coords);

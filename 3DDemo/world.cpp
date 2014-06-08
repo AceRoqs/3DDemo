@@ -173,7 +173,7 @@ static Map load_world_data(
 }
 
 Map start_load(
-    _In_ char* file_name,
+    _In_z_ const char* file_name,
     std::vector<Bitmap>* texture_list,
     std::vector<Vector3f>* vertices,
     std::vector<Vector2f>* texture_coords)
