@@ -72,6 +72,34 @@ static void validate_pcx_header(_In_ const PCX_header* header)
     }
 }
 
+static const uint8_t* rle_decode(
+    _In_ const uint8_t* start_iterator,
+    _In_ const uint8_t* end_iterator,
+    _Out_ uint8_t* value,
+    _Out_ uint8_t* run_count)
+{
+    if(start_iterator >= end_iterator)
+    {
+        throw std::exception();
+    }
+
+    *run_count = 1;
+    if(*start_iterator >= 192)
+    {
+        *run_count = *start_iterator - 192;
+        ++start_iterator;
+
+        if(start_iterator >= end_iterator)
+        {
+            throw std::exception();
+        }
+    }
+
+    *value = *start_iterator;
+    ++start_iterator;
+    return start_iterator;
+}
+
 Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory, size_t size)
 {
     if(size < sizeof(PCX_header))
@@ -99,38 +127,28 @@ Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory,
 
     bitmap.bitmap.reserve(uncompressed_size * sizeof(Color_rgb));
 
-    const uint8_t* color_pointer = pcx_memory + sizeof(PCX_header);
-    unsigned int index = 0;
+    const uint8_t* iterator = pcx_memory + sizeof(PCX_header);
+    unsigned int running_size = 0;
     do
     {
-        // TODO: if last byte is not RLE, color_pointer + 1 is incorrect.
-        if(color_pointer + 1 >= reinterpret_cast<const uint8_t*>(palette))
-        {
-            throw std::exception();
-        }
+        uint8_t value;
+        uint8_t run_count;
+        iterator = rle_decode(iterator, reinterpret_cast<const uint8_t*>(palette), &value, &run_count);
 
-        unsigned int run_count = 1;
-        if(*color_pointer >= 192)
-        {
-            run_count = *color_pointer - 192;
-            ++color_pointer;
-        }
-
-        if(index + run_count > uncompressed_size)
+        if(running_size + run_count > uncompressed_size)
         {
             throw std::exception();
         }
 
         // MSVC complains that fill_n is insecure.
-        //std::fill_n(&bitmap.bitmap[index], run_count, palette[*color_pointer]);
+        //std::fill_n(&bitmap.bitmap[running_size], run_count, palette[*iterator]);
         for(unsigned int ii = 0; ii < run_count; ++ii)
         {
-            bitmap.bitmap.push_back(palette[*color_pointer]);
+            bitmap.bitmap.push_back(palette[value]);
         }
 
-        ++color_pointer;
-        index += run_count;
-    } while(index < uncompressed_size);
+        running_size += run_count;
+    } while(running_size < uncompressed_size);
 
     return bitmap;
 }
