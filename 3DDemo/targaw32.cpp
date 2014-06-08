@@ -87,14 +87,14 @@ void validate_tga_header(_In_ const TGA_header* header)
     // TODO: validate all used fields.
 }
 
-Bitmap decode_bitmap_from_tga_memory(const uint8_t* file, size_t size)
+Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory, size_t size)
 {
     if(size < sizeof(TGA_header))
     {
         throw std::exception();
     }
 
-    const TGA_header* header = reinterpret_cast<const TGA_header*>(file);
+    const TGA_header* header = reinterpret_cast<const TGA_header*>(tga_memory);
     validate_tga_header(header);
 
     Bitmap bitmap;
@@ -117,7 +117,7 @@ Bitmap decode_bitmap_from_tga_memory(const uint8_t* file, size_t size)
 
     // MSVC complains that std::copy is insecure.
     //std::copy(reinterpret_cast<const Color_rgb*>(&file[off]), reinterpret_cast<const Color_rgb*>(&file[off]) + pixel_count, &bitmap.bitmap[0]);
-    memcpy(&bitmap.bitmap[0], file + off, pixel_count * sizeof(Color_rgb));
+    memcpy(&bitmap.bitmap[0], tga_memory + off, pixel_count * sizeof(Color_rgb));
 
     return bitmap;
 }

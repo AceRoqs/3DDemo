@@ -72,18 +72,17 @@ static void validate_pcx_header(_In_ const PCX_header* header)
     }
 }
 
-// TODO: 2014: SAL.
-Bitmap decode_bitmap_from_pcx_memory(const uint8_t* file, size_t size)
+Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory, size_t size)
 {
     if(size < sizeof(PCX_header))
     {
         throw std::exception();
     }
 
-    const PCX_header* header = reinterpret_cast<const PCX_header*>(file);
+    const PCX_header* header = reinterpret_cast<const PCX_header*>(pcx_memory);
     validate_pcx_header(header);
 
-    const Color_rgb* palette = reinterpret_cast<const Color_rgb*>(file + size - sizeof(Color_rgb) * 256);
+    const Color_rgb* palette = reinterpret_cast<const Color_rgb*>(pcx_memory + size - sizeof(Color_rgb) * 256);
     if(size < sizeof(PCX_header) + sizeof(Color_rgb) * 256)
     {
         // TODO: need to support non-palette PCX.
@@ -100,7 +99,7 @@ Bitmap decode_bitmap_from_pcx_memory(const uint8_t* file, size_t size)
 
     bitmap.bitmap.reserve(uncompressed_size * sizeof(Color_rgb));
 
-    const uint8_t* color_pointer = file + sizeof(PCX_header);
+    const uint8_t* color_pointer = pcx_memory + sizeof(PCX_header);
     unsigned int index = 0;
     do
     {

@@ -4,7 +4,7 @@
 #include "Bitmap.h"
 
 bool TGADecodeRGB(const char* szFileName, struct Bitmap* spr);
-Bitmap decode_bitmap_from_tga_memory(const uint8_t* file, size_t size);
+Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory, size_t size);
 
 #endif
 
