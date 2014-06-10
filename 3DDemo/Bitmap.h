@@ -1,7 +1,7 @@
 #ifndef BITMAP_H
 #define BITMAP_H
 
-//#define USE_NEW_READERS
+#define USE_NEW_READERS
 
 #pragma pack(push)
 #pragma pack(1)

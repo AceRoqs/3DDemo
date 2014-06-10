@@ -103,27 +103,39 @@ static const uint8_t* rle_decode(
 // TODO: The parameters need some reworking.
 static void pcx_decode(
     _In_ const uint8_t* start_iterator,
+    _In_ const uint8_t* end_iterator,
     unsigned int uncompressed_size,
-    Bitmap& bitmap, // TEMP?
+    Color_rgb* bitmap, // TEMP?
     _In_count_(256) const Color_rgb* palette)
 {
+    uint8_t* bitmapb = reinterpret_cast<uint8_t*>(bitmap);
     unsigned int running_size = 0;
     do
     {
         uint8_t value;
         uint8_t run_count;
-        start_iterator = rle_decode(start_iterator, reinterpret_cast<const uint8_t*>(palette), &value, &run_count);
+        start_iterator = rle_decode(start_iterator, end_iterator, &value, &run_count);
 
         if(running_size + run_count > uncompressed_size)
         {
             throw std::exception();
         }
 
-        // MSVC complains that fill_n is insecure.
-        //std::fill_n(&bitmap.bitmap[running_size], run_count, palette[*iterator]);
-        for(unsigned int ii = 0; ii < run_count; ++ii)
+        if(palette != nullptr)
         {
-            bitmap.bitmap.push_back(palette[value]);
+            // MSVC complains that fill_n is insecure.
+            //std::fill_n(&bitmap.bitmap[running_size], run_count, palette[*iterator]);
+            for(unsigned int ii = 0; ii < run_count; ++ii)
+            {
+                bitmap[running_size + ii] = palette[value];
+            }
+        }
+        else
+        {
+            for(unsigned int ii = 0; ii < run_count; ++ii)
+            {
+                bitmapb[running_size + ii] = value;
+            }
         }
 
         running_size += run_count;
@@ -140,12 +152,19 @@ Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory,
     const PCX_header* header = reinterpret_cast<const PCX_header*>(pcx_memory);
     validate_pcx_header(header);
 
-    const Color_rgb* palette = reinterpret_cast<const Color_rgb*>(pcx_memory + size - sizeof(Color_rgb) * 256);
-    if(size < sizeof(PCX_header) + sizeof(Color_rgb) * 256)
-    {
+    //const Color_rgb* palette = reinterpret_cast<const Color_rgb*>(pcx_memory + size - sizeof(Color_rgb) * 256);
+    //if(size < sizeof(PCX_header) + sizeof(Color_rgb) * 256)
+    //{
         // TODO: need to support non-palette PCX.
-        throw std::exception();
+    //    throw std::exception();
+    //}
+    const Color_rgb* palette = nullptr;
+    if(header->version == PC_Paintbrush_3 && header->color_plane_count == 1)
+    {
+        palette = reinterpret_cast<const Color_rgb*>(pcx_memory + size - sizeof(Color_rgb) * 256);
     }
+    // Validate C0
+    // Validate bounds
 
     Bitmap bitmap;
     bitmap.xsize = static_cast<unsigned int>(header->max_x) - header->min_x + 1;
@@ -153,13 +172,14 @@ Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory,
     bitmap.filtered = true;
 
     // uncompressed_size does not account for palette expansion.
-    const unsigned int uncompressed_size = header->bytes_per_line * bitmap.ysize;
-
-    bitmap.bitmap.reserve(uncompressed_size * sizeof(Color_rgb));
+    //const unsigned int uncompressed_size = header->bytes_per_line * bitmap.ysize;
+    const unsigned int uncompressed_size = bitmap.xsize * bitmap.ysize * header->color_plane_count;
+    //bitmap.bitmap.reserve(palette != nullptr ? uncompressed_size * sizeof(Color_rgb) : uncompressed_size);
+    bitmap.bitmap.resize(palette != nullptr ? uncompressed_size * sizeof(Color_rgb) : uncompressed_size);
 
     const uint8_t* iterator = pcx_memory + sizeof(PCX_header);
 
-    pcx_decode(iterator, uncompressed_size, bitmap, palette);
+    pcx_decode(iterator, palette != nullptr ? reinterpret_cast<const uint8_t*>(palette) - 1 : iterator + size, uncompressed_size, &bitmap.bitmap[0], palette);
 
     return bitmap;
 }
