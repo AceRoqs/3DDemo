@@ -100,6 +100,36 @@ static const uint8_t* rle_decode(
     return start_iterator;
 }
 
+// TODO: The parameters need some reworking.
+static void pcx_decode(
+    _In_ const uint8_t* start_iterator,
+    unsigned int uncompressed_size,
+    Bitmap& bitmap, // TEMP?
+    _In_count_(256) const Color_rgb* palette)
+{
+    unsigned int running_size = 0;
+    do
+    {
+        uint8_t value;
+        uint8_t run_count;
+        start_iterator = rle_decode(start_iterator, reinterpret_cast<const uint8_t*>(palette), &value, &run_count);
+
+        if(running_size + run_count > uncompressed_size)
+        {
+            throw std::exception();
+        }
+
+        // MSVC complains that fill_n is insecure.
+        //std::fill_n(&bitmap.bitmap[running_size], run_count, palette[*iterator]);
+        for(unsigned int ii = 0; ii < run_count; ++ii)
+        {
+            bitmap.bitmap.push_back(palette[value]);
+        }
+
+        running_size += run_count;
+    } while(running_size < uncompressed_size);
+}
+
 Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory, size_t size)
 {
     if(size < sizeof(PCX_header))
@@ -128,27 +158,8 @@ Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory,
     bitmap.bitmap.reserve(uncompressed_size * sizeof(Color_rgb));
 
     const uint8_t* iterator = pcx_memory + sizeof(PCX_header);
-    unsigned int running_size = 0;
-    do
-    {
-        uint8_t value;
-        uint8_t run_count;
-        iterator = rle_decode(iterator, reinterpret_cast<const uint8_t*>(palette), &value, &run_count);
 
-        if(running_size + run_count > uncompressed_size)
-        {
-            throw std::exception();
-        }
-
-        // MSVC complains that fill_n is insecure.
-        //std::fill_n(&bitmap.bitmap[running_size], run_count, palette[*iterator]);
-        for(unsigned int ii = 0; ii < run_count; ++ii)
-        {
-            bitmap.bitmap.push_back(palette[value]);
-        }
-
-        running_size += run_count;
-    } while(running_size < uncompressed_size);
+    pcx_decode(iterator, uncompressed_size, bitmap, palette);
 
     return bitmap;
 }
