@@ -67,7 +67,7 @@ static void generate_grid_texture_rgb(
 
 Bitmap bitmap_from_file(_In_z_ const char* file_name)
 {
-#ifdef USE_NEW_READERS
+#if 1
     std::ifstream file(file_name, std::ios::binary);
     file.seekg(0, std::ios::end);
     std::streamsize size = file.tellg();

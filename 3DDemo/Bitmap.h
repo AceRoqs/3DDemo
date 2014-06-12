@@ -1,8 +1,6 @@
 #ifndef BITMAP_H
 #define BITMAP_H
 
-#define USE_NEW_READERS
-
 #pragma pack(push)
 #pragma pack(1)
 struct Color_rgb
@@ -30,11 +28,7 @@ struct Bitmap
 #error This compiler may autodefine the default move constructor.
 #endif
 
-#ifdef USE_NEW_READERS
     std::vector<Color_rgb> bitmap;
-#else
-    std::unique_ptr<uint8_t[]> bitmap;
-#endif
     unsigned int xsize;
     unsigned int ysize;
     bool filtered;

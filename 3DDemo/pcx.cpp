@@ -38,7 +38,6 @@ struct PCX_header
 };
 #pragma pack(pop)
 
-#ifdef USE_NEW_READERS
 static void validate_pcx_header(_In_ const PCX_header* header)
 {
     if(header->manufacturer != PCX_magic)
@@ -183,90 +182,4 @@ Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory,
 
     return bitmap;
 }
-#else
-bool PCXDecodeRGB(const char* filename, Bitmap* spr)
-{
-    FILE* in;
-    long total_size;
-    int count, scanline;
-    unsigned char buffer;
-    PCX_header pcx;
-    Color_rgb palette[256];
-
-    int index, run_count;
-
-    if(fopen_s(&in, filename, "rb") != 0)
-    {
-        return false;
-    }
-    if(in == nullptr)
-    {
-        return false;
-    }
-    if(fread(&pcx, 1, sizeof(pcx), in) == sizeof(pcx))
-    {
-        spr->xsize = pcx.max_x - pcx.min_x + 1;
-        spr->ysize = pcx.max_y - pcx.min_y + 1;
-        spr->filtered = true;
-        total_size = spr->xsize * spr->ysize * pcx.color_plane_count * pcx.bits_per_pixel / 8;
-
-        // TODO: 2014: Use smart pointer for file handle, so new can throw.
-        spr->bitmap.reset(new(std::nothrow) uint8_t[total_size]);
-
-        index = count = run_count = scanline = 0;
-        do
-        {
-            if(fread(&buffer, 1, 1, in) != 1)
-            {
-                fclose(in);
-                return false;
-            }
-            if(buffer > 192)
-            {
-                run_count = buffer & 63;
-                fread(&buffer, 1, 1, in);
-            }
-            else
-            {
-                run_count = 1;
-            }
-            if(index + run_count > total_size)
-            {
-                return false;
-            }
-            for(int ii = 0; ii < run_count; ++ii)
-            {
-                spr->bitmap[index + ii] = buffer;
-            }
-            index += run_count;
-            // we ignore the extra padding crap because I've never seen a
-            // PCX with that padding
-        } while(index < total_size);
-
-        // translate palette crap
-
-        fseek(in, -769, SEEK_END);
-
-        fread(&buffer, 1, 1, in);
-        if(fread(palette, 1, 768, in) == 768)
-        {
-            // read in palette
-            Color_rgb* picture = new(std::nothrow) Color_rgb[spr->xsize * spr->ysize];
-            for(unsigned long ii = 0; ii < spr->xsize * spr->ysize; ++ii)
-            {
-                unsigned char x = spr->bitmap[ii];
-
-                picture[ii].red = palette[x].red;
-                picture[ii].green = palette[x].green;
-                picture[ii].blue = palette[x].blue;
-            }
-            spr->bitmap.reset(reinterpret_cast<uint8_t *>(picture));
-            fclose(in);
-            return true;
-        }
-    }
-    fclose(in);
-    return false;
-}
-#endif
 

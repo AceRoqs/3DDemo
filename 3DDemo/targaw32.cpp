@@ -76,7 +76,7 @@ typedef struct
 
 #pragma pack(pop)
 
-#ifdef USE_NEW_READERS
+#if 1
 void validate_tga_header(_In_ const TGA_header* header)
 {
     if(header->eImageType != 2 && header->eImageType != 10)
