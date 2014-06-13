@@ -87,6 +87,13 @@ void validate_tga_header(_In_ const TGA_header* header)
     // TODO: validate all used fields.
 }
 
+size_t get_pixel_data_offset(_In_ const TGA_header* header)
+{
+    return sizeof(TGA_header) +
+           header->cbIDfield +
+           header->wColorMapLength * (header->cbColorMapEntrySize + 7) / 8;
+}
+
 Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory, size_t size)
 {
     if(size < sizeof(TGA_header))
@@ -108,9 +115,7 @@ Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory,
     bitmap.bitmap.resize(pixel_count);
 
     // TODO: turn into function.
-    LONG off = sizeof(TGA_header) +
-               header->cbIDfield +
-               header->wColorMapLength * (header->cbColorMapEntrySize + 7) / 8;
+    size_t off = get_pixel_data_offset(header);
 
     // TODO: can be shorter.
     // TODO: prevent read overrun past size.
