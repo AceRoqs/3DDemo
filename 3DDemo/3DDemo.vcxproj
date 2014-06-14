@@ -139,7 +139,7 @@
     <ClCompile Include="particle.cpp" />
     <ClCompile Include="render.cpp" />
     <ClCompile Include="pcx.cpp" />
-    <ClCompile Include="targaw32.cpp" />
+    <ClCompile Include="targa.cpp" />
     <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
