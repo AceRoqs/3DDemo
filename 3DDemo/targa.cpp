@@ -23,23 +23,23 @@ struct TGA_header
     int8_t    eImageDescriptorBits;
 };
 
-typedef struct
+struct TGA_footer
 {
     int32_t   dwExtensionFilePos;
     int32_t   dwDirectoryFilePos;
     int8_t    szID[18];
-} targa_footer_t;
+};
 
-typedef struct
+struct TGA_dev_directory
 {
 /*  int16_t   cEntries; */
     int16_t   eTag1;
     int32_t   dwPos1;
     int32_t   dwSize1;
 /*  ... */
-} targa_devdir_t;
+};
 
-typedef struct
+struct TGA_extended_area
 {
     int16_t   cbSize;
     int8_t    szAuthorName[41];
@@ -72,7 +72,7 @@ typedef struct
     int32_t   dwThumbnailFilePos;
     int32_t   dwScanlineTableFilePos;
     int8_t    bAttributeType;
-} targa_extarea_t;
+} ;
 
 #pragma pack(pop)
 
@@ -169,12 +169,12 @@ HRESULT TargaReadHeader(
 // NOTE: file pointer is moved
 HRESULT TargaReadFooter(
     HANDLE hFile,
-    targa_footer_t* pfooter)
+    TGA_footer* pfooter)
 {
     HRESULT hr;
     do
     {
-        if(SetFilePointer(hFile, 0 - sizeof(targa_footer_t), nullptr, FILE_END) == 0xFFFFFFFF)
+        if(SetFilePointer(hFile, 0 - sizeof(TGA_footer), nullptr, FILE_END) == 0xFFFFFFFF)
         {
             hr = GetLastError();
             break;
@@ -183,7 +183,7 @@ HRESULT TargaReadFooter(
         DWORD cbRead;   // WARNING: never checked!!!
         BOOL fOk = ReadFile(hFile,
                             pfooter,
-                            sizeof(targa_footer_t),
+                            sizeof(TGA_footer),
                             &cbRead,
                             nullptr);
 
@@ -202,8 +202,8 @@ HRESULT TargaReadFooter(
 // NOTE: file pointer is moved
 HRESULT TargaReadExtArea(
     HANDLE hFile,
-    const targa_footer_t* pfooter,
-    targa_extarea_t* pext)
+    const TGA_footer* pfooter,
+    TGA_extended_area* pext)
 {
     HRESULT hr;
     do
@@ -217,7 +217,7 @@ HRESULT TargaReadExtArea(
         DWORD cbRead;   // WARNING: never checked!!!
         BOOL fOk = ReadFile(hFile,
                             pext,
-                            sizeof(targa_extarea_t),
+                            sizeof(TGA_extended_area),
                             &cbRead,
                             nullptr);
 
@@ -236,7 +236,7 @@ HRESULT TargaReadExtArea(
 // NOTE: file pointer is moved
 HRESULT TargaSeekToDevDir(
     HANDLE hFile,
-    const targa_footer_t* pfooter,
+    const TGA_footer* pfooter,
     WORD cEntries)
 {
     HRESULT hr;
@@ -270,7 +270,7 @@ HRESULT TargaSeekToDevDir(
 // NOTE: file pointer is moved
 HRESULT TargaReadNextDevDirEntry(
     HANDLE hFile,
-    targa_devdir_t* pentry)
+    TGA_dev_directory* pentry)
 {
     HRESULT hr;
     do
@@ -278,7 +278,7 @@ HRESULT TargaReadNextDevDirEntry(
         DWORD cbRead;   // WARNING: never checked!!!
         BOOL fOk = ReadFile(hFile,
                             pentry,
-                            sizeof(targa_devdir_t),
+                            sizeof(TGA_dev_directory),
                             &cbRead,
                             nullptr);
 
@@ -352,7 +352,7 @@ HRESULT TargaSeekToImage(
 //---------------------------------------------------------------------------
 HRESULT TargaSeekToColorCorrectionTable(
     HANDLE hFile,
-    targa_extarea_t* pext)
+    TGA_extended_area* pext)
 {
     HRESULT hr;
     if(SetFilePointer(hFile, pext->dwColorCorrectionFilePos, nullptr, FILE_BEGIN) == 0xFFFFFFFF)
@@ -369,7 +369,7 @@ HRESULT TargaSeekToColorCorrectionTable(
 //---------------------------------------------------------------------------
 HRESULT TargaSeekToThumbnail(
     HANDLE hFile,
-    targa_extarea_t* pext)
+    TGA_extended_area* pext)
 {
     HRESULT hr;
     if(SetFilePointer(hFile, pext->dwThumbnailFilePos, nullptr, FILE_BEGIN) == 0xFFFFFFFF)
@@ -386,7 +386,7 @@ HRESULT TargaSeekToThumbnail(
 //---------------------------------------------------------------------------
 HRESULT TargaSeekToScanlineTable(
     HANDLE hFile,
-    targa_extarea_t* pext)
+    TGA_extended_area* pext)
 {
     HRESULT hr;
     if(SetFilePointer(hFile, pext->dwScanlineTableFilePos, nullptr, FILE_BEGIN) == 0xFFFFFFFF)
