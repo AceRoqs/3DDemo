@@ -9,18 +9,18 @@
 
 struct TGA_header
 {
-    int8_t    cbIDfield;
-    int8_t    eColorMapType;
-    int8_t    eImageType;
-    int16_t   wFirstColorMapEntry;
-    int16_t   wColorMapLength;
-    int8_t    cbColorMapEntrySize;
-    int16_t   xOrigin;
-    int16_t   yOrigin;
-    int16_t   cxWidth;
-    int16_t   cyHeight;
-    int8_t    cBitsPerPixel;
-    int8_t    eImageDescriptorBits;
+    uint8_t  id_length;
+    uint8_t  color_map_type;
+    uint8_t  image_type;
+    uint16_t first_color_map_index;
+    uint16_t color_map_length;
+    uint8_t  color_map_bits_per_pixel;
+    uint16_t x_origin;
+    uint16_t y_origin;
+    uint16_t image_width;
+    uint16_t image_height;
+    uint8_t  bits_per_pixel;
+    uint8_t  image_descriptor;
 };
 
 struct TGA_footer
@@ -79,7 +79,7 @@ struct TGA_extended_area
 #if 1
 void validate_tga_header(_In_ const TGA_header* header)
 {
-    if(header->eImageType != 2 && header->eImageType != 10)
+    if(header->image_type != 2 && header->image_type!= 10)
     {
         throw std::exception();
     }
@@ -90,8 +90,8 @@ void validate_tga_header(_In_ const TGA_header* header)
 size_t get_pixel_data_offset(_In_ const TGA_header* header)
 {
     return sizeof(TGA_header) +
-           header->cbIDfield +
-           header->wColorMapLength * (header->cbColorMapEntrySize + 7) / 8;
+           header->id_length +
+           header->color_map_length * (header->color_map_bits_per_pixel + 7) / 8;
 }
 
 Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory, size_t size)
@@ -105,12 +105,12 @@ Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory,
     validate_tga_header(header);
 
     Bitmap bitmap;
-    bitmap.xsize = header->cxWidth;
-    bitmap.ysize = header->cyHeight;
+    bitmap.xsize = header->image_width;
+    bitmap.ysize = header->image_height;
     bitmap.filtered = true;
 
     // TODO: overflow.
-    DWORD cbBitmap = header->cxWidth * header->cyHeight * (header->cBitsPerPixel + 7) / 8;
+    DWORD cbBitmap = header->image_width * header->image_height * (header->bits_per_pixel + 7) / 8;
     const int pixel_count = cbBitmap / sizeof(Color_rgb);
     bitmap.bitmap.resize(pixel_count);
 
@@ -314,7 +314,7 @@ HRESULT TargaSeekToColorMap(
     HANDLE hFile,
     TGA_header* ptga)
 {
-    LONG off = sizeof(*ptga) + ptga->cbIDfield;
+    LONG off = sizeof(*ptga) + ptga->id_length;
 
     HRESULT hr;
     if(SetFilePointer(hFile, off, nullptr, FILE_BEGIN) == 0xFFFFFFFF)
@@ -334,8 +334,8 @@ HRESULT TargaSeekToImage(
     TGA_header* ptga)
 {
     LONG off = sizeof(*ptga) +
-               ptga->cbIDfield +
-               ptga->wColorMapLength * (ptga->cbColorMapEntrySize + 7) / 8;
+               ptga->id_length +
+               ptga->color_map_length * (ptga->color_map_bits_per_pixel + 7) / 8;
 
     HRESULT hr;
     if(SetFilePointer(hFile, off, nullptr, FILE_BEGIN) == 0xFFFFFFFF)
@@ -426,7 +426,7 @@ bool TGADecodeRGB(
     if(FAILED(hr))
         return false;
 
-    if(tga.eImageType != 2 && tga.eImageType != 10)
+    if(tga.image_type != 2 && tga.image_type!= 10)
     {
         hr = E_FAIL;
         return false;
@@ -435,12 +435,12 @@ bool TGADecodeRGB(
     // Use targa info to finish building surface descriptor
     //ddsd.dwWidth  = tga.cxWidth;
     //ddsd.dwHeight = tga.cyHeight;
-    spr->xsize = tga.cxWidth;
-    spr->ysize = tga.cyHeight;
+    spr->xsize = tga.image_width;
+    spr->ysize = tga.image_height;
     spr->filtered = true;
 
     // Allocate a temporary bitmap from the stack
-    DWORD cbBitmap = tga.cxWidth * tga.cyHeight * (tga.cBitsPerPixel + 7) / 8;
+    DWORD cbBitmap = tga.image_width * tga.image_height* (tga.bits_per_pixel + 7) / 8;
 //    char *pBitmap = (char*)_alloca(cbBitmap);
     spr->bitmap.reset(new(std::nothrow) uint8_t[cbBitmap]);
 
