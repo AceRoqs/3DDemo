@@ -4,23 +4,40 @@
 
 #define TRUEVISION_TARGA "TRUEVISION-TARGA"
 
+static enum TGA_color_map
+{
+    Has_no_color_map = 0,
+    Has_color_map = 1,
+};
+
+static enum TGA_image_type
+{
+    No_image_data = 0,
+    Color_mapped = 1,
+    True_color = 2,
+    Black_and_white = 3,
+    RLE_color_mapped = 9,
+    RLE_true_color = 10,
+    RLE_black_and_white = 11,
+};
+
 #pragma pack(push)
 #pragma pack(1)
 
 struct TGA_header
 {
-    uint8_t  id_length;
-    uint8_t  color_map_type;
-    uint8_t  image_type;
-    uint16_t first_color_map_index;
-    uint16_t color_map_length;
-    uint8_t  color_map_bits_per_pixel;
-    uint16_t x_origin;
-    uint16_t y_origin;
-    uint16_t image_width;
-    uint16_t image_height;
-    uint8_t  bits_per_pixel;
-    uint8_t  image_descriptor;
+    uint8_t  id_length;                 // Length of the image ID field.
+    uint8_t  color_map_type;            // TGA_color_map.
+    uint8_t  image_type;                // TGA_image_type.
+    uint16_t color_map_first_index;     // Offset into color map table.
+    uint16_t color_map_length;          // Number of entries.
+    uint8_t  color_map_bits_per_pixel;  // Number of bits per pixel.
+    uint16_t x_origin;                  // Lower-left corner.
+    uint16_t y_origin;                  // Lower-left corner.
+    uint16_t image_width;               // Width in pixels.
+    uint16_t image_height;              // Height in pixels.
+    uint8_t  bits_per_pixel;            // Bits per pixel.
+    uint8_t  image_descriptor;          // Bits 0-3 are the alpha channel depth; bits 4-5 are the direction.
 };
 
 struct TGA_footer
@@ -79,7 +96,7 @@ struct TGA_extended_area
 #if 1
 void validate_tga_header(_In_ const TGA_header* header)
 {
-    if(header->image_type != 2 && header->image_type!= 10)
+    if(header->image_type != True_color && header->image_type != RLE_true_color)
     {
         throw std::exception();
     }
@@ -426,7 +443,7 @@ bool TGADecodeRGB(
     if(FAILED(hr))
         return false;
 
-    if(tga.image_type != 2 && tga.image_type!= 10)
+    if(tga.image_type != True_color && tga.image_type != RLE_true_color)
     {
         hr = E_FAIL;
         return false;
