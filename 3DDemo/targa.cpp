@@ -96,7 +96,7 @@ struct TGA_extended_area
 #if 1
 void validate_tga_header(_In_ const TGA_header* header)
 {
-    if(header->image_type != True_color && header->image_type != RLE_true_color)
+    if(header->image_type != True_color)
     {
         throw std::exception();
     }
@@ -443,7 +443,7 @@ bool TGADecodeRGB(
     if(FAILED(hr))
         return false;
 
-    if(tga.image_type != True_color && tga.image_type != RLE_true_color)
+    if(tga.image_type != True_color)
     {
         hr = E_FAIL;
         return false;
@@ -462,7 +462,6 @@ bool TGADecodeRGB(
     spr->bitmap.reset(new(std::nothrow) uint8_t[cbBitmap]);
 
     // Read targa data into temporary area
-//#pragma message("TODO: Pipe through RLE and make sure we are a truecolor bitmap...")
 //#pragma message("TODO: Support transparent part of sprites using targa data")
     DWORD dwRead;
     ReadFile(hFile, &spr->bitmap[0], cbBitmap, &dwRead, nullptr);
