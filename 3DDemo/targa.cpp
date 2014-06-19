@@ -42,9 +42,9 @@ struct TGA_header
 
 struct TGA_footer
 {
-    int32_t   dwExtensionFilePos;
-    int32_t   dwDirectoryFilePos;
-    int8_t    szID[18];
+    uint32_t extension_area_offset;     // Offset in bytes from beginning of file.
+    uint32_t developer_area_offset;     // Offset in bytes from beginning of file.
+    char     signature[18];             // "TRUEVISION-XFILE.".
 };
 
 struct TGA_dev_directory
@@ -56,39 +56,39 @@ struct TGA_dev_directory
 /*  ... */
 };
 
-struct TGA_extended_area
+struct TGA_extension_area
 {
-    int16_t   cbSize;
-    int8_t    szAuthorName[41];
-    int8_t    szAuthorComment1[81];
-    int8_t    szAuthorComment2[81];
-    int8_t    szAuthorComment3[81];
-    int8_t    szAuthorComment4[81];
-    int16_t   wCreationMonth;
-    int16_t   wCreationDay;
-    int16_t   wCreationYear;
-    int16_t   wCreationHour;
-    int16_t   wCreationMinute;
-    int16_t   wCreationSecond;
-    int8_t    szJobName[41];
-    int16_t   wJobHours;
-    int16_t   wJobMinutes;
-    int16_t   wJobSeconds;
-    int8_t    szProgramName[41];
-    int16_t   wVersionTimes100;
-    int8_t    bVersionLetter;
-    int8_t    eBlue;
-    int8_t    eGreen;
-    int8_t    eRed;
-    int8_t    eAlpha;
-    int16_t   wPixelAspectNumerator;
-    int16_t   wPixelAspectDenominator;
-    int16_t   wGammaValueNumerator;
-    int16_t   wGammaValueDenominator;
-    int32_t   dwColorCorrectionFilePos;
-    int32_t   dwThumbnailFilePos;
-    int32_t   dwScanlineTableFilePos;
-    int8_t    bAttributeType;
+    uint16_t extension_size;            // Size in bytes of the extension area (always 495).
+    char     author_name[41];           // Null terminated, space/null padded author name.
+    char     author_comment1[81];       // Null terminated, space/null padded comment line 1.
+    char     author_comment2[81];       // Null terminated, space/null padded comment line 2.
+    char     author_comment3[81];       // Null terminated, space/null padded comment line 3.
+    char     author_comment4[81];       // Null terminated, space/null padded comment line 4.
+    uint16_t creation_month;
+    uint16_t creation_day;
+    uint16_t creation_year;
+    uint16_t creation_hour;
+    uint16_t creation_minute;
+    uint16_t creation_second;
+    char     job_name[41];              // Null terminated, space/null padded production job.
+    uint16_t job_hours;                 // Time spent on the job (for billing).
+    uint16_t job_minutes;
+    uint16_t job_seconds;
+    char     software_id[41];           // Null terminated, space/null padded creation application.
+    uint16_t version;                   // Version number times 100.
+    char     version_letter;
+    uint8_t  blue;                      // Background color.  TODO: 2014: Should this be a Color_rgba?
+    uint8_t  green;
+    uint8_t  red;
+    uint8_t  alpha;
+    uint16_t pixel_aspect_numerator;    // Pixel aspect ratio.
+    uint16_t pixel_aspect_denominator;
+    uint16_t gamma_value_numerator;     // Gamma, in the range of 0.0-10.0.
+    uint16_t gamma_value_denominator;   // Denominator of zero indicates field is unused.
+    uint32_t color_correction_offset;   // Offset in bytes from beginning of file.
+    uint32_t thumbnail_image_offset;    // Offset in bytes from beginning of file.
+    uint32_t scanline_table_offset;     // Offset in bytes from beginning of file
+    uint8_t  attributes_type;           // TODO: enum.
 } ;
 
 #pragma pack(pop)
@@ -220,7 +220,7 @@ HRESULT TargaReadFooter(
 HRESULT TargaReadExtArea(
     HANDLE hFile,
     const TGA_footer* pfooter,
-    TGA_extended_area* pext)
+    TGA_extension_area* pext)
 {
     HRESULT hr;
     do
@@ -234,7 +234,7 @@ HRESULT TargaReadExtArea(
         DWORD cbRead;   // WARNING: never checked!!!
         BOOL fOk = ReadFile(hFile,
                             pext,
-                            sizeof(TGA_extended_area),
+                            sizeof(TGA_extension_area),
                             &cbRead,
                             nullptr);
 
@@ -369,7 +369,7 @@ HRESULT TargaSeekToImage(
 //---------------------------------------------------------------------------
 HRESULT TargaSeekToColorCorrectionTable(
     HANDLE hFile,
-    TGA_extended_area* pext)
+    TGA_extension_area* pext)
 {
     HRESULT hr;
     if(SetFilePointer(hFile, pext->dwColorCorrectionFilePos, nullptr, FILE_BEGIN) == 0xFFFFFFFF)
@@ -386,7 +386,7 @@ HRESULT TargaSeekToColorCorrectionTable(
 //---------------------------------------------------------------------------
 HRESULT TargaSeekToThumbnail(
     HANDLE hFile,
-    TGA_extended_area* pext)
+    TGA_extension_area* pext)
 {
     HRESULT hr;
     if(SetFilePointer(hFile, pext->dwThumbnailFilePos, nullptr, FILE_BEGIN) == 0xFFFFFFFF)
@@ -403,7 +403,7 @@ HRESULT TargaSeekToThumbnail(
 //---------------------------------------------------------------------------
 HRESULT TargaSeekToScanlineTable(
     HANDLE hFile,
-    TGA_extended_area* pext)
+    TGA_extension_area* pext)
 {
     HRESULT hr;
     if(SetFilePointer(hFile, pext->dwScanlineTableFilePos, nullptr, FILE_BEGIN) == 0xFFFFFFFF)
