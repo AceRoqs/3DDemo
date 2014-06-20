@@ -96,12 +96,19 @@ struct TGA_extension_area
 #if 1
 void validate_tga_header(_In_ const TGA_header* header)
 {
-    if(header->image_type != True_color)
+    bool succeeded = true;
+
+    succeeded &= (header->image_type == True_color);
+    succeeded &= (header->bits_per_pixel == 24);
+    succeeded &= (header->color_map_length == 0);
+    succeeded &= (header->color_map_bits_per_pixel == 0);
+
+    // image_height, image_width, and id_length are unbounded.
+
+    if(!succeeded)
     {
         throw std::exception();
     }
-
-    // TODO: validate all used fields.
 }
 
 size_t get_pixel_data_offset(_In_ const TGA_header* header)
