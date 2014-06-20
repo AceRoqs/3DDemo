@@ -21,6 +21,15 @@ static enum TGA_image_type
     RLE_black_and_white = 11,
 };
 
+static enum TGA_alpha_type
+{
+    No_alpha = 0,                       // No alpha data exists.
+    Ignorable_alpha = 1,                // Alpha data can be ignored.
+    Retained_alpha = 2,                 // Alpha data is undefined, but should be retained.
+    Alpha_exists = 3,                   // Alpha data exists.
+    Premultiplied_alpha = 4,            // Alpha is pre-multiplied.
+};
+
 #pragma pack(push)
 #pragma pack(1)
 
@@ -42,18 +51,22 @@ struct TGA_header
 
 struct TGA_footer
 {
-    uint32_t extension_area_offset;     // Offset in bytes from beginning of file.
-    uint32_t developer_area_offset;     // Offset in bytes from beginning of file.
-    char     signature[18];             // "TRUEVISION-XFILE.".
+    uint32_t extension_area_offset;         // Offset in bytes from the beginning of the file.
+    uint32_t developer_directory_offset;    // Offset in bytes from the beginning of the file.
+    char     signature[18];                 // "TRUEVISION-XFILE.".
 };
 
-struct TGA_dev_directory
+struct TGA_developer_directory_entry
 {
-/*  int16_t   cEntries; */
-    int16_t   eTag1;
-    int32_t   dwPos1;
-    int32_t   dwSize1;
-/*  ... */
+    uint16_t tag;                       // Application specific tag ID.
+    uint32_t developer_field_offset;    // Offset in bytes from the beginning of the file.
+    uint32_t developer_field_size;      // Size in bytes.
+};
+
+struct TGA_developer_directory
+{
+    uint16_t entry_count;
+    TGA_developer_directory_entry entries[1];   // entry_count number of entries.
 };
 
 struct TGA_extension_area
@@ -85,10 +98,10 @@ struct TGA_extension_area
     uint16_t pixel_aspect_denominator;
     uint16_t gamma_value_numerator;     // Gamma, in the range of 0.0-10.0.
     uint16_t gamma_value_denominator;   // Denominator of zero indicates field is unused.
-    uint32_t color_correction_offset;   // Offset in bytes from beginning of file.
-    uint32_t thumbnail_image_offset;    // Offset in bytes from beginning of file.
-    uint32_t scanline_table_offset;     // Offset in bytes from beginning of file
-    uint8_t  attributes_type;           // TODO: enum.
+    uint32_t color_correction_offset;   // Offset in bytes from the beginning of the file.
+    uint32_t thumbnail_image_offset;    // Offset in bytes from the beginning of the file.
+    uint32_t scanline_table_offset;     // Offset in bytes from the beginning of the file
+    uint8_t  attributes_type;           // TGA_alpha_type.
 } ;
 
 #pragma pack(pop)
@@ -103,7 +116,11 @@ void validate_tga_header(_In_ const TGA_header* header)
     succeeded &= (header->color_map_length == 0);
     succeeded &= (header->color_map_bits_per_pixel == 0);
 
-    // image_height, image_width, and id_length are unbounded.
+    // Bound the size as this is used in buffer size calculations, which may need to fit in 
+    succeeded &= (header->image_width <= 16384);
+    succeeded &= (header->image_height <= 16384);
+
+    // id_length is unbounded.
 
     if(!succeeded)
     {
@@ -115,7 +132,7 @@ size_t get_pixel_data_offset(_In_ const TGA_header* header)
 {
     return sizeof(TGA_header) +
            header->id_length +
-           header->color_map_length * (header->color_map_bits_per_pixel + 7) / 8;
+           header->color_map_length * (header->color_map_bits_per_pixel / 8);
 }
 
 Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory, size_t size)
@@ -133,20 +150,15 @@ Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory,
     bitmap.ysize = header->image_height;
     bitmap.filtered = true;
 
-    // TODO: overflow.
-    DWORD cbBitmap = header->image_width * header->image_height * (header->bits_per_pixel + 7) / 8;
-    const int pixel_count = cbBitmap / sizeof(Color_rgb);
+    const size_t pixel_count = header->image_width * header->image_height * (header->bits_per_pixel / 8) / sizeof(Color_rgb);
     bitmap.bitmap.resize(pixel_count);
 
-    // TODO: turn into function.
-    size_t off = get_pixel_data_offset(header);
-
-    // TODO: can be shorter.
     // TODO: prevent read overrun past size.
 
     // MSVC complains that std::copy is insecure.
-    //std::copy(reinterpret_cast<const Color_rgb*>(&file[off]), reinterpret_cast<const Color_rgb*>(&file[off]) + pixel_count, &bitmap.bitmap[0]);
-    memcpy(&bitmap.bitmap[0], tga_memory + off, pixel_count * sizeof(Color_rgb));
+    //std::copy(reinterpret_cast<const Color_rgb*>(&file[pixel_data_offset]), reinterpret_cast<const Color_rgb*>(&file[pixel_data_offset]) + pixel_count, &bitmap.bitmap[0]);
+    const size_t pixel_data_offset = get_pixel_data_offset(header);
+    memcpy(&bitmap.bitmap[0], tga_memory + pixel_data_offset, pixel_count * sizeof(Color_rgb));
 
     return bitmap;
 }
