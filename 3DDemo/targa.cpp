@@ -131,7 +131,7 @@ size_t get_pixel_data_offset(_In_ const TGA_header* header)
 {
     return sizeof(TGA_header) +
            header->id_length +
-           header->color_map_length * (header->color_map_bits_per_pixel / 8);
+           static_cast<size_t>(header->color_map_length) * (header->color_map_bits_per_pixel / 8);
 }
 
 Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory, size_t size)
@@ -149,15 +149,24 @@ Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory,
     bitmap.ysize = header->image_height;
     bitmap.filtered = true;
 
-    const size_t pixel_count = header->image_width * header->image_height * (header->bits_per_pixel / 8) / sizeof(Color_rgb);
-    bitmap.bitmap.resize(pixel_count);
+    const size_t pixel_data_offset = get_pixel_data_offset(header);
+    const auto pixel_start = reinterpret_cast<const Color_rgb*>(tga_memory + pixel_data_offset);
+    const size_t pixel_count = static_cast<size_t>(header->image_width) * header->image_height * (header->bits_per_pixel / 8) / sizeof(Color_rgb);
 
-    // TODO: prevent read overrun past size.
+    if((pixel_start + pixel_count < pixel_start) || (tga_memory + size < tga_memory))
+    {
+        throw std::exception();
+    }
+
+    if(reinterpret_cast<const uint8_t*>(pixel_start + pixel_count) > (tga_memory + size))
+    {
+        throw std::exception();
+    }
 
     // MSVC complains that std::copy is insecure.
-    //std::copy(reinterpret_cast<const Color_rgb*>(&file[pixel_data_offset]), reinterpret_cast<const Color_rgb*>(&file[pixel_data_offset]) + pixel_count, &bitmap.bitmap[0]);
-    const size_t pixel_data_offset = get_pixel_data_offset(header);
-    memcpy(&bitmap.bitmap[0], tga_memory + pixel_data_offset, pixel_count * sizeof(Color_rgb));
+    // _SCL_SECURE_NO_WARNINGS or checked iterator required.
+    bitmap.bitmap.resize(pixel_count);
+    std::copy(pixel_start, pixel_start + pixel_count, &bitmap.bitmap[0]);
 
     return bitmap;
 }
