@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3DDemo", "3DDemo\3DDemo.vcxproj", "{B85AE189-CC74-415C-4850-8AFCFD3D0A1C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3DDemo", "3DDemo\3DDemo.vcxproj", "{8551B751-B7FF-443B-AC88-87F8A57E3FC4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F87DF4F3-6744-4DFF-BDCF-1CB9AAA654D1} = {F87DF4F3-6744-4DFF-BDCF-1CB9AAA654D1}
 	EndProjectSection
@@ -15,10 +15,10 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B85AE189-CC74-415C-4850-8AFCFD3D0A1C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{B85AE189-CC74-415C-4850-8AFCFD3D0A1C}.Debug|Win32.Build.0 = Debug|Win32
-		{B85AE189-CC74-415C-4850-8AFCFD3D0A1C}.Release|Win32.ActiveCfg = Release|Win32
-		{B85AE189-CC74-415C-4850-8AFCFD3D0A1C}.Release|Win32.Build.0 = Release|Win32
+		{8551B751-B7FF-443B-AC88-87F8A57E3FC4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8551B751-B7FF-443B-AC88-87F8A57E3FC4}.Debug|Win32.Build.0 = Debug|Win32
+		{8551B751-B7FF-443B-AC88-87F8A57E3FC4}.Release|Win32.ActiveCfg = Release|Win32
+		{8551B751-B7FF-443B-AC88-87F8A57E3FC4}.Release|Win32.Build.0 = Release|Win32
 		{F87DF4F3-6744-4DFF-BDCF-1CB9AAA654D1}.Debug|Win32.ActiveCfg = Debug|Win32
 		{F87DF4F3-6744-4DFF-BDCF-1CB9AAA654D1}.Debug|Win32.Build.0 = Debug|Win32
 		{F87DF4F3-6744-4DFF-BDCF-1CB9AAA654D1}.Release|Win32.ActiveCfg = Release|Win32
