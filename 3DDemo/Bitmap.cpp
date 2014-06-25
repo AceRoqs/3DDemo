@@ -68,15 +68,18 @@ static void generate_grid_texture_rgb(
 Bitmap bitmap_from_file(_In_z_ const char* file_name)
 {
 #if 1
-    std::ifstream file(file_name, std::ios::binary);
-    file.seekg(0, std::ios::end);
-    std::streamsize size = file.tellg();
-    file.seekg(0, std::ios::beg);
+    const HANDLE file = CreateFileA(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if(file == INVALID_HANDLE_VALUE)
+    {
+        throw std::exception();
+    }
+    DWORD size = GetFileSize(file, nullptr);
 
     // TODO: zero inits.
     // TODO: truncates size.
-    std::vector<uint8_t> buffer(static_cast<size_t>(size));
-    file.read(reinterpret_cast<char*>(buffer.data()), size);
+    std::vector<uint8_t> buffer(size);
+    ReadFile(file, buffer.data(), size, &size, nullptr);
+    CloseHandle(file);
 
     const int cch = strlen(file_name);
     if((cch >= 4) && (strcmp(file_name + cch - 4, ".pcx") == 0))
