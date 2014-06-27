@@ -123,18 +123,14 @@ static void pcx_decode(
         if(palette != nullptr)
         {
             // MSVC complains that fill_n is insecure.
-            //std::fill_n(&bitmap.bitmap[running_size], run_count, palette[*iterator]);
-            for(unsigned int ii = 0; ii < run_count; ++ii)
-            {
-                bitmap[running_size + ii] = palette[value];
-            }
+            // _SCL_SECURE_NO_WARNINGS or checked iterator required.
+            std::fill_n(bitmap + running_size, run_count, palette[value]);
         }
         else
         {
-            for(unsigned int ii = 0; ii < run_count; ++ii)
-            {
-                bitmapb[running_size + ii] = value;
-            }
+            // MSVC complains that fill_n is insecure.
+            // _SCL_SECURE_NO_WARNINGS or checked iterator required.
+            std::fill_n(bitmapb + running_size, run_count, value);
         }
 
         running_size += run_count;
