@@ -91,8 +91,8 @@ Scoped_atom register_window_class(const WNDCLASSEX& window_class)
 
 // TODO: WindowClass.cpp is not the best place for this.
 Scoped_window create_window(
-    _In_opt_ PCWSTR class_name,
-    _In_opt_ PCWSTR window_name,
+    _In_opt_ PCTSTR class_name,
+    _In_opt_ PCTSTR window_name,
     DWORD style,
     int x,
     int y,
