@@ -2,6 +2,7 @@
 #include "Bitmap.h"
 #include "pcx.h"
 #include "targa.h"
+#include "HRException.h"
 
 Bitmap::Bitmap() :
     xsize(0),
@@ -38,6 +39,8 @@ Bitmap& Bitmap::operator=(Bitmap&& other) NOEXCEPT
 #error This compiler may autodefine the default move constructor.
 #endif
 
+// This code is fine, but it is currently unused.
+#if 0
 static void generate_grid_texture_rgb(
     _Out_cap_(xsize * ysize) uint8_t* bitmap,
     unsigned int xsize,
@@ -64,21 +67,21 @@ static void generate_grid_texture_rgb(
         }
     }
 }
+#endif
 
 Bitmap bitmap_from_file(_In_z_ const char* file_name)
 {
-#if 1
     OVERLAPPED overlapped = {};
     overlapped.hEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
     if(overlapped.hEvent == nullptr)
     {
-        throw std::exception();
+        WindowsCommon::throw_hr(WindowsCommon::hresult_from_last_error());
     }
 
     const HANDLE file = CreateFileA(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr);
     if(file == INVALID_HANDLE_VALUE)
     {
-        throw std::exception();
+        WindowsCommon::throw_hr(WindowsCommon::hresult_from_last_error());
     }
     DWORD size = GetFileSize(file, nullptr);
 
@@ -89,6 +92,7 @@ Bitmap bitmap_from_file(_In_z_ const char* file_name)
     ReadFile(file, buffer.data(), size, &size_read, &overlapped);
     WaitForSingleObject(overlapped.hEvent, INFINITE);
     CloseHandle(file);
+    CloseHandle(overlapped.hEvent);
 
     const int cch = strlen(file_name);
     if((cch >= 4) && (strcmp(file_name + cch - 4, ".pcx") == 0))
@@ -100,30 +104,5 @@ Bitmap bitmap_from_file(_In_z_ const char* file_name)
         return decode_bitmap_from_tga_memory(buffer.data(), static_cast<size_t>(size));
     }
     throw std::exception();
-#else
-    Bitmap bitmap;
-
-    bool use_default_texture = true;
-    const int cch = strlen(file_name);
-    if((cch >= 4) && (strcmp(file_name + cch - 4, ".pcx") == 0))
-    {
-        use_default_texture = !PCXDecodeRGB(file_name, &bitmap);
-    }
-    else if((cch >= 4) && (strcmp(file_name + cch - 4, ".tga") == 0))
-    {
-        use_default_texture = !TGADecodeRGB(file_name, &bitmap);
-    }
-
-    if(use_default_texture)
-    {
-        bitmap.xsize  = 64;
-        bitmap.ysize  = 64;
-        bitmap.filtered = false;
-        bitmap.bitmap.reset(new uint8_t[bitmap.xsize * bitmap.ysize * 3]);
-        generate_grid_texture_rgb(reinterpret_cast<unsigned char*>(&bitmap.bitmap[0]), bitmap.xsize, bitmap.ysize);
-    }
-
-    return bitmap;
-#endif
 }
 
