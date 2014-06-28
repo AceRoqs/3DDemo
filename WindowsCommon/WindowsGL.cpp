@@ -34,7 +34,7 @@ static std::vector<std::string> tokenize_string(_In_z_ const char* str, _In_z_ c
 static std::vector<std::string> get_opengl_extensions()
 {
     // The VMware OpenGL Mesa driver includes an extra space on the end of the string.
-    // The tokenizer works either way, but this appears to be work around bugy tokenizers that
+    // The tokenizer works either way, but this appears to be working around buggy tokenizers that
     // miss the final OpenGL extension string.
     const char* extensions_string = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
 

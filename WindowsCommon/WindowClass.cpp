@@ -77,7 +77,7 @@ WNDCLASSEX get_default_blank_window_class(_In_ HINSTANCE instance, _In_ WNDPROC 
 
 Scoped_atom register_window_class(const WNDCLASSEX& window_class)
 {
-    auto atom = make_scoped_window_class(RegisterClassEx(&window_class), window_class.hInstance);
+    const auto atom = RegisterClassEx(&window_class);
 
     if(0 == atom)
     {
@@ -86,7 +86,7 @@ Scoped_atom register_window_class(const WNDCLASSEX& window_class)
         WindowsCommon::throw_hr(hr);
     }
 
-    return atom;
+    return make_scoped_window_class(atom, window_class.hInstance);
 }
 
 // TODO: WindowClass.cpp is not the best place for this.
@@ -103,7 +103,7 @@ Scoped_window create_window(
     _In_opt_ HINSTANCE instance,
     _In_opt_ PVOID param)
 {
-    auto window = make_scoped_window(CreateWindow(class_name, window_name, style, x, y, width, height, parent, menu, instance, param));
+    const auto window = CreateWindow(class_name, window_name, style, x, y, width, height, parent, menu, instance, param);
 
     if(nullptr == window)
     {
@@ -111,7 +111,7 @@ Scoped_window create_window(
         WindowsCommon::throw_hr(hr);
     }
 
-    return window;
+    return make_scoped_window(window);
 }
 
 Scoped_window create_normal_window(_In_ PCTSTR window_class_name, _In_ PCTSTR title, int width, int height, _In_opt_ HINSTANCE instance, _In_opt_ PVOID param)
@@ -134,14 +134,14 @@ Scoped_window create_normal_window(_In_ PCTSTR window_class_name, _In_ PCTSTR ti
 
 Scoped_device_context get_device_context(_In_ HWND window)
 {
-    auto device_context = make_scoped_device_context(GetDC(window), window);
+    const auto device_context = GetDC(window);
 
     if(nullptr == device_context)
     {
         WindowsCommon::throw_hr(E_FAIL);
     }
 
-    return device_context;
+    return make_scoped_device_context(device_context, window);
 }
 
 Scoped_gl_context create_gl_context(_In_ HDC device_context)
@@ -180,26 +180,23 @@ Scoped_gl_context create_gl_context(_In_ HDC device_context)
         throw_hr(hresult_from_last_error());
     }
 
-    auto rendering_context = make_scoped_gl_context(wglCreateContext(device_context));
+    const auto rendering_context = wglCreateContext(device_context);
     if(nullptr == rendering_context)
     {
         throw_hr(hresult_from_last_error());
     }
 
-    return rendering_context;
+    return make_scoped_gl_context(rendering_context);
 }
 
 Scoped_current_context create_current_context(_In_ HDC device_context, _In_ HGLRC gl_context)
 {
-    auto current_context = make_scoped_current_context(gl_context);
-
     if(!wglMakeCurrent(device_context, gl_context))
     {
-        current_context.release();
         throw_hr(WindowsCommon::hresult_from_last_error());
     }
 
-    return current_context;
+    return make_scoped_current_context(gl_context);
 }
 
 }
