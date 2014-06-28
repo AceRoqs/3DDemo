@@ -99,5 +99,20 @@ Scoped_current_context make_scoped_current_context(_In_ HGLRC gl_context)
     return std::move(Scoped_current_context(gl_context, std::function<void (HGLRC)>(clear_gl_context)));
 }
 
+static void close_handle(_In_ HANDLE handle) NOEXCEPT
+{
+    if(!CloseHandle(handle))
+    {
+        auto hr = hresult_from_last_error();
+        (hr);
+        assert(SUCCEEDED(hr));
+    }
+}
+
+Scoped_handle make_scoped_handle(_In_ HANDLE handle)
+{
+    return std::move(Scoped_handle(handle, std::function<void (HANDLE)>(close_handle)));
+}
+
 }
 
