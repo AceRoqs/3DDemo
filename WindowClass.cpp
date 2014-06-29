@@ -199,5 +199,26 @@ Scoped_current_context create_current_context(_In_ HDC device_context, _In_ HGLR
     return make_scoped_current_context(gl_context);
 }
 
+// TODO: WindowClass.cpp is not the best place for this.
+Scoped_handle create_file(
+    _In_ PCTSTR file_name,
+    DWORD desired_access,
+    DWORD share_mode,
+    _In_opt_ PSECURITY_ATTRIBUTES security_attributes,
+    DWORD creation_disposition,
+    DWORD flags,
+    _In_opt_ HANDLE template_file)
+{
+    const auto handle = CreateFile(file_name, desired_access, share_mode, security_attributes, creation_disposition, flags, template_file);
+
+    if(INVALID_HANDLE_VALUE == handle)
+    {
+        HRESULT hr = hresult_from_last_error();
+        WindowsCommon::throw_hr(hr);
+    }
+
+    return make_scoped_handle(handle);
+}
+
 }
 
