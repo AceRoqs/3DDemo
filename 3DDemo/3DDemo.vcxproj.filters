@@ -59,6 +59,9 @@
     <ClCompile Include="world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Unicode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Action.h">
