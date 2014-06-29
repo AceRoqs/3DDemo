@@ -26,6 +26,8 @@ Scoped_window create_normal_window(_In_ PCTSTR window_class_name, _In_ PCTSTR ti
 Scoped_device_context get_device_context(_In_ HWND window);
 Scoped_gl_context create_gl_context(_In_ HDC device_context);
 Scoped_current_context create_current_context(_In_ HDC device_context, _In_ HGLRC gl_context);
+Scoped_handle create_file(_In_ PCTSTR file_name, DWORD desired_access, DWORD share_mode,
+    _In_opt_ PSECURITY_ATTRIBUTES security_attributes, DWORD creation_disposition, DWORD flags, _In_opt_ HANDLE template_file);
 
 }
 
