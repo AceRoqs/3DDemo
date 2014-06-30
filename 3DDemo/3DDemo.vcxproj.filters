@@ -106,6 +106,9 @@
     <ClInclude Include="world.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Unicode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="icon1.ico">

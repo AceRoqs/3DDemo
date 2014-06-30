@@ -3,7 +3,7 @@
 namespace Encoding
 {
 
-// Does not at a BOM at the beginning of the returned string.
+// Does not write a BOM at the beginning of the returned string.
 std::wstring utf16le_from_utf8(const std::string& utf8_string)
 {
     std::wstring utf16_string;
@@ -16,7 +16,7 @@ std::wstring utf16le_from_utf8(const std::string& utf8_string)
         // Convert UTF-8 character to code point.
 
         // U+0000 - U+007F.  One byte.
-        if(utf8_string[ix] < 128)
+        if((utf8_string[ix] & 0x80) == 0)
         {
             code_point = utf8_string[ix];
         }
@@ -88,6 +88,70 @@ std::wstring utf16le_from_utf8(const std::string& utf8_string)
     }
 
     return utf16_string;
+}
+
+// Code point   UTF-16      UTF-8
+// U+007A       007A        7A
+// TODO: Add 2-byte UTF-8 sequence.
+// U+6C34       6C34        E6 B0 B4
+// U+10000      D800 DC00   F0 90 80 80
+// U+1D11E      D834 DD1E   F0 9D 84 9E
+// U+10FFFD     DBFF DFFD   F4 8F BF BD
+
+static char utf8_case1[] = "\x7a";
+static char utf8_case2[] = "\xe6\xb0\xb4";
+static char utf8_case3[] = "\xf0\x90\x80\x80";
+static char utf8_case4[] = "\xf0\x9d\x84\x9e";
+static char utf8_case5[] = "\xf4\x8f\xbf\xbd";
+
+// TODO: Enforce encoding of these as little endian.
+static wchar_t utf16_case1[] = L"\x7a";
+static wchar_t utf16_case2[] = L"\x6c34";
+static wchar_t utf16_case3[] = L"\xd800\xdc00";
+static wchar_t utf16_case4[] = L"\xd834\xdd1e";
+static wchar_t utf16_case5[] = L"\xdbff\xdffd";
+
+static bool test_case1()
+{
+    auto utf16_string = utf16le_from_utf8(utf8_case1);
+    return utf16_string.compare(utf16_case1) == 0;
+}
+
+static bool test_case2()
+{
+    auto utf16_string = utf16le_from_utf8(utf8_case2);
+    return utf16_string.compare(utf16_case2) == 0;
+}
+
+static bool test_case3()
+{
+    auto utf16_string = utf16le_from_utf8(utf8_case3);
+    return utf16_string.compare(utf16_case3) == 0;
+}
+
+static bool test_case4()
+{
+    auto utf16_string = utf16le_from_utf8(utf8_case4);
+    return utf16_string.compare(utf16_case4) == 0;
+}
+
+static bool test_case5()
+{
+    auto utf16_string = utf16le_from_utf8(utf8_case5);
+    return utf16_string.compare(utf16_case5) == 0;
+}
+
+void test()
+{
+#ifndef NDEBUG
+    const bool case1 = test_case1();
+    const bool case2 = test_case2();
+    const bool case3 = test_case3();
+    const bool case4 = test_case4();
+    const bool case5 = test_case5();
+
+    assert(case1 && case2 && case3 && case4 && case5);
+#endif
 }
 
 }

@@ -117,6 +117,7 @@
     <ClInclude Include="render.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="targa.h" />
+    <ClInclude Include="Unicode.h" />
     <ClInclude Include="world.h" />
   </ItemGroup>
   <ItemGroup>
