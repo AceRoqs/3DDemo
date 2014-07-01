@@ -3,6 +3,66 @@
 namespace Encoding
 {
 
+// TODO: Return code_point/index pair instead of a reference.
+static uint32_t code_point_from_utf8_string(const std::string& utf8_string, size_t& index)
+{
+    const size_t length = utf8_string.length();
+
+    uint32_t code_point;
+
+    // Convert UTF-8 character to code point.
+
+    // U+0000 - U+007F.  One byte.
+    int continuation_byte_count = 0;
+    if((utf8_string[index] & 0x80) == 0)
+    {
+        code_point = utf8_string[index];
+    }
+    // U+0080 - U+07FF.  Two bytes.
+    else if((utf8_string[index] & 0xe0) == 0xc0)
+    {
+        code_point = utf8_string[index] & 0x1f;
+        continuation_byte_count = 1;
+    }
+    // U+0800 - U+FFFF.  Three bytes.
+    else if((utf8_string[index] & 0xf0) == 0xe0)
+    {
+        code_point = utf8_string[index] & 0x0f;
+        continuation_byte_count = 2;
+    }
+    // U+10000 - U+1FFFFF.  Four bytes.
+    else if((utf8_string[index] & 0xf8) == 0xf0)
+    {
+        code_point = utf8_string[index] & 7;
+        continuation_byte_count = 3;
+    }
+    else
+    {
+        throw std::exception();
+    }
+
+    if(index + continuation_byte_count > length)
+    {
+        throw std::exception();
+    }
+
+    while(continuation_byte_count > 0)
+    {
+        ++index;
+        code_point <<= 6;
+        code_point += utf8_string[index] & 0x3f;
+        --continuation_byte_count;
+
+        // Continuation bytes must have the top two bits set to 10.
+        if((utf8_string[index] & 0xc0) != 0x80)
+        {
+            throw std::exception();
+        }
+    }
+
+    return code_point;
+}
+
 // Does not write a BOM at the beginning of the returned string.
 std::wstring utf16le_from_utf8(const std::string& utf8_string)
 {
@@ -11,57 +71,7 @@ std::wstring utf16le_from_utf8(const std::string& utf8_string)
     const size_t length = utf8_string.length();
     for(size_t ix = 0; ix < length; ++ix)
     {
-        uint32_t code_point;
-
-        // Convert UTF-8 character to code point.
-
-        // U+0000 - U+007F.  One byte.
-        int continuation_byte_count = 0;
-        if((utf8_string[ix] & 0x80) == 0)
-        {
-            code_point = utf8_string[ix];
-        }
-        // U+0080 - U+07FF.  Two bytes.
-        else if((utf8_string[ix] & 0xe0) == 0xc0)
-        {
-            code_point = utf8_string[ix] & 0x1f;
-            continuation_byte_count = 1;
-        }
-        // U+0800 - U+FFFF.  Three bytes.
-        else if((utf8_string[ix] & 0xf0) == 0xe0)
-        {
-            code_point = utf8_string[ix] & 0x0f;
-            continuation_byte_count = 2;
-        }
-        // U+10000 - U+1FFFFF.  Four bytes.
-        else if((utf8_string[ix] & 0xf8) == 0xf0)
-        {
-            code_point = utf8_string[ix] & 7;
-            continuation_byte_count = 3;
-        }
-        else
-        {
-            throw std::exception();
-        }
-
-        if(ix + continuation_byte_count > length)
-        {
-            throw std::exception();
-        }
-
-        while(continuation_byte_count > 0)
-        {
-            ++ix;
-            code_point <<= 6;
-            code_point += utf8_string[ix] & 0x3f;
-            --continuation_byte_count;
-
-            // Continuation bytes must have the top two bits set to 10.
-            if((utf8_string[ix] & 0xc0) != 0x80)
-            {
-                throw std::exception();
-            }
-        }
+        uint32_t code_point = code_point_from_utf8_string(utf8_string, ix);
 
         // Convert code point to UTF-16LE character.
 
@@ -82,8 +92,8 @@ std::wstring utf16le_from_utf8(const std::string& utf8_string)
             code_point -= 0x010000;
             assert(code_point < 0xfffff);
 
-            const wchar_t lead_surrogate = ((code_point >> 10) & 0x3ff) + 0xd800;
-            const wchar_t trail_surrogate = (code_point & 0x3ff) + 0xdc00;
+            const uint16_t lead_surrogate = ((code_point >> 10) & 0x3ff) + 0xd800;
+            const uint16_t trail_surrogate = (code_point & 0x3ff) + 0xdc00;
 
             utf16_string += lead_surrogate;
             utf16_string += trail_surrogate;
