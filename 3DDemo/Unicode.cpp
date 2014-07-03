@@ -63,8 +63,58 @@ static uint32_t code_point_from_utf8_string(const std::string& utf8_string, size
     return code_point;
 }
 
-// Does not write a BOM at the beginning of the returned string.
-std::wstring utf16le_from_utf8(const std::string& utf8_string)
+static wchar_t utf16_from_code_point(uint32_t code_point)
+{
+    // UTF-8 that encodes U+D800 to U+DFFF is an error per spec.
+    if(code_point >= 0xd800 && code_point <= 0xdfff)
+    {
+        throw std::exception();
+    }
+
+    return static_cast<wchar_t>(code_point);
+}
+
+static wchar_t lead_surrogate_from_code_point(uint32_t code_point)
+{
+    code_point -= 0x010000;
+    assert(code_point < 0xfffff);
+
+    const uint16_t lead_surrogate = ((code_point >> 10) & 0x3ff) + 0xd800;
+    return lead_surrogate;
+}
+
+static wchar_t trail_surrogate_from_code_point(uint32_t code_point)
+{
+    code_point -= 0x010000;
+    assert(code_point < 0xfffff);
+
+    const uint16_t trail_surrogate = (code_point & 0x3ff) + 0xdc00;
+    return trail_surrogate;
+}
+
+// TODO: Find a way to do this without passing a mutable reference.  The challenge is that
+// either one or two characters can be appended, depending on the passed value.
+// Dependent types might be nice...
+static void encode_and_append_code_point(std::wstring& utf16_string, uint32_t code_point)
+{
+    // Convert code point to UTF-16 character.
+
+    // Basic Multilingual Plane - U+0000 to U+D7FF and U+E000 to U+FFFF.
+    if(code_point < 0x10000)
+    {
+        utf16_string += utf16_from_code_point(code_point);
+    }
+    // Supplementary Planes.
+    else
+    {
+        utf16_string += lead_surrogate_from_code_point(code_point);
+        utf16_string += trail_surrogate_from_code_point(code_point);;
+    }
+}
+
+// Does not write a BOM at the beginning of the returned string, as wchar_t is
+// endian neutral until serialization.
+std::wstring utf16_from_utf8(const std::string& utf8_string)
 {
     std::wstring utf16_string;
 
@@ -72,32 +122,7 @@ std::wstring utf16le_from_utf8(const std::string& utf8_string)
     for(size_t ix = 0; ix < length; ++ix)
     {
         uint32_t code_point = code_point_from_utf8_string(utf8_string, ix);
-
-        // Convert code point to UTF-16LE character.
-
-        // Basic Multilingual Plane - U+0000 to U+D7FF and U+E000 to U+FFFF.
-        if(code_point < 0x10000)
-        {
-            // UTF-8 that encodes U+D800 to U+DFFF is an error per spec.
-            if(code_point >= 0xd800 && code_point <= 0xdfff)
-            {
-                throw std::exception();
-            }
-
-            utf16_string += static_cast<wchar_t>(code_point);
-        }
-        // Supplementary Planes.
-        else
-        {
-            code_point -= 0x010000;
-            assert(code_point < 0xfffff);
-
-            const uint16_t lead_surrogate = ((code_point >> 10) & 0x3ff) + 0xd800;
-            const uint16_t trail_surrogate = (code_point & 0x3ff) + 0xdc00;
-
-            utf16_string += lead_surrogate;
-            utf16_string += trail_surrogate;
-        }
+        encode_and_append_code_point(utf16_string, code_point);
     }
 
     return utf16_string;
