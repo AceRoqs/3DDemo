@@ -3,55 +3,59 @@
 namespace Encoding
 {
 
-// TODO: Return code_point/index pair instead of a reference.
-static uint32_t code_point_from_utf8_string(const std::string& utf8_string, size_t& index)
+struct UTF8_descriptor
+{
+    uint32_t code_point;
+    unsigned int sequence_length;
+};
+
+static UTF8_descriptor descriptor_from_utf8_index(const std::string& utf8_string, size_t index)
 {
     const size_t length = utf8_string.length();
 
-    uint32_t code_point;
+    UTF8_descriptor descriptor;
 
     // Convert UTF-8 character to code point.
 
     // U+0000 - U+007F.  One byte.
-    int continuation_byte_count = 0;
     if((utf8_string[index] & 0x80) == 0)
     {
-        code_point = utf8_string[index];
+        descriptor.code_point = utf8_string[index];
+        descriptor.sequence_length = 1;
     }
     // U+0080 - U+07FF.  Two bytes.
     else if((utf8_string[index] & 0xe0) == 0xc0)
     {
-        code_point = utf8_string[index] & 0x1f;
-        continuation_byte_count = 1;
+        descriptor.code_point = utf8_string[index] & 0x1f;
+        descriptor.sequence_length = 2;
     }
     // U+0800 - U+FFFF.  Three bytes.
     else if((utf8_string[index] & 0xf0) == 0xe0)
     {
-        code_point = utf8_string[index] & 0x0f;
-        continuation_byte_count = 2;
+        descriptor.code_point = utf8_string[index] & 0x0f;
+        descriptor.sequence_length = 3;
     }
     // U+10000 - U+1FFFFF.  Four bytes.
     else if((utf8_string[index] & 0xf8) == 0xf0)
     {
-        code_point = utf8_string[index] & 7;
-        continuation_byte_count = 3;
+        descriptor.code_point = utf8_string[index] & 7;
+        descriptor.sequence_length = 4;
     }
     else
     {
         throw std::exception();
     }
 
-    if(index + continuation_byte_count > length)
+    if(index + descriptor.sequence_length > length)
     {
         throw std::exception();
     }
 
-    while(continuation_byte_count > 0)
+    for(unsigned int count = 0; count < descriptor.sequence_length - 1; ++count)
     {
         ++index;
-        code_point <<= 6;
-        code_point += utf8_string[index] & 0x3f;
-        --continuation_byte_count;
+        descriptor.code_point <<= 6;
+        descriptor.code_point += utf8_string[index] & 0x3f;
 
         // Continuation bytes must have the top two bits set to 10.
         if((utf8_string[index] & 0xc0) != 0x80)
@@ -60,7 +64,7 @@ static uint32_t code_point_from_utf8_string(const std::string& utf8_string, size
         }
     }
 
-    return code_point;
+    return descriptor;
 }
 
 static wchar_t utf16_from_code_point(uint32_t code_point)
@@ -108,7 +112,7 @@ static void encode_and_append_code_point(std::wstring& utf16_string, uint32_t co
     else
     {
         utf16_string += lead_surrogate_from_code_point(code_point);
-        utf16_string += trail_surrogate_from_code_point(code_point);;
+        utf16_string += trail_surrogate_from_code_point(code_point);
     }
 }
 
@@ -119,10 +123,11 @@ std::wstring utf16_from_utf8(const std::string& utf8_string)
     std::wstring utf16_string;
 
     const size_t length = utf8_string.length();
-    for(size_t ix = 0; ix < length; ++ix)
+    for(size_t index = 0; index < length; )
     {
-        uint32_t code_point = code_point_from_utf8_string(utf8_string, ix);
-        encode_and_append_code_point(utf16_string, code_point);
+        auto descriptor = descriptor_from_utf8_index(utf8_string, index);
+        encode_and_append_code_point(utf16_string, descriptor.code_point);
+        index += descriptor.sequence_length;
     }
 
     return utf16_string;
@@ -151,31 +156,31 @@ static wchar_t utf16_case5[] = L"\xdbff\xdffd";
 
 static bool test_case1()
 {
-    auto utf16_string = utf16le_from_utf8(utf8_case1);
+    auto utf16_string = utf16_from_utf8(utf8_case1);
     return utf16_string.compare(utf16_case1) == 0;
 }
 
 static bool test_case2()
 {
-    auto utf16_string = utf16le_from_utf8(utf8_case2);
+    auto utf16_string = utf16_from_utf8(utf8_case2);
     return utf16_string.compare(utf16_case2) == 0;
 }
 
 static bool test_case3()
 {
-    auto utf16_string = utf16le_from_utf8(utf8_case3);
+    auto utf16_string = utf16_from_utf8(utf8_case3);
     return utf16_string.compare(utf16_case3) == 0;
 }
 
 static bool test_case4()
 {
-    auto utf16_string = utf16le_from_utf8(utf8_case4);
+    auto utf16_string = utf16_from_utf8(utf8_case4);
     return utf16_string.compare(utf16_case4) == 0;
 }
 
 static bool test_case5()
 {
-    auto utf16_string = utf16le_from_utf8(utf8_case5);
+    auto utf16_string = utf16_from_utf8(utf8_case5);
     return utf16_string.compare(utf16_case5) == 0;
 }
 
