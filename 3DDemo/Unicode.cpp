@@ -51,23 +51,22 @@ static UTF8_descriptor descriptor_from_utf8_index(const std::string& utf8_string
         throw std::exception();
     }
 
-    for(unsigned int count = 0; count < descriptor.sequence_length - 1; ++count)
+    std::for_each(&utf8_string[index + 1], &utf8_string[index + descriptor.sequence_length], [&descriptor](char ch)
     {
-        ++index;
         descriptor.code_point <<= 6;
-        descriptor.code_point += utf8_string[index] & 0x3f;
+        descriptor.code_point += ch & 0x3f;
 
         // Continuation bytes must have the top two bits set to 10.
-        if((utf8_string[index] & 0xc0) != 0x80)
+        if((ch & 0xc0) != 0x80)
         {
             throw std::exception();
         }
-    }
+    });
 
     return descriptor;
 }
 
-static wchar_t utf16_from_code_point(uint32_t code_point)
+static wchar_t utf16_from_bmp_code_point(uint32_t code_point)
 {
     // UTF-8 that encodes U+D800 to U+DFFF is an error per spec.
     if(code_point >= 0xd800 && code_point <= 0xdfff)
@@ -78,7 +77,7 @@ static wchar_t utf16_from_code_point(uint32_t code_point)
     return static_cast<wchar_t>(code_point);
 }
 
-static wchar_t lead_surrogate_from_code_point(uint32_t code_point)
+static wchar_t lead_surrogate_from_code_point(uint32_t code_point) NOEXCEPT
 {
     code_point -= 0x010000;
     assert(code_point < 0xfffff);
@@ -87,7 +86,7 @@ static wchar_t lead_surrogate_from_code_point(uint32_t code_point)
     return lead_surrogate;
 }
 
-static wchar_t trail_surrogate_from_code_point(uint32_t code_point)
+static wchar_t trail_surrogate_from_code_point(uint32_t code_point) NOEXCEPT
 {
     code_point -= 0x010000;
     assert(code_point < 0xfffff);
@@ -96,17 +95,15 @@ static wchar_t trail_surrogate_from_code_point(uint32_t code_point)
     return trail_surrogate;
 }
 
-// TODO: Find a way to do this without passing a mutable reference.  The challenge is that
-// either one or two characters can be appended, depending on the passed value.
-// Dependent types might be nice...
-static void encode_and_append_code_point(std::wstring& utf16_string, uint32_t code_point)
+static std::wstring utf16_encode_code_point(uint32_t code_point)
 {
     // Convert code point to UTF-16 character.
+    std::wstring utf16_string;
 
     // Basic Multilingual Plane - U+0000 to U+D7FF and U+E000 to U+FFFF.
     if(code_point < 0x10000)
     {
-        utf16_string += utf16_from_code_point(code_point);
+        utf16_string += utf16_from_bmp_code_point(code_point);
     }
     // Supplementary Planes.
     else
@@ -114,6 +111,8 @@ static void encode_and_append_code_point(std::wstring& utf16_string, uint32_t co
         utf16_string += lead_surrogate_from_code_point(code_point);
         utf16_string += trail_surrogate_from_code_point(code_point);
     }
+
+    return utf16_string;
 }
 
 // Does not write a BOM at the beginning of the returned string, as wchar_t is
@@ -125,8 +124,9 @@ std::wstring utf16_from_utf8(const std::string& utf8_string)
     const size_t length = utf8_string.length();
     for(size_t index = 0; index < length; )
     {
+        // TODO: Single append for each character is too expensive.
         auto descriptor = descriptor_from_utf8_index(utf8_string, index);
-        encode_and_append_code_point(utf16_string, descriptor.code_point);
+        utf16_string += utf16_encode_code_point(descriptor.code_point);
         index += descriptor.sequence_length;
     }
 
@@ -135,24 +135,26 @@ std::wstring utf16_from_utf8(const std::string& utf8_string)
 
 // Code point   UTF-16      UTF-8
 // U+007A       007A        7A
-// TODO: Add 2-byte UTF-8 sequence.
+// U+00E9       00E9        C3 A9
 // U+6C34       6C34        E6 B0 B4
 // U+10000      D800 DC00   F0 90 80 80
 // U+1D11E      D834 DD1E   F0 9D 84 9E
 // U+10FFFD     DBFF DFFD   F4 8F BF BD
 
 static char utf8_case1[] = "\x7a";
-static char utf8_case2[] = "\xe6\xb0\xb4";
-static char utf8_case3[] = "\xf0\x90\x80\x80";
-static char utf8_case4[] = "\xf0\x9d\x84\x9e";
-static char utf8_case5[] = "\xf4\x8f\xbf\xbd";
+static char utf8_case2[] = "\xc3\xa9";
+static char utf8_case3[] = "\xe6\xb0\xb4";
+static char utf8_case4[] = "\xf0\x90\x80\x80";
+static char utf8_case5[] = "\xf0\x9d\x84\x9e";
+static char utf8_case6[] = "\xf4\x8f\xbf\xbd";
 
 // TODO: Enforce encoding of these as little endian.
 static wchar_t utf16_case1[] = L"\x7a";
-static wchar_t utf16_case2[] = L"\x6c34";
-static wchar_t utf16_case3[] = L"\xd800\xdc00";
-static wchar_t utf16_case4[] = L"\xd834\xdd1e";
-static wchar_t utf16_case5[] = L"\xdbff\xdffd";
+static wchar_t utf16_case2[] = L"\x00e9";
+static wchar_t utf16_case3[] = L"\x6c34";
+static wchar_t utf16_case4[] = L"\xd800\xdc00";
+static wchar_t utf16_case5[] = L"\xd834\xdd1e";
+static wchar_t utf16_case6[] = L"\xdbff\xdffd";
 
 static bool test_case1()
 {
@@ -184,6 +186,12 @@ static bool test_case5()
     return utf16_string.compare(utf16_case5) == 0;
 }
 
+static bool test_case6()
+{
+    auto utf16_string = utf16_from_utf8(utf8_case6);
+    return utf16_string.compare(utf16_case6) == 0;
+}
+
 void test()
 {
 #ifndef NDEBUG
@@ -192,8 +200,9 @@ void test()
     const bool case3 = test_case3();
     const bool case4 = test_case4();
     const bool case5 = test_case5();
+    const bool case6 = test_case6();
 
-    assert(case1 && case2 && case3 && case4 && case5);
+    assert(case1 && case2 && case3 && case4 && case5 && case6);
 #endif
 }
 
