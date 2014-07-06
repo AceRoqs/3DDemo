@@ -99,7 +99,6 @@
     </ClCompile>
     <ClCompile Include="render.cpp" />
     <ClCompile Include="targa.cpp" />
-    <ClCompile Include="Unicode.cpp" />
     <ClCompile Include="winmain.cpp" />
     <ClCompile Include="world.cpp" />
   </ItemGroup>
@@ -117,7 +116,6 @@
     <ClInclude Include="render.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="targa.h" />
-    <ClInclude Include="Unicode.h" />
     <ClInclude Include="world.h" />
   </ItemGroup>
   <ItemGroup>
