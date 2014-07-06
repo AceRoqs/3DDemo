@@ -19,6 +19,7 @@
     <ClInclude Include="ScopedWindowsTypes.h" />
     <ClInclude Include="ThreadAffinity.h" />
     <ClInclude Include="Tracing.h" />
+    <ClInclude Include="Unicode.h" />
     <ClInclude Include="WindowsGL.h" />
     <ClInclude Include="WindowClass.h" />
   </ItemGroup>
@@ -33,6 +34,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ScopedWindowsTypes.cpp" />
+    <ClCompile Include="Unicode.cpp" />
     <ClCompile Include="WindowClass.cpp" />
     <ClCompile Include="WindowsGL.cpp" />
   </ItemGroup>
