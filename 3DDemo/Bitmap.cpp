@@ -1,8 +1,9 @@
 #include "PreCompile.h"
-#include "Bitmap.h"
+#include "Bitmap.h"         // Pick up forward declarations to ensure correctness.
 #include "pcx.h"
 #include "targa.h"
 #include "HRException.h"
+#include "WindowClass.h"
 
 Bitmap::Bitmap() :
     xsize(0),
@@ -78,7 +79,7 @@ Bitmap bitmap_from_file(_In_z_ const char* file_name)
         WindowsCommon::throw_hr(WindowsCommon::hresult_from_last_error());
     }
 
-    const HANDLE file = CreateFileA(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr);
+    const auto file = WindowsCommon::create_file(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr);
     if(file == INVALID_HANDLE_VALUE)
     {
         WindowsCommon::throw_hr(WindowsCommon::hresult_from_last_error());
@@ -91,7 +92,6 @@ Bitmap bitmap_from_file(_In_z_ const char* file_name)
     DWORD size_read;
     ReadFile(file, buffer.data(), size, &size_read, &overlapped);
     WaitForSingleObject(overlapped.hEvent, INFINITE);
-    CloseHandle(file);
     CloseHandle(overlapped.hEvent);
 
     const int cch = strlen(file_name);
