@@ -4,7 +4,7 @@
 namespace Encoding
 {
 
-std::wstring utf16le_from_utf8(const std::string& utf8_string);
+std::wstring utf16_from_utf8(const std::string& utf8_string);
 
 }
 
