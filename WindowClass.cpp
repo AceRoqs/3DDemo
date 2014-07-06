@@ -1,6 +1,7 @@
 #include "PreCompile.h"
 #include "WindowClass.h"    // Pick up forward declarations to ensure correctness.
 #include "HRException.h"
+#include "Unicode.h"
 
 namespace WindowsCommon
 {
@@ -201,7 +202,7 @@ Scoped_current_context create_current_context(_In_ HDC device_context, _In_ HGLR
 
 // TODO: WindowClass.cpp is not the best place for this.
 Scoped_handle create_file(
-    _In_ PCTSTR file_name,
+    _In_ PCSTR file_name,
     DWORD desired_access,
     DWORD share_mode,
     _In_opt_ PSECURITY_ATTRIBUTES security_attributes,
@@ -209,7 +210,13 @@ Scoped_handle create_file(
     DWORD flags,
     _In_opt_ HANDLE template_file)
 {
-    const auto handle = CreateFile(file_name, desired_access, share_mode, security_attributes, creation_disposition, flags, template_file);
+    const auto handle = CreateFileW(Encoding::utf16_from_utf8(file_name).c_str(),
+                                    desired_access,
+                                    share_mode,
+                                    security_attributes,
+                                    creation_disposition,
+                                    flags,
+                                    template_file);
 
     if(INVALID_HANDLE_VALUE == handle)
     {
