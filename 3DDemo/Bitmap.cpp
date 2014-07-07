@@ -80,10 +80,6 @@ Bitmap bitmap_from_file(_In_z_ const char* file_name)
     }
 
     const auto file = WindowsCommon::create_file(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr);
-    if(file == INVALID_HANDLE_VALUE)
-    {
-        WindowsCommon::throw_hr(WindowsCommon::hresult_from_last_error());
-    }
     DWORD size = GetFileSize(file, nullptr);
 
     // TODO: zero inits.
