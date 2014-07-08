@@ -72,23 +72,19 @@ static void generate_grid_texture_rgb(
 
 Bitmap bitmap_from_file(_In_z_ const char* file_name)
 {
-    OVERLAPPED overlapped = {};
-    overlapped.hEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-    if(overlapped.hEvent == nullptr)
-    {
-        WindowsCommon::throw_hr(WindowsCommon::hresult_from_last_error());
-    }
-
     const auto file = WindowsCommon::create_file(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr);
-    DWORD size = GetFileSize(file, nullptr);
+    const DWORD size = GetFileSize(file, nullptr);
+    const auto read_complete = WindowsCommon::create_event(nullptr, true, false, nullptr);
+
+    OVERLAPPED overlapped = {};
+    overlapped.hEvent = read_complete;
 
     // TODO: zero inits.
     // TODO: truncates size.
     std::vector<uint8_t> buffer(size);
     DWORD size_read;
     ReadFile(file, buffer.data(), size, &size_read, &overlapped);
-    WaitForSingleObject(overlapped.hEvent, INFINITE);
-    CloseHandle(overlapped.hEvent);
+    WaitForSingleObject(read_complete, INFINITE);
 
     const int cch = strlen(file_name);
     if((cch >= 4) && (strcmp(file_name + cch - 4, ".pcx") == 0))
