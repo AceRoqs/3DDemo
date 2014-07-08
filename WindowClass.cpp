@@ -227,5 +227,26 @@ Scoped_handle create_file(
     return make_scoped_handle(handle);
 }
 
+// TODO: WindowClass.cpp is not the best place for this.
+Scoped_handle create_event(
+    _In_opt_ PSECURITY_ATTRIBUTES security_attributes,
+    bool manual_reset,
+    bool initial_state,
+    _In_opt_ PCSTR name)
+{
+    const auto handle = CreateEventW(security_attributes,
+                                     manual_reset,
+                                     initial_state,
+                                     name != nullptr ? Encoding::utf16_from_utf8(name).c_str() : nullptr);
+
+    if(INVALID_HANDLE_VALUE == handle)
+    {
+        HRESULT hr = hresult_from_last_error();
+        WindowsCommon::throw_hr(hr);
+    }
+
+    return make_scoped_handle(handle);
+}
+
 }
 
