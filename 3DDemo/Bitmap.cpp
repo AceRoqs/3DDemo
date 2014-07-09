@@ -70,6 +70,15 @@ static void generate_grid_texture_rgb(
 }
 #endif
 
+// This function is case sensitive due to the lack of library support for
+// UTF-8 case insensitive matching.
+static bool file_has_extension_case_sensitive(_In_z_ const char* file_name, _In_z_ const char* extension) NOEXCEPT
+{
+    const size_t length_file = strlen(file_name);
+    const size_t length_extension = strlen(extension);
+    return ((length_file >= length_extension) && (strcmp(file_name + length_file - length_extension, extension) == 0));
+}
+
 Bitmap bitmap_from_file(_In_z_ const char* file_name)
 {
     const auto file = WindowsCommon::create_file(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr);
@@ -86,14 +95,13 @@ Bitmap bitmap_from_file(_In_z_ const char* file_name)
     ReadFile(file, buffer.data(), size, &size_read, &overlapped);
     WaitForSingleObject(read_complete, INFINITE);
 
-    const int cch = strlen(file_name);
-    if((cch >= 4) && (strcmp(file_name + cch - 4, ".pcx") == 0))
+    if(file_has_extension_case_sensitive(file_name, ".pcx"))
     {
-        return decode_bitmap_from_pcx_memory(buffer.data(), static_cast<size_t>(size));
+        return decode_bitmap_from_pcx_memory(buffer.data(), size);
     }
-    else if((cch >= 4) && (strcmp(file_name + cch - 4, ".tga") == 0))
+    else if(file_has_extension_case_sensitive(file_name, ".tga"))
     {
-        return decode_bitmap_from_tga_memory(buffer.data(), static_cast<size_t>(size));
+        return decode_bitmap_from_tga_memory(buffer.data(), size);
     }
     throw std::exception();
 }
