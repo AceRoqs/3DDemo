@@ -133,6 +133,26 @@ std::wstring utf16_from_utf8(const std::string& utf8_string)
     return utf16_string;
 }
 
+// Untested, and not used anywhere.
+#if 0
+bool utf8_is_ascii(_In_z_ const char* utf8_string)
+{
+    bool is_ascii = true;
+
+    while(*utf8_string != '\0')
+    {
+        if(*utf8_string < 0)
+        {
+            is_ascii = false;
+            break;
+        }
+        ++utf8_string;
+    }
+
+    return is_ascii;
+}
+#endif
+
 // Code point   UTF-16      UTF-8
 // U+007A       007A        7A
 // U+00E9       00E9        C3 A9
