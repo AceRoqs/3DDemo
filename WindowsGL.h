@@ -2,7 +2,7 @@
 #define WGLSTATE_H
 
 #include "ScopedWindowsTypes.h"
-#include "WindowClass.h"
+#include "Wrappers.h"
 
 namespace WindowsCommon
 {

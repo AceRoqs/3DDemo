@@ -1,5 +1,5 @@
 #include "PreCompile.h"
-#include "WindowClass.h"    // Pick up forward declarations to ensure correctness.
+#include "Wrappers.h"       // Pick up forward declarations to ensure correctness.
 #include "HRException.h"
 #include "Unicode.h"
 
@@ -90,7 +90,6 @@ Scoped_atom register_window_class(const WNDCLASSEX& window_class)
     return make_scoped_window_class(atom, window_class.hInstance);
 }
 
-// TODO: WindowClass.cpp is not the best place for this.
 Scoped_window create_window(
     _In_opt_ PCTSTR class_name,
     _In_opt_ PCTSTR window_name,
@@ -200,7 +199,6 @@ Scoped_current_context create_current_context(_In_ HDC device_context, _In_ HGLR
     return make_scoped_current_context(gl_context);
 }
 
-// TODO: WindowClass.cpp is not the best place for this.
 Scoped_handle create_file(
     _In_ PCSTR file_name,
     DWORD desired_access,
@@ -227,7 +225,6 @@ Scoped_handle create_file(
     return make_scoped_handle(handle);
 }
 
-// TODO: WindowClass.cpp is not the best place for this.
 Scoped_handle create_event(
     _In_opt_ PSECURITY_ATTRIBUTES security_attributes,
     bool manual_reset,

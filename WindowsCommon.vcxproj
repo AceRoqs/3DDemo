@@ -21,7 +21,7 @@
     <ClInclude Include="Tracing.h" />
     <ClInclude Include="Unicode.h" />
     <ClInclude Include="WindowsGL.h" />
-    <ClInclude Include="WindowClass.h" />
+    <ClInclude Include="Wrappers.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Clock.cpp" />
@@ -35,7 +35,7 @@
     </ClCompile>
     <ClCompile Include="ScopedWindowsTypes.cpp" />
     <ClCompile Include="Unicode.cpp" />
-    <ClCompile Include="WindowClass.cpp" />
+    <ClCompile Include="Wrappers.cpp" />
     <ClCompile Include="WindowsGL.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
