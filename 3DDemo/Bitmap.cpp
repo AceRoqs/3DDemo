@@ -3,7 +3,7 @@
 #include "pcx.h"
 #include "targa.h"
 #include "HRException.h"
-#include "WindowClass.h"
+#include "Wrappers.h"
 
 Bitmap::Bitmap() :
     xsize(0),

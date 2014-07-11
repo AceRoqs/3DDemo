@@ -2,7 +2,6 @@
 #include "WindowsGL.h"      // Pick up forward declarations to ensure correctness.
 #include "HRException.h"
 #include "Tracing.h"
-#include "WindowClass.h"
 
 namespace WindowsCommon
 {
