@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WindowsCommon", "WindowsCom
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Direct3D9Common", "Direct3D9Common\Direct3D9Common.vcxproj", "{F7B0044A-AF74-4FC1-B877-76438F568131}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PortableRuntime", "PortableRuntime\PortableRuntime.vcxproj", "{0D716D67-7339-4780-9764-F48808DB8DAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -27,6 +29,10 @@ Global
 		{F7B0044A-AF74-4FC1-B877-76438F568131}.Debug|Win32.Build.0 = Debug|Win32
 		{F7B0044A-AF74-4FC1-B877-76438F568131}.Release|Win32.ActiveCfg = Release|Win32
 		{F7B0044A-AF74-4FC1-B877-76438F568131}.Release|Win32.Build.0 = Release|Win32
+		{0D716D67-7339-4780-9764-F48808DB8DAE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0D716D67-7339-4780-9764-F48808DB8DAE}.Debug|Win32.Build.0 = Debug|Win32
+		{0D716D67-7339-4780-9764-F48808DB8DAE}.Release|Win32.ActiveCfg = Release|Win32
+		{0D716D67-7339-4780-9764-F48808DB8DAE}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
