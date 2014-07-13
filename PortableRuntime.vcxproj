@@ -18,6 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PreCompile.h" />
+    <ClInclude Include="PreCPP11.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0D716D67-7339-4780-9764-F48808DB8DAE}</ProjectGuid>
