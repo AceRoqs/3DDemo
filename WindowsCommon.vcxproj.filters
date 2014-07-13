@@ -21,9 +21,6 @@
     <ClInclude Include="HRException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PreCPP11.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ScopedWindowsTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>

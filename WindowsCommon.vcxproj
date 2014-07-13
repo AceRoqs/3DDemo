@@ -15,7 +15,6 @@
     <ClInclude Include="HRException.h" />
     <ClInclude Include="InputDevice.h" />
     <ClInclude Include="PreCompile.h" />
-    <ClInclude Include="PreCPP11.h" />
     <ClInclude Include="ScopedWindowsTypes.h" />
     <ClInclude Include="ThreadAffinity.h" />
     <ClInclude Include="Tracing.h" />
@@ -74,6 +73,7 @@
       <PrecompiledHeaderFile>PreCompile.h</PrecompiledHeaderFile>
       <TreatWarningAsError>true</TreatWarningAsError>
       <WarningLevel>Level4</WarningLevel>
+      <AdditionalIncludeDirectories>..\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -90,6 +90,7 @@
       <PrecompiledHeaderFile>PreCompile.h</PrecompiledHeaderFile>
       <TreatWarningAsError>true</TreatWarningAsError>
       <WarningLevel>Level4</WarningLevel>
+      <AdditionalIncludeDirectories>..\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
