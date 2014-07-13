@@ -7,14 +7,14 @@
 #include "Action.h"
 #include "Bezier.h"
 #include "Bitmap.h"
-#include "Clock.h"
+#include <WindowsCommon/Clock.h>
 #include "DirectInputMap.h"
-#include "HRException.h"
-#include "InputDevice.h"
+#include <WindowsCommon/HRException.h>
+#include <WindowsCommon/InputDevice.h>
 #include "LinearAlgebra.h"
-#include "ThreadAffinity.h"
-#include "Tracing.h"
-#include "WindowsGL.h"
+#include <WindowsCommon/ThreadAffinity.h>
+#include <WindowsCommon/Tracing.h>
+#include <WindowsCommon/WindowsGL.h>
 
 static bool s_fWindowed = true;
 

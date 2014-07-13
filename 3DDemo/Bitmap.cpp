@@ -2,8 +2,8 @@
 #include "Bitmap.h"         // Pick up forward declarations to ensure correctness.
 #include "pcx.h"
 #include "targa.h"
-#include "HRException.h"
-#include "Wrappers.h"
+#include <WindowsCommon/HRException.h>
+#include <WindowsCommon/Wrappers.h>
 
 Bitmap::Bitmap() :
     xsize(0),

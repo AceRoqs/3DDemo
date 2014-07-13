@@ -1,6 +1,6 @@
 #include "PreCompile.h"
 #include "app.h"
-#include "HRException.h"
+#include <WindowsCommon/HRException.h>
 
 // The command line and environment can also be accessed
 // via __argc, __targv, and _tenviron.
