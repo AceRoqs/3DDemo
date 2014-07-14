@@ -18,12 +18,18 @@
     <ClCompile Include="PreCompile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Unicode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PreCompile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PreCPP11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Unicode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
