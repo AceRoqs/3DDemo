@@ -15,10 +15,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Unicode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PreCompile.h" />
     <ClInclude Include="PreCPP11.h" />
+    <ClInclude Include="Unicode.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0D716D67-7339-4780-9764-F48808DB8DAE}</ProjectGuid>
