@@ -1,7 +1,7 @@
 #include "PreCompile.h"
 #include "Wrappers.h"       // Pick up forward declarations to ensure correctness.
 #include "HRException.h"
-#include "Unicode.h"
+#include <PortableRuntime/Unicode.h>
 
 namespace WindowsCommon
 {
