@@ -208,7 +208,7 @@ Scoped_handle create_file(
     DWORD flags,
     _In_opt_ HANDLE template_file)
 {
-    const auto handle = CreateFileW(Encoding::utf16_from_utf8(file_name).c_str(),
+    const auto handle = CreateFileW(PortableRuntime::utf16_from_utf8(file_name).c_str(),
                                     desired_access,
                                     share_mode,
                                     security_attributes,
@@ -234,7 +234,7 @@ Scoped_handle create_event(
     const auto handle = CreateEventW(security_attributes,
                                      manual_reset,
                                      initial_state,
-                                     name != nullptr ? Encoding::utf16_from_utf8(name).c_str() : nullptr);
+                                     name != nullptr ? PortableRuntime::utf16_from_utf8(name).c_str() : nullptr);
 
     if(INVALID_HANDLE_VALUE == handle)
     {

@@ -1,7 +1,7 @@
 #include "PreCompile.h"
 #include "Unicode.h"        // Pick up forward declarations to ensure correctness.
 
-namespace Encoding
+namespace PortableRuntime
 {
 
 struct UTF8_descriptor
