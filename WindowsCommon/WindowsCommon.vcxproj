@@ -12,7 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Clock.h" />
-    <ClInclude Include="HRException.h" />
+    <ClInclude Include="CheckHR.h" />
     <ClInclude Include="InputDevice.h" />
     <ClInclude Include="PreCompile.h" />
     <ClInclude Include="ScopedWindowsTypes.h" />
@@ -26,7 +26,7 @@
     <ClCompile Include="InputDevice.cpp" />
     <ClCompile Include="ThreadAffinity.cpp" />
     <ClCompile Include="Tracing.cpp" />
-    <ClCompile Include="HRException.cpp" />
+    <ClCompile Include="CheckHR.cpp" />
     <ClCompile Include="PreCompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

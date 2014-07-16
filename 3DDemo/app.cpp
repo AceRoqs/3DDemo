@@ -9,7 +9,7 @@
 #include "Bitmap.h"
 #include <WindowsCommon/Clock.h>
 #include "DirectInputMap.h"
-#include <WindowsCommon/HRException.h>
+#include <WindowsCommon/CheckHR.h>
 #include <WindowsCommon/InputDevice.h>
 #include "LinearAlgebra.h"
 #include <WindowsCommon/ThreadAffinity.h>

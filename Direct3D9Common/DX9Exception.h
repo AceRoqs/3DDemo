@@ -1,7 +1,7 @@
 #ifndef DX9EXCEPTION_H
 #define DX9EXCEPTION_H
 
-#include <WindowsCommon/HRException.h>
+#include <WindowsCommon/CheckHR.h>
 
 namespace Direct3D9Common
 {

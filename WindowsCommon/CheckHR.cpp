@@ -1,5 +1,5 @@
 #include "PreCompile.h"
-#include "HRException.h"    // Pick up forward declarations to ensure correctness.
+#include "CheckHR.h"    // Pick up forward declarations to ensure correctness.
 
 namespace WindowsCommon
 {
