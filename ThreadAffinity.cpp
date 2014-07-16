@@ -1,6 +1,6 @@
 #include "PreCompile.h"
 #include "ThreadAffinity.h"
-#include "HRException.h"
+#include "CheckHR.h"
 
 namespace WindowsCommon
 {

@@ -1,6 +1,6 @@
 #include "PreCompile.h"
 #include "WindowsGL.h"      // Pick up forward declarations to ensure correctness.
-#include "HRException.h"
+#include "CheckHR.h"
 #include "Tracing.h"
 
 namespace WindowsCommon
