@@ -11,12 +11,12 @@ Input_device::Input_device(_In_ HINSTANCE hInstance, _In_ HWND hwnd)
     using namespace WindowsCommon;
 
     ATL::CComPtr<IDirectInput8> direct_input;
-    throw_hr(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, reinterpret_cast<PVOID*>(&direct_input), nullptr));
-    throw_hr(direct_input->CreateDevice(GUID_SysKeyboard, &m_device, nullptr));
+    check_hr(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, reinterpret_cast<PVOID*>(&direct_input), nullptr));
+    check_hr(direct_input->CreateDevice(GUID_SysKeyboard, &m_device, nullptr));
 
     assert(c_dfDIKeyboard.dwDataSize == KEYBOARD_BUFFER_SIZE);
-    throw_hr(m_device->SetDataFormat(&c_dfDIKeyboard));
-    throw_hr(m_device->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
+    check_hr(m_device->SetDataFormat(&c_dfDIKeyboard));
+    check_hr(m_device->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
 
     // Acquisition is done before input is read the first time.
 
@@ -32,7 +32,7 @@ void Input_device::get_input(_In_ Keyboard_state* keyboard_state) const
 {
     if(SUCCEEDED(m_device->Acquire()))
     {
-        WindowsCommon::throw_hr(m_device->GetDeviceState(keyboard_state->size(), keyboard_state));
+        WindowsCommon::check_hr(m_device->GetDeviceState(keyboard_state->size(), keyboard_state));
     }
     else
     {

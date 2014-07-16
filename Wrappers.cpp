@@ -84,7 +84,7 @@ Scoped_atom register_window_class(const WNDCLASSEX& window_class)
     {
         HRESULT hr = hresult_from_last_error();
         assert(HRESULT_FROM_WIN32(ERROR_CLASS_ALREADY_EXISTS) != hr);
-        WindowsCommon::throw_hr(hr);
+        WindowsCommon::check_hr(hr);
     }
 
     return make_scoped_window_class(atom, window_class.hInstance);
@@ -108,7 +108,7 @@ Scoped_window create_window(
     if(nullptr == window)
     {
         HRESULT hr = hresult_from_last_error();
-        WindowsCommon::throw_hr(hr);
+        WindowsCommon::check_hr(hr);
     }
 
     return make_scoped_window(window);
@@ -138,7 +138,7 @@ Scoped_device_context get_device_context(_In_ HWND window)
 
     if(nullptr == device_context)
     {
-        WindowsCommon::throw_hr(E_FAIL);
+        WindowsCommon::check_hr(E_FAIL);
     }
 
     return make_scoped_device_context(device_context, window);
@@ -172,18 +172,18 @@ Scoped_gl_context create_gl_context(_In_ HDC device_context)
     const int pixel_format = ChoosePixelFormat(device_context, &descriptor);
     if(pixel_format == 0)
     {
-        throw_hr(hresult_from_last_error());
+        check_hr(hresult_from_last_error());
     }
 
     if(!SetPixelFormat(device_context, pixel_format, &descriptor))
     {
-        throw_hr(hresult_from_last_error());
+        check_hr(hresult_from_last_error());
     }
 
     const auto rendering_context = wglCreateContext(device_context);
     if(nullptr == rendering_context)
     {
-        throw_hr(hresult_from_last_error());
+        check_hr(hresult_from_last_error());
     }
 
     return make_scoped_gl_context(rendering_context);
@@ -193,7 +193,7 @@ Scoped_current_context create_current_context(_In_ HDC device_context, _In_ HGLR
 {
     if(!wglMakeCurrent(device_context, gl_context))
     {
-        throw_hr(WindowsCommon::hresult_from_last_error());
+        check_hr(WindowsCommon::hresult_from_last_error());
     }
 
     return make_scoped_current_context(gl_context);
@@ -219,7 +219,7 @@ Scoped_handle create_file(
     if(INVALID_HANDLE_VALUE == handle)
     {
         HRESULT hr = hresult_from_last_error();
-        WindowsCommon::throw_hr(hr);
+        WindowsCommon::check_hr(hr);
     }
 
     return make_scoped_handle(handle);
@@ -239,7 +239,7 @@ Scoped_handle create_event(
     if(INVALID_HANDLE_VALUE == handle)
     {
         HRESULT hr = hresult_from_last_error();
-        WindowsCommon::throw_hr(hr);
+        WindowsCommon::check_hr(hr);
     }
 
     return make_scoped_handle(handle);
