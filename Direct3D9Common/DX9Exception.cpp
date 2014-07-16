@@ -17,7 +17,7 @@ void DX9_exception::get_error_string(_Out_z_cap_(size) PTSTR error_string, size_
     }
     else
     {
-        assert(!"DX error string could not be found.  Was throw_hr intended?");
+        assert(!"DX error string could not be found.  Was check_hr intended?");
         HRESULT_exception::get_error_string(error_string, size);
     }
 }

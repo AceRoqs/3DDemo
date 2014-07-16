@@ -179,13 +179,13 @@ void app_run(HINSTANCE instance, int show_command)
     {
         UNREFERENCED_PARAMETER(ex);
 
-        WindowsCommon::throw_hr(E_OUTOFMEMORY);
+        WindowsCommon::check_hr(E_OUTOFMEMORY);
     }
     catch(...)
     {
         // TODO: uninitialize isn't always the correct text.
         //MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
-        WindowsCommon::throw_hr(E_FAIL);
+        WindowsCommon::check_hr(E_FAIL);
     }
 }
 

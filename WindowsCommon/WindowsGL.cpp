@@ -160,7 +160,7 @@ OpenGL_window::OpenGL_window(_In_ PCTSTR window_title, _In_ HINSTANCE instance, 
     {
         // TODO: 2014: This message text is good - find some way to pass this via the exception.
         //MessageBox(window, TEXT("3D Engine demo requires 32-bit color."), TEXT("System requirements"), MB_OK);
-        WindowsCommon::throw_hr(E_FAIL);
+        WindowsCommon::check_hr(E_FAIL);
     }
 
     m_state.device_context = get_device_context(m_state.window);
