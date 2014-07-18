@@ -1,5 +1,5 @@
-#ifndef DX9EXCEPTION_H
-#define DX9EXCEPTION_H
+#ifndef CHECKDX9_H
+#define CHECKDX9_H
 
 #include <WindowsCommon/CheckHR.h>
 
@@ -14,7 +14,7 @@ public:
     virtual void get_error_string(_Out_z_cap_(size) PTSTR error_string, size_t size) const OVERRIDE;
 };
 
-inline void throw_dx9err(HRESULT hr)
+inline void check_dx9(HRESULT hr)
 {
     if(FAILED(hr))
     {

@@ -1,5 +1,5 @@
 #include "PreCompile.h"
-#include "DX9Exception.h"   // Pick up forward declarations to ensure correctness.
+#include "CheckDX9.h"   // Pick up forward declarations to ensure correctness.
 
 namespace Direct3D9Common
 {
@@ -38,7 +38,7 @@ void throw_dx9err_buffer(HRESULT hr, ATL::CComPtr<ID3DXBuffer>& error_buffer)
         OutputDebugStringA(error_string);
     }
 
-    throw_dx9err(hr);
+    check_dx9(hr);
 }
 
 } // namespace Direct3D9Common

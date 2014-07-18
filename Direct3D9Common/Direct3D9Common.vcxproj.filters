@@ -18,7 +18,7 @@
     <ClInclude Include="PreCompile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DX9Exception.h">
+    <ClInclude Include="CheckDX9.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -26,7 +26,7 @@
     <ClCompile Include="PreCompile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DX9Exception.cpp">
+    <ClCompile Include="CheckDX9.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

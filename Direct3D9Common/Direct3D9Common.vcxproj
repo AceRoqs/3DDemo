@@ -11,11 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DX9Exception.h" />
+    <ClInclude Include="CheckDX9.h" />
     <ClInclude Include="PreCompile.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DX9Exception.cpp" />
+    <ClCompile Include="CheckDX9.cpp" />
     <ClCompile Include="PreCompile.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
