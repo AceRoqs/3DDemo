@@ -2,7 +2,6 @@
 #define HREXCEPTION_H
 
 namespace WindowsCommon
-
 {
 
 class HRESULT_exception : public std::exception
@@ -16,7 +15,7 @@ public:
     HRESULT m_hr;
 };
 
-inline void check_hr(HRESULT hr)
+inline void throw_hr(HRESULT hr)
 {
     if(FAILED(hr))
     {
