@@ -1,5 +1,5 @@
-#ifndef HREXCEPTION_H
-#define HREXCEPTION_H
+#ifndef CHECKHR_H
+#define CHECKHR_H
 
 namespace WindowsCommon
 {
@@ -15,7 +15,7 @@ public:
     HRESULT m_hr;
 };
 
-inline void throw_hr(HRESULT hr)
+inline void check_hr(HRESULT hr)
 {
     if(FAILED(hr))
     {
