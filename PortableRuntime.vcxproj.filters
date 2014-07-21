@@ -32,5 +32,8 @@
     <ClInclude Include="Unicode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CheckException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
