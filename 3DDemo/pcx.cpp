@@ -1,6 +1,7 @@
 #include "PreCompile.h"
 #include "pcx.h"
 #include "Bitmap.h"
+#include <PortableRuntime/CheckException.h>
 
 static enum PCX_manufacturer { PCX_magic = 10 };
 static enum PCX_version
@@ -40,35 +41,12 @@ struct PCX_header
 
 static void validate_pcx_header(_In_ const PCX_header* header)
 {
-    if(header->manufacturer != PCX_magic)
-    {
-        throw std::exception();
-    }
-
-    if(header->encoding != RLE_encoding)
-    {
-        throw std::exception();
-    }
-
-    if(header->min_x >= header->max_x)
-    {
-        throw std::exception();
-    }
-
-    if(header->min_y >= header->max_y)
-    {
-        throw std::exception();
-    }
-
-    if((header->color_plane_count != 1) && (header->color_plane_count != 3))
-    {
-        throw std::exception();
-    }
-
-    if(header->bits_per_pixel != 8)
-    {
-        throw std::exception();
-    }
+    PortableRuntime::check_exception(header->manufacturer == PCX_magic);
+    PortableRuntime::check_exception(header->encoding == RLE_encoding);
+    PortableRuntime::check_exception(header->min_x < header->max_x);
+    PortableRuntime::check_exception(header->min_y < header->max_y);
+    PortableRuntime::check_exception((header->color_plane_count == 1) || (header->color_plane_count == 3));
+    PortableRuntime::check_exception(header->bits_per_pixel == 8);
 }
 
 static const uint8_t* rle_decode(
