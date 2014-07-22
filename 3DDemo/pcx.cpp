@@ -55,10 +55,7 @@ static const uint8_t* rle_decode(
     _Out_ uint8_t* value,
     _Out_ uint8_t* run_count)
 {
-    if(start_iterator >= end_iterator)
-    {
-        throw std::exception();
-    }
+    PortableRuntime::check_exception(start_iterator < end_iterator);
 
     *run_count = 1;
     if(*start_iterator >= 192)
@@ -66,10 +63,7 @@ static const uint8_t* rle_decode(
         *run_count = *start_iterator - 192;
         ++start_iterator;
 
-        if(start_iterator >= end_iterator)
-        {
-            throw std::exception();
-        }
+        PortableRuntime::check_exception(start_iterator < end_iterator);
     }
 
     *value = *start_iterator;
@@ -93,10 +87,7 @@ static void pcx_decode(
         uint8_t run_count;
         start_iterator = rle_decode(start_iterator, end_iterator, &value, &run_count);
 
-        if(running_size + run_count > uncompressed_size)
-        {
-            throw std::exception();
-        }
+        PortableRuntime::check_exception(running_size + run_count <= uncompressed_size);
 
         if(palette != nullptr)
         {
@@ -117,10 +108,7 @@ static void pcx_decode(
 
 Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory, size_t size)
 {
-    if(size < sizeof(PCX_header))
-    {
-        throw std::exception();
-    }
+    PortableRuntime::check_exception(size >= sizeof(PCX_header));
 
     const PCX_header* header = reinterpret_cast<const PCX_header*>(pcx_memory);
     validate_pcx_header(header);

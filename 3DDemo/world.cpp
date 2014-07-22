@@ -2,6 +2,7 @@
 #include "world.h"
 #include "Bitmap.h"
 #include "LinearAlgebra.h"
+#include <PortableRuntime/CheckException.h>
 
 static const Vector3f world_vertices[] =
 {
@@ -148,24 +149,12 @@ static Map load_world_data(
         {
             // TODO: 2014: Bounds check constant arrays.
             auto ix = poly.vertex_indices[jj];
-            if(ix < ARRAYSIZE(world_vertices))
-            {
-                vertices->push_back(world_vertices[ix]);
-            }
-            else
-            {
-                throw std::exception();
-            }
+            PortableRuntime::check_exception(ix < ARRAYSIZE(world_vertices));
+            vertices->push_back(world_vertices[ix]);
 
             ix = poly.texture_coordinates[jj];
-            if(ix < ARRAYSIZE(world_texture_coords))
-            {
-                texture_coords->push_back(world_texture_coords[ix]);
-            }
-            else
-            {
-                throw std::exception();
-            }
+            PortableRuntime::check_exception(ix < ARRAYSIZE(world_texture_coords));
+            texture_coords->push_back(world_texture_coords[ix]);
         }
     }
 
@@ -180,10 +169,7 @@ Map start_load(
 {
     std::ifstream fis;
     fis.open(file_name);
-    if(!fis.is_open())
-    {
-        throw std::exception();
-    }
+    PortableRuntime::check_exception(fis.is_open());
 
     return load_world_data(fis, texture_list, vertices, texture_coords);
 }

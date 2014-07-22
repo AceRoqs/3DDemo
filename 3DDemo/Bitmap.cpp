@@ -103,6 +103,6 @@ Bitmap bitmap_from_file(_In_z_ const char* file_name)
     {
         return decode_bitmap_from_tga_memory(buffer.data(), size);
     }
-    throw std::exception();
+    throw std::exception();     // TODO: Use check_exception instead of naked throw.
 }
 

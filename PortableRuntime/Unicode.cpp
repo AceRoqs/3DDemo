@@ -1,5 +1,6 @@
 #include "PreCompile.h"
 #include "Unicode.h"        // Pick up forward declarations to ensure correctness.
+#include "CheckException.h"
 
 namespace PortableRuntime
 {
@@ -44,13 +45,10 @@ static UTF8_descriptor descriptor_from_utf8_index(const std::string& utf8_string
     }
     else
     {
-        throw std::exception();
+        PortableRuntime::check_exception(false);
     }
 
-    if(index + descriptor.sequence_length > length)
-    {
-        throw std::exception();
-    }
+    PortableRuntime::check_exception(index + descriptor.sequence_length <= length);
 
     std::for_each(&utf8_string[index + 1], &utf8_string[index + descriptor.sequence_length], [&descriptor](char ch)
     {
@@ -58,10 +56,7 @@ static UTF8_descriptor descriptor_from_utf8_index(const std::string& utf8_string
         descriptor.code_point += ch & 0x3f;
 
         // Continuation bytes must have the top two bits set to 10.
-        if((ch & 0xc0) != 0x80)
-        {
-            throw std::exception();
-        }
+        PortableRuntime::check_exception((ch & 0xc0) == 0x80);
     });
 
     return descriptor;
@@ -70,10 +65,7 @@ static UTF8_descriptor descriptor_from_utf8_index(const std::string& utf8_string
 static wchar_t utf16_from_bmp_code_point(uint32_t code_point)
 {
     // UTF-8 that encodes U+D800 to U+DFFF is an error per spec.
-    if(code_point >= 0xd800 && code_point <= 0xdfff)
-    {
-        throw std::exception();
-    }
+    PortableRuntime::check_exception((code_point < 0xd800) || (code_point > 0xdfff));
 
     return static_cast<wchar_t>(code_point);
 }

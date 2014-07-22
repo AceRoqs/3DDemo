@@ -1,6 +1,7 @@
 #include "PreCompile.h"
 #include "targa.h"
 #include "Bitmap.h"
+#include <PortableRuntime/CheckException.h>
 
 #define TRUEVISION_TARGA "TRUEVISION-TARGA"
 
@@ -121,10 +122,7 @@ void validate_tga_header(_In_ const TGA_header* header)
 
     // id_length is unbounded.
 
-    if(!succeeded)
-    {
-        throw std::exception();
-    }
+    PortableRuntime::check_exception(succeeded);
 }
 
 size_t get_pixel_data_offset(_In_ const TGA_header* header)
@@ -136,10 +134,7 @@ size_t get_pixel_data_offset(_In_ const TGA_header* header)
 
 Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory, size_t size)
 {
-    if(size < sizeof(TGA_header))
-    {
-        throw std::exception();
-    }
+    PortableRuntime::check_exception(size >= sizeof(TGA_header));
 
     const TGA_header* header = reinterpret_cast<const TGA_header*>(tga_memory);
     validate_tga_header(header);
@@ -153,15 +148,8 @@ Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory,
     const auto pixel_start = reinterpret_cast<const Color_rgb*>(tga_memory + pixel_data_offset);
     const size_t pixel_count = static_cast<size_t>(header->image_width) * header->image_height * (header->bits_per_pixel / 8) / sizeof(Color_rgb);
 
-    if((pixel_start + pixel_count < pixel_start) || (tga_memory + size < tga_memory))
-    {
-        throw std::exception();
-    }
-
-    if(reinterpret_cast<const uint8_t*>(pixel_start + pixel_count) > (tga_memory + size))
-    {
-        throw std::exception();
-    }
+    PortableRuntime::check_exception((pixel_start + pixel_count >= pixel_start) && (tga_memory + size >= tga_memory));
+    PortableRuntime::check_exception(reinterpret_cast<const uint8_t*>(pixel_start + pixel_count) <= (tga_memory + size));
 
     // MSVC complains that std::copy is insecure.
     // _SCL_SECURE_NO_WARNINGS or checked iterator required.
