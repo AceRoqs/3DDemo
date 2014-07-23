@@ -31,7 +31,7 @@ struct WGL_state
 class OpenGL_window : public Window_procedure
 {
 public:
-    OpenGL_window(_In_ PCTSTR window_title, _In_ HINSTANCE instance, bool windowed);
+    OpenGL_window(_In_ PCSTR window_title, _In_ HINSTANCE instance, bool windowed);
     ~OpenGL_window();
 
     WindowsCommon::WGL_state m_state;

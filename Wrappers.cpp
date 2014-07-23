@@ -35,6 +35,35 @@ LRESULT CALLBACK Window_procedure::static_window_proc(__in HWND window, UINT mes
     return return_value;
 }
 
+Window_class::Window_class(UINT style, _In_ WNDPROC window_proc, int class_extra, int window_extra, _In_ HINSTANCE instance, _In_opt_ HICON icon, _In_ HCURSOR cursor,
+    _In_opt_ HBRUSH background, _In_opt_ PCSTR menu_name, _In_ PCSTR class_name, _In_opt_ HICON small_icon) :
+    m_menu_name(menu_name ? PortableRuntime::utf16_from_utf8(menu_name) : L""),
+    m_class_name(PortableRuntime::utf16_from_utf8(class_name))
+{
+    m_window_class.cbSize        = sizeof(m_window_class);
+    m_window_class.style         = style;
+    m_window_class.lpfnWndProc   = window_proc;
+    m_window_class.cbClsExtra    = class_extra;
+    m_window_class.cbWndExtra    = window_extra;
+    m_window_class.hInstance     = instance;
+    m_window_class.hIcon         = icon;
+    m_window_class.hCursor       = cursor;
+    m_window_class.hbrBackground = background;
+    // TODO: m_window_class is mutable so that these values can be calculated when operator WNDCLASSEX() is taken.
+    // These must be calculated in that function because RVO isn't done in get_default_blank_window_class.
+    // Look into whether a move constructor will address this issue.
+    //m_window_class.lpszMenuName  = m_menu_name.length() > 0 ? &m_menu_name[0] : nullptr;
+    //m_window_class.lpszClassName = &m_class_name[0];
+    m_window_class.hIconSm       = small_icon;
+}
+
+Window_class::operator const WNDCLASSEXW&() const NOEXCEPT
+{
+    m_window_class.lpszMenuName  = m_menu_name.length() > 0 ? m_menu_name.c_str() : nullptr;
+    m_window_class.lpszClassName = m_class_name.c_str();
+    return m_window_class;
+}
+
 // Returns false if WM_QUIT was posted.
 bool dispatch_all_windows_messages(_Out_ MSG* message) NOEXCEPT
 {
@@ -56,29 +85,27 @@ bool dispatch_all_windows_messages(_Out_ MSG* message) NOEXCEPT
     return !message_exists || (WM_QUIT != message->message);
 }
 
-WNDCLASSEX get_default_blank_window_class(_In_ HINSTANCE instance, _In_ WNDPROC window_proc, _In_ PCTSTR window_class_name) NOEXCEPT
+Window_class get_default_blank_window_class(_In_ HINSTANCE instance, _In_ WNDPROC window_proc, _In_ PCSTR window_class_name) NOEXCEPT
 {
-    WNDCLASSEX window_class;
-    window_class.cbSize        = sizeof(window_class);
-    window_class.style         = CS_HREDRAW | CS_VREDRAW;
-    window_class.lpfnWndProc   = window_proc;
-    window_class.cbClsExtra    = 0;
-    window_class.cbWndExtra    = 0;
-    window_class.hInstance     = instance;
-    window_class.hIcon         = nullptr;
-    window_class.hCursor       = LoadCursor(nullptr, IDC_ARROW);
-    window_class.hbrBackground = nullptr;
-    window_class.lpszMenuName  = nullptr;
-    window_class.lpszClassName = window_class_name;
-    window_class.hIconSm       = window_class.hIcon;
+    Window_class window_class(CS_HREDRAW | CS_VREDRAW,
+                              window_proc,
+                              0,
+                              0,
+                              instance,
+                              nullptr,
+                              LoadCursor(nullptr, IDC_ARROW),
+                              nullptr,
+                              nullptr,
+                              window_class_name,
+                              nullptr);
 
     // Return value optimization expected.
     return window_class;
 }
 
-Scoped_atom register_window_class(const WNDCLASSEX& window_class)
+Scoped_atom register_window_class(const WNDCLASSEXW& window_class)
 {
-    const auto atom = RegisterClassEx(&window_class);
+    const auto atom = RegisterClassExW(&window_class);
 
     if(0 == atom)
     {
@@ -91,8 +118,8 @@ Scoped_atom register_window_class(const WNDCLASSEX& window_class)
 }
 
 Scoped_window create_window(
-    _In_opt_ PCTSTR class_name,
-    _In_opt_ PCTSTR window_name,
+    _In_opt_ PCSTR class_name,
+    _In_opt_ PCSTR window_name,
     DWORD style,
     int x,
     int y,
@@ -103,7 +130,9 @@ Scoped_window create_window(
     _In_opt_ HINSTANCE instance,
     _In_opt_ PVOID param)
 {
-    const auto window = CreateWindow(class_name, window_name, style, x, y, width, height, parent, menu, instance, param);
+    const auto class_name_utf16 = PortableRuntime::utf16_from_utf8(class_name);
+    const auto window_name_utf16 = PortableRuntime::utf16_from_utf8(window_name);
+    const auto window = CreateWindowW(class_name_utf16.c_str(), window_name_utf16.c_str(), style, x, y, width, height, parent, menu, instance, param);
 
     if(nullptr == window)
     {
@@ -114,11 +143,11 @@ Scoped_window create_window(
     return make_scoped_window(window);
 }
 
-Scoped_window create_normal_window(_In_ PCTSTR window_class_name, _In_ PCTSTR title, int width, int height, _In_opt_ HINSTANCE instance, _In_opt_ PVOID param)
+Scoped_window create_normal_window(_In_ PCSTR class_name, _In_ PCSTR window_name, int width, int height, _In_opt_ HINSTANCE instance, _In_opt_ PVOID param)
 {
     return create_window(
-        window_class_name,      // class_name.
-        title,                  // window_name.
+        class_name,             // class_name.
+        window_name,            // window_name.
         WS_OVERLAPPEDWINDOW |
         WS_CLIPCHILDREN |
         WS_CLIPSIBLINGS,        // style.
