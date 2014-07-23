@@ -113,12 +113,12 @@ WGL_state& WGL_state::operator=(WGL_state&& other) NOEXCEPT
 #endif
 
 // TODO: set window width/height if full screen
-OpenGL_window::OpenGL_window(_In_ PCTSTR window_title, _In_ HINSTANCE instance, bool windowed) : m_windowed(windowed)
+OpenGL_window::OpenGL_window(_In_ PCSTR window_title, _In_ HINSTANCE instance, bool windowed) : m_windowed(windowed)
 {
     const int window_width = 800;
     const int window_height = 600;
 
-    const WNDCLASSEX window_class = WindowsCommon::get_default_blank_window_class(instance, WindowsCommon::Window_procedure::static_window_proc, window_title);
+    const Window_class window_class = WindowsCommon::get_default_blank_window_class(instance, WindowsCommon::Window_procedure::static_window_proc, window_title);
 
     m_state.atom = WindowsCommon::register_window_class(window_class);
 

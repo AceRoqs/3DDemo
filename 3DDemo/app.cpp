@@ -110,7 +110,7 @@ class App_window : public WindowsCommon::OpenGL_window
 {
 public:
     App_window(_In_ HINSTANCE instance, bool windowed) :
-        OpenGL_window(TEXT("3D Demo 1999 (Updated for C++11)"), instance, windowed)
+        OpenGL_window(UTF8("3D Demo 1999 (Updated for C++11)"), instance, windowed)
     {
     }
 
