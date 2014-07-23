@@ -24,5 +24,12 @@
 #define NOEXCEPT
 #endif
 
+
+#if defined(_MSC_VER)
+#define UTF8(x) x
+#else
+#define UTF8(x) u8##x
+#endif
+
 #endif
 
