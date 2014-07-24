@@ -20,10 +20,11 @@ class Window_class
 public:
     Window_class(UINT style, _In_ WNDPROC window_proc, int class_extra, int window_extra, _In_ HINSTANCE instance, _In_opt_ HICON icon, _In_ HCURSOR cursor,
         _In_opt_ HBRUSH background, _In_opt_ PCSTR menu_name, _In_ PCSTR class_name, _In_opt_ HICON small_icon);
+    Window_class(const Window_class&& other) NOEXCEPT;
     operator const WNDCLASSEXW&() const NOEXCEPT;
 
 private:
-    mutable WNDCLASSEXW m_window_class;
+    WNDCLASSEXW m_window_class;
     std::wstring m_menu_name;
     std::wstring m_class_name;
 };

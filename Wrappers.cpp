@@ -49,18 +49,22 @@ Window_class::Window_class(UINT style, _In_ WNDPROC window_proc, int class_extra
     m_window_class.hIcon         = icon;
     m_window_class.hCursor       = cursor;
     m_window_class.hbrBackground = background;
-    // TODO: m_window_class is mutable so that these values can be calculated when operator WNDCLASSEX() is taken.
-    // These must be calculated in that function because RVO isn't done in get_default_blank_window_class.
-    // Look into whether a move constructor will address this issue.
-    //m_window_class.lpszMenuName  = m_menu_name.length() > 0 ? &m_menu_name[0] : nullptr;
-    //m_window_class.lpszClassName = &m_class_name[0];
+    m_window_class.lpszMenuName  = m_menu_name.length() > 0 ? m_menu_name.c_str() : nullptr;
+    m_window_class.lpszClassName = m_class_name.c_str();
     m_window_class.hIconSm       = small_icon;
+}
+
+Window_class::Window_class(const Window_class&& other) NOEXCEPT :
+    m_window_class(other.m_window_class),
+    m_menu_name(std::move(other.m_menu_name)),
+    m_class_name(std::move(other.m_class_name))
+{
+    m_window_class.lpszMenuName  = m_menu_name.length() > 0 ? m_menu_name.c_str() : nullptr;
+    m_window_class.lpszClassName = m_class_name.c_str();
 }
 
 Window_class::operator const WNDCLASSEXW&() const NOEXCEPT
 {
-    m_window_class.lpszMenuName  = m_menu_name.length() > 0 ? m_menu_name.c_str() : nullptr;
-    m_window_class.lpszClassName = m_class_name.c_str();
     return m_window_class;
 }
 
