@@ -2,7 +2,7 @@
 
 #define MESSAGE(message) { #message, message }
 
-static const struct
+static const struct Message_map
 {
     PCSTR text;
     UINT message;
@@ -101,7 +101,7 @@ static const struct
     MESSAGE(WM_NCXBUTTONDBLCLK),
     MESSAGE(WM_INPUT_DEVICE_CHANGE),
     MESSAGE(WM_INPUT),
-    MESSAGE(WM_KEYDOWN),
+    MESSAGE(WM_KEYDOWN),            // WM_KEYFIRST.
     MESSAGE(WM_KEYUP),
     MESSAGE(WM_CHAR),
     MESSAGE(WM_DEADCHAR),
@@ -142,7 +142,7 @@ static const struct
     MESSAGE(WM_CTLCOLORSCROLLBAR),
     MESSAGE(WM_CTLCOLORSTATIC),
     MESSAGE(MN_GETHMENU),
-    MESSAGE(WM_MOUSEMOVE),
+    MESSAGE(WM_MOUSEMOVE),          // WM_MOUSEFIRST.
     MESSAGE(WM_LBUTTONDOWN),
     MESSAGE(WM_LBUTTONUP),
     MESSAGE(WM_LBUTTONDBLCLK),
@@ -155,7 +155,7 @@ static const struct
     MESSAGE(WM_MOUSEWHEEL),
     MESSAGE(WM_XBUTTONDOWN),
     MESSAGE(WM_XBUTTONUP),
-    MESSAGE(WM_XBUTTONDBLCLK),
+    MESSAGE(WM_XBUTTONDBLCLK),      // WM_MOUSELAST.
     MESSAGE(WM_MOUSEHWHEEL),
     MESSAGE(WM_PARENTNOTIFY),
     MESSAGE(WM_ENTERMENULOOP),
@@ -236,7 +236,87 @@ static const struct
     MESSAGE(WM_PENWINFIRST),
     MESSAGE(WM_PENWINLAST),
 };
+#undef MESSAGE
 
-//MESSAGE(WM_APP                          0x8000
-//MESSAGE(WM_USER                         0x0400
+static bool map_message_to_index(_In_ const Message_map* message_map, size_t map_size, unsigned int message, _Out_ size_t* final_index)
+{
+    size_t bottom = 0;
+    size_t top = map_size - 1;
+    bool found = false;
+    while(bottom <= top)
+    {
+        size_t ix = (bottom + top) / 2;
+
+        if(message < message_map[ix].message)
+        {
+            top = ix - 1;
+        }
+        else if(message > message_map[ix].message)
+        {
+            bottom = ix + 1;
+        }
+        else
+        {
+            *final_index = ix;
+            found = true;
+            break;
+        }
+    }
+
+    return found;
+}
+
+static void validate_message_map_in_order(_In_ const Message_map* message_map, size_t map_size)
+{
+    auto message = message_map[0].message;
+    for(size_t index = 1; index < map_size; ++index)
+    {
+        assert(message < message_map[index].message);
+        message = message_map[index].message;
+    }
+}
+
+static void validate_message_map_all_entries_accessible(_In_ const Message_map* message_map, size_t map_size)
+{
+    for(size_t index = 0; index < map_size; ++index)
+    {
+        size_t message_index;
+        assert(map_message_to_index(message_map, map_size, message_map[index].message, &message_index));
+        assert(index == message_index);
+    }
+}
+
+void debug_validate_message_map()
+{
+#ifndef NDEBUG
+    validate_message_map_in_order(window_messages, ARRAYSIZE(window_messages));
+    validate_message_map_all_entries_accessible(window_messages, ARRAYSIZE(window_messages));
+    assert(window_messages[ARRAYSIZE(window_messages) - 1].message < WM_USER);
+#endif
+}
+
+PCSTR string_from_window_message(UINT message)
+{
+    PCSTR text;
+
+    size_t index;
+    if(message >= WM_APP)
+    {
+        text = "WM_APP private message";
+    }
+    else if(message >= WM_USER)
+    {
+        text = "WM_USER private message";
+    }
+    else if(map_message_to_index(window_messages, ARRAYSIZE(window_messages), message, &index))
+    {
+        text = window_messages[index].text;
+    }
+    else
+    {
+        text = "Unknown message";
+    }
+
+    return text;
+}
 
