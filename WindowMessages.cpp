@@ -1,5 +1,8 @@
 #include "PreCompile.h"
 
+namespace WindowsCommon
+{
+
 #define MESSAGE(message) { #message, message }
 
 static const struct Message_map
@@ -238,7 +241,7 @@ static const struct Message_map
 };
 #undef MESSAGE
 
-static bool map_message_to_index(_In_ const Message_map* message_map, size_t map_size, unsigned int message, _Out_ size_t* final_index)
+static bool map_message_to_index(_In_ const Message_map* message_map, size_t map_size, unsigned int message, _Out_ size_t* final_index) NOEXCEPT
 {
     size_t bottom = 0;
     size_t top = map_size - 1;
@@ -266,7 +269,7 @@ static bool map_message_to_index(_In_ const Message_map* message_map, size_t map
     return found;
 }
 
-static void validate_message_map_in_order(_In_ const Message_map* message_map, size_t map_size)
+static void validate_message_map_in_order(_In_ const Message_map* message_map, size_t map_size) NOEXCEPT
 {
     auto message = message_map[0].message;
     for(size_t index = 1; index < map_size; ++index)
@@ -276,7 +279,7 @@ static void validate_message_map_in_order(_In_ const Message_map* message_map, s
     }
 }
 
-static void validate_message_map_all_entries_accessible(_In_ const Message_map* message_map, size_t map_size)
+static void validate_message_map_all_entries_accessible(_In_ const Message_map* message_map, size_t map_size) NOEXCEPT
 {
     for(size_t index = 0; index < map_size; ++index)
     {
@@ -286,7 +289,7 @@ static void validate_message_map_all_entries_accessible(_In_ const Message_map* 
     }
 }
 
-void debug_validate_message_map()
+void debug_validate_message_map() NOEXCEPT
 {
 #ifndef NDEBUG
     validate_message_map_in_order(window_messages, ARRAYSIZE(window_messages));
@@ -295,7 +298,7 @@ void debug_validate_message_map()
 #endif
 }
 
-PCSTR string_from_window_message(UINT message)
+PCSTR string_from_window_message(UINT message) NOEXCEPT
 {
     PCSTR text;
 
@@ -318,5 +321,7 @@ PCSTR string_from_window_message(UINT message)
     }
 
     return text;
+}
+
 }
 
