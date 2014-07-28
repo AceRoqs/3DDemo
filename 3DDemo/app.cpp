@@ -14,6 +14,7 @@
 #include "LinearAlgebra.h"
 #include <WindowsCommon/ThreadAffinity.h>
 #include <WindowsCommon/Tracing.h>
+#include <WindowsCommon/WindowMessages.h>
 #include <WindowsCommon/WindowsGL.h>
 
 static bool s_fWindowed = true;
@@ -154,6 +155,7 @@ void app_run(HINSTANCE instance, int show_command)
         ShowWindow(app.m_state.window, show_command);
         UpdateWindow(app.m_state.window);
 
+        WindowsCommon::debug_validate_message_map();
         auto return_code = game_message_loop(map, clock, keyboard);
 
         // _tWinMain return code is an int type.

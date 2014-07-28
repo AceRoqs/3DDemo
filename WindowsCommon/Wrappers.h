@@ -29,8 +29,6 @@ private:
     std::wstring m_class_name;
 };
 
-bool dispatch_all_windows_messages(_Out_ MSG* message) NOEXCEPT;
-
 Window_class get_default_blank_window_class(_In_ HINSTANCE instance, _In_ WNDPROC window_proc, _In_ PCSTR window_class_name) NOEXCEPT;
 Scoped_atom register_window_class(const WNDCLASSEX& window_class);
 
