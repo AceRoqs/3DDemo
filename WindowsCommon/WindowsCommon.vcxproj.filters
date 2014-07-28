@@ -42,6 +42,9 @@
     <ClInclude Include="CheckHR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WindowMessages.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PreCompile.cpp">
