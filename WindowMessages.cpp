@@ -323,5 +323,26 @@ PCSTR string_from_window_message(UINT message) NOEXCEPT
     return text;
 }
 
+// Returns false if WM_QUIT was posted.
+bool dispatch_all_windows_messages(_Out_ MSG* message) NOEXCEPT
+{
+    // Clear out all the messages before drawing a new frame.
+    BOOL message_exists = PeekMessage(message, nullptr, 0, 0, PM_REMOVE);
+    while(message_exists)
+    {
+        if(WM_QUIT == message->message)
+        {
+            break;
+        }
+
+        ::TranslateMessage(message);
+        DispatchMessage(message);
+
+        message_exists = PeekMessage(message, nullptr, 0, 0, PM_REMOVE);
+    }
+
+    return !message_exists || (WM_QUIT != message->message);
+}
+
 }
 
