@@ -81,7 +81,7 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
         }
 
         const float elapsed_milliseconds = clock.ellapsed_milliseconds();
-        WindowsCommon::dprintf("QPC: %f\r\n", elapsed_milliseconds);
+        WindowsCommon::dprintf("QPC: %f\n", elapsed_milliseconds);
 
         WindowsCommon::Keyboard_state keyboard_state;
         keyboard.get_input(&keyboard_state);

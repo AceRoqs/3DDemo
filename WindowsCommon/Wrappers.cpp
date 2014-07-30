@@ -2,12 +2,16 @@
 #include "Wrappers.h"       // Pick up forward declarations to ensure correctness.
 #include "CheckHR.h"
 #include <PortableRuntime/Unicode.h>
+#include "Tracing.h"
+#include "WindowMessages.h"
 
 namespace WindowsCommon
 {
 
 LRESULT CALLBACK Window_procedure::static_window_proc(__in HWND window, UINT message, WPARAM w_param, LPARAM l_param) NOEXCEPT
 {
+    WindowsCommon::dprintf("%s\n", WindowsCommon::string_from_window_message(message));
+
     // Sent by CreateWindow.
     if(message == WM_NCCREATE)
     {
