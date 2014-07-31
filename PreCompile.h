@@ -4,6 +4,7 @@
 #include <cassert>
 
 // C++ Standard Library.
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <exception>
