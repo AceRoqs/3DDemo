@@ -112,7 +112,7 @@ static const struct Message_map
     MESSAGE(WM_SYSKEYUP),
     MESSAGE(WM_SYSCHAR),
     MESSAGE(WM_SYSDEADCHAR),
-    MESSAGE(WM_UNICHAR),
+    MESSAGE(WM_UNICHAR),            // WM_KEYLAST.
     MESSAGE(WM_IME_STARTCOMPOSITION),
     MESSAGE(WM_IME_ENDCOMPOSITION),
     MESSAGE(WM_IME_COMPOSITION),
@@ -269,30 +269,29 @@ static bool map_message_to_index(_In_ const Message_map* message_map, size_t map
     return found;
 }
 
-static void validate_message_map_in_order(_In_ const Message_map* message_map, size_t map_size) NOEXCEPT
+static bool operator<(const Message_map& first, const Message_map& second)
 {
-    auto message = message_map[0].message;
-    for(size_t index = 1; index < map_size; ++index)
-    {
-        assert(message < message_map[index].message);
-        message = message_map[index].message;
-    }
+    return first.message < second.message;
+}
+
+static void validate_message_map_sorted(_In_ const Message_map* message_map, size_t map_size) NOEXCEPT
+{
+    assert(std::is_sorted(message_map, message_map + map_size));
 }
 
 static void validate_message_map_all_entries_accessible(_In_ const Message_map* message_map, size_t map_size) NOEXCEPT
 {
-    for(size_t index = 0; index < map_size; ++index)
-    {
+    std::for_each(message_map, message_map + map_size, [&](const Message_map& entry){
         size_t message_index;
-        assert(map_message_to_index(message_map, map_size, message_map[index].message, &message_index));
-        assert(index == message_index);
-    }
+        assert(map_message_to_index(message_map, map_size, entry.message, &message_index));
+        assert(entry.message == message_map[message_index].message);
+    });
 }
 
 void debug_validate_message_map() NOEXCEPT
 {
 #ifndef NDEBUG
-    validate_message_map_in_order(window_messages, ARRAYSIZE(window_messages));
+    validate_message_map_sorted(window_messages, ARRAYSIZE(window_messages));
     validate_message_map_all_entries_accessible(window_messages, ARRAYSIZE(window_messages));
     assert(window_messages[ARRAYSIZE(window_messages) - 1].message < WM_USER);
 #endif
@@ -303,11 +302,11 @@ PCSTR string_from_window_message(UINT message) NOEXCEPT
     PCSTR text;
 
     size_t index;
-    if(message >= WM_APP)
+    if(message >= WM_APP)       // WM_APP = 0x8000.
     {
         text = "WM_APP private message";
     }
-    else if(message >= WM_USER)
+    else if(message >= WM_USER) // WM_USER = 0x0400.
     {
         text = "WM_USER private message";
     }
