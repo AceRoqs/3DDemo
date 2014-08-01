@@ -28,13 +28,13 @@ std::list<std::pair<float, Action>> actions_from_keyboard_state(float ellapsed_m
     // TODO: 2014: should this be an input map of all inputs (mouse, keyboard, network, time)
     // rather than an action map?
     std::list<std::pair<float, Action>> actions;
-    for(int ix = 0; ix < ARRAYSIZE(action_map); ++ix)
+    std::for_each(action_map, action_map + ARRAYSIZE(action_map), [&](const Action_map& map)
     {
-        if(keyboard_state[action_map[ix].input])
+        if(keyboard_state[map.input])
         {
-            actions.push_back(std::make_pair(ellapsed_milliseconds, action_map[ix].action));
+            actions.push_back(std::make_pair(ellapsed_milliseconds, map.action));
         }
-    }
+    });
 
     actions.sort();
     actions.unique();
