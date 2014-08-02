@@ -22,14 +22,14 @@ Camera apply_actions(const std::list<std::pair<float, Action>>& actions, const C
     // then moving forward and strafing at the same time still produces movement.
     // Ideally, moving forward would just follow the edge until there is no possible
     // forward motion possible, even while moving laterally.
-    for(auto action = actions.cbegin(); action != actions.cend(); ++action)
+    std::for_each(actions.cbegin(), actions.cend(), [&](const std::pair<float, Action>& action)
     {
-        const auto walk_distance = walk_distance_per_tick * action->first;
+        const auto walk_distance = walk_distance_per_tick * action.first;
         const auto sine = sinf(new_camera.m_degrees * radians_per_degree) * walk_distance;
         const auto cosine = cosf(new_camera.m_degrees * radians_per_degree) * walk_distance;
-        const auto rotation_degrees = keyboard_rotational_speed_per_tick * action->first;
+        const auto rotation_degrees = keyboard_rotational_speed_per_tick * action.first;
 
-        switch(action->second)
+        switch(action.second)
         {
             case Move_forward:
             {
@@ -71,7 +71,7 @@ Camera apply_actions(const std::list<std::pair<float, Action>>& actions, const C
                 break;
             }
         }
-    }
+    });
 
     // Testing each coordinate on its own only is correct because each boundary is axis aligned.
     float updated_x = new_camera.m_position.x();
