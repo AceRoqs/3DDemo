@@ -118,7 +118,7 @@ std::wstring utf16_from_utf8(const std::string& utf8_string)
     for(size_t index = 0; index < length; )
     {
         // TODO: Single append for each character is too expensive.
-        auto descriptor = descriptor_from_utf8_index(utf8_string, index);
+        const auto descriptor = descriptor_from_utf8_index(utf8_string, index);
         utf16_string += utf16_encode_code_point(descriptor.code_point);
         index += descriptor.sequence_length;
     }
