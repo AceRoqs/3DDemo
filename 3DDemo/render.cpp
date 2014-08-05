@@ -30,14 +30,14 @@ static void draw_patch(const std::vector<Vector3f>& vertices, unsigned int patch
             glTexCoord2f(k * scale, l * scale);
             glVertex3f(p1.x(), p1.y(), p1.z());
 
-            glTexCoord2f((k + 1) * scale, l * scale);
-            glVertex3f(p2.x(), p2.y(), p2.z());
+            glTexCoord2f(k * scale, (l + 1) * scale);
+            glVertex3f(p4.x(), p4.y(), p4.z());
 
             glTexCoord2f((k + 1) * scale, (l + 1) * scale);
             glVertex3f(p3.x(), p3.y(), p3.z());
 
-            glTexCoord2f(k * scale, (l + 1) * scale);
-            glVertex3f(p4.x(), p4.y(), p4.z());
+            glTexCoord2f((k + 1) * scale, l * scale);
+            glVertex3f(p2.x(), p2.y(), p2.z());
         }
     }
     glEnd();
@@ -66,14 +66,14 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
         glTexCoord2f(0.0f, 0.0f);
         glVertex3f(half_size, -half_size, 0.0f);
 
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(-half_size, -half_size, 0.0f);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(half_size, half_size, 0.0f);
 
         glTexCoord2f(1.0f, 1.0f);
         glVertex3f(-half_size, half_size, 0.0f);
 
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(half_size, half_size, 0.0f);
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(-half_size, -half_size, 0.0f);
     }
     glEnd();
 }
@@ -136,7 +136,7 @@ void initialize_gl_constants()
     // Enable backface culling and hidden surface removal.
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CW);
+    glFrontFace(GL_CCW);
     glCullFace(GL_BACK);
 
     glEnable(GL_BLEND);
