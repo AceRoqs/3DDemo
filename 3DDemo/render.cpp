@@ -63,17 +63,18 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
     {
         const float half_size = size / 2.0f;
 
+        // Begin in upper-left corner, and draw counterclockwise.
         glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(half_size, -half_size, 0.0f);
-
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(half_size, half_size, 0.0f);
-
-        glTexCoord2f(1.0f, 1.0f);
         glVertex3f(-half_size, half_size, 0.0f);
 
-        glTexCoord2f(1.0f, 0.0f);
+        glTexCoord2f(0.0f, 1.0f);
         glVertex3f(-half_size, -half_size, 0.0f);
+
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(half_size, -half_size, 0.0f);
+
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(half_size, half_size, 0.0f);
     }
     glEnd();
 }
@@ -251,7 +252,7 @@ void draw_list(
 
 //    glUnlockArraysEXT();
 //  glDisable(GL_CULL_FACE);
-    draw_emitter(emitter, camera, 6);
+    draw_emitter(emitter, camera, 2);
 
     //swap_buffers();
 #if 1
