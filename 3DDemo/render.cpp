@@ -252,7 +252,7 @@ void draw_list(
 
 //    glUnlockArraysEXT();
 //  glDisable(GL_CULL_FACE);
-    draw_emitter(emitter, camera, 2);
+    draw_emitter(emitter, camera, 6);
 
     //swap_buffers();
 #if 1

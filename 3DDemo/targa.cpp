@@ -107,6 +107,16 @@ struct TGA_extension_area
 
 #pragma pack(pop)
 
+bool is_left_to_right(uint8_t image_descriptor)
+{
+    return (image_descriptor & 0x10) != 0x10;
+}
+
+bool is_top_to_bottom(uint8_t image_descriptor)
+{
+    return (image_descriptor & 0x20) == 0x20;
+}
+
 void validate_tga_header(_In_ const TGA_header* header)
 {
     bool succeeded = true;
@@ -115,8 +125,9 @@ void validate_tga_header(_In_ const TGA_header* header)
     succeeded &= (header->bits_per_pixel == 24);
     succeeded &= (header->color_map_length == 0);
     succeeded &= (header->color_map_bits_per_pixel == 0);
+    succeeded &= (is_left_to_right(header->image_descriptor));
 
-    // Bound the size as this is used in buffer size calculations, which may need to fit in 
+    // Bound the size as this is used in buffer size calculations.
     succeeded &= (header->image_width <= 16384);
     succeeded &= (header->image_height <= 16384);
 
@@ -154,7 +165,21 @@ Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory,
     // MSVC complains that std::copy is insecure.
     // _SCL_SECURE_NO_WARNINGS or checked iterator required.
     bitmap.bitmap.resize(pixel_count);
-    std::copy(pixel_start, pixel_start + pixel_count, &bitmap.bitmap[0]);
+    if(is_top_to_bottom(header->image_descriptor))
+    {
+        std::copy(pixel_start, pixel_start + pixel_count, &bitmap.bitmap[0]);
+    }
+    else
+    {
+        // TODO: 2014: It would be good to log this, as bottom to top is inefficient for content.
+
+        const auto row_length = pixel_count / header->image_height;
+        for(decltype(header->image_height) iy = 0; iy < header->image_height; ++iy)
+        {
+            const auto row_offset = row_length * iy;
+            std::copy(pixel_start + row_offset, pixel_start + row_offset + row_length, &bitmap.bitmap[pixel_count - row_offset - row_length]);
+        }
+    }
 
     return bitmap;
 }
