@@ -107,17 +107,17 @@ struct TGA_extension_area
 
 #pragma pack(pop)
 
-bool is_left_to_right(uint8_t image_descriptor)
+static bool is_left_to_right(uint8_t image_descriptor)
 {
     return (image_descriptor & 0x10) != 0x10;
 }
 
-bool is_top_to_bottom(uint8_t image_descriptor)
+static bool is_top_to_bottom(uint8_t image_descriptor)
 {
     return (image_descriptor & 0x20) == 0x20;
 }
 
-void validate_tga_header(_In_ const TGA_header* header)
+static void validate_tga_header(_In_ const TGA_header* header)
 {
     bool succeeded = true;
 
@@ -136,7 +136,7 @@ void validate_tga_header(_In_ const TGA_header* header)
     PortableRuntime::check_exception(succeeded);
 }
 
-size_t get_pixel_data_offset(_In_ const TGA_header* header)
+static size_t get_pixel_data_offset(_In_ const TGA_header* header)
 {
     return sizeof(TGA_header) +
            header->id_length +
