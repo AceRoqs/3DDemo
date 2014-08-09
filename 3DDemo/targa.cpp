@@ -4,6 +4,7 @@
 #include <PortableRuntime/CheckException.h>
 
 #define TRUEVISION_TARGA "TRUEVISION-TARGA"
+const unsigned int max_dimension = 16384;
 
 static enum TGA_color_map
 {
@@ -117,6 +118,11 @@ static bool is_top_to_bottom(uint8_t image_descriptor)
     return (image_descriptor & 0x20) == 0x20;
 }
 
+static unsigned int top_to_bottom_bit()
+{
+    return 0x20;
+}
+
 static void validate_tga_header(_In_ const TGA_header* header)
 {
     bool succeeded = true;
@@ -128,8 +134,8 @@ static void validate_tga_header(_In_ const TGA_header* header)
     succeeded &= (is_left_to_right(header->image_descriptor));
 
     // Bound the size as this is used in buffer size calculations.
-    succeeded &= (header->image_width <= 16384);
-    succeeded &= (header->image_height <= 16384);
+    succeeded &= (header->image_width <= max_dimension);
+    succeeded &= (header->image_height <= max_dimension);
 
     // id_length is unbounded.
 
@@ -182,5 +188,26 @@ Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory,
     }
 
     return bitmap;
+}
+
+std::vector<uint8_t> encode_tga_from_bitmap(const Bitmap& bitmap)
+{
+    PortableRuntime::check_exception(bitmap.xsize <= max_dimension);
+    PortableRuntime::check_exception(bitmap.ysize <= max_dimension);
+
+    std::vector<uint8_t> tga(sizeof(TGA_header) + bitmap.bitmap.size() * sizeof(Color_rgb));
+
+    TGA_header* header = reinterpret_cast<TGA_header*>(&tga[0]);
+    header->color_map_type = Has_no_color_map;
+    header->image_type = True_color;
+    header->image_width = static_cast<decltype(header->image_width)>(bitmap.xsize);
+    header->image_height = static_cast<decltype(header->image_height)>(bitmap.ysize);
+    header->bits_per_pixel = sizeof(Color_rgb) * 8;
+    header->image_descriptor |= top_to_bottom_bit();
+
+    const auto pixel_start = reinterpret_cast<const uint8_t*>(&bitmap.bitmap[0]);
+    std::copy(pixel_start, pixel_start + bitmap.bitmap.size() * sizeof(Color_rgb), &tga[sizeof(TGA_header)]);
+
+    return std::move(tga);
 }
 

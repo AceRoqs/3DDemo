@@ -27,6 +27,7 @@ static void draw_patch(const std::vector<Vector3f>& vertices, unsigned int patch
             const Vector3f& p3 = vertices[(l + 1) * curve_vertex_count + k + 1];
             const Vector3f& p4 = vertices[(l + 1) * curve_vertex_count + k];
 
+            // Begin in upper-left corner, and draw counterclockwise.
             glTexCoord2f(k * scale, l * scale);
             glVertex3f(p1.x(), p1.y(), p1.z());
 
