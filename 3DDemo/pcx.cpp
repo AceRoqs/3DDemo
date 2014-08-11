@@ -113,21 +113,17 @@ Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory,
     const PCX_header* header = reinterpret_cast<const PCX_header*>(pcx_memory);
     validate_pcx_header(header);
 
-    //const Color_rgb* palette = reinterpret_cast<const Color_rgb*>(pcx_memory + size - sizeof(Color_rgb) * 256);
-    //if(size < sizeof(PCX_header) + sizeof(Color_rgb) * 256)
-    //{
-        // TODO: need to support non-palette PCX.
-    //    throw std::exception();
-    //}
     const Color_rgb* palette = nullptr;
     if(header->version == PC_Paintbrush_3 && header->color_plane_count == 1)
     {
+        // Add space for palette + C0 marker byte.
+        PortableRuntime::check_exception(size >= sizeof(PCX_header) + sizeof(Color_rgb) * 256 + 1);
+
         palette = reinterpret_cast<const Color_rgb*>(pcx_memory + size - sizeof(Color_rgb) * 256);
 
         // Validate 0C byte.  Some documentation incorrectly says this byte is C0 instead of 0C.
         PortableRuntime::check_exception(reinterpret_cast<const uint8_t*>(palette)[-1] == 0x0c);
     }
-    // Validate bounds
 
     Bitmap bitmap;
     bitmap.xsize = static_cast<unsigned int>(header->max_x) - header->min_x + 1;
@@ -135,14 +131,13 @@ Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory,
     bitmap.filtered = true;
 
     // uncompressed_size does not account for palette expansion.
-    //const unsigned int uncompressed_size = header->bytes_per_line * bitmap.ysize;
     const unsigned int uncompressed_size = bitmap.xsize * bitmap.ysize * header->color_plane_count;
-    //bitmap.bitmap.reserve(palette != nullptr ? uncompressed_size * sizeof(Color_rgb) : uncompressed_size);
     bitmap.bitmap.resize(palette != nullptr ? uncompressed_size * sizeof(Color_rgb) : uncompressed_size);
 
-    const uint8_t* iterator = pcx_memory + sizeof(PCX_header);
+    const uint8_t* start_iterator = pcx_memory + sizeof(PCX_header);
+    const uint8_t* end_iterator = palette != nullptr ? reinterpret_cast<const uint8_t*>(palette) - 1 : start_iterator + size;
 
-    pcx_decode(iterator, palette != nullptr ? reinterpret_cast<const uint8_t*>(palette) - 1 : iterator + size, uncompressed_size, &bitmap.bitmap[0], palette);
+    pcx_decode(start_iterator, end_iterator, uncompressed_size, &bitmap.bitmap[0], palette);
 
     return bitmap;
 }
