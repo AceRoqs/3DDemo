@@ -77,7 +77,7 @@ static void pcx_decode(
     _In_ const uint8_t* end_iterator,
     unsigned int uncompressed_size,
     Color_rgb* bitmap, // TEMP?
-    _In_count_(256) const Color_rgb* palette)
+    _In_opt_count_(256) const Color_rgb* palette)
 {
     uint8_t* bitmapb = reinterpret_cast<uint8_t*>(bitmap);
     unsigned int running_size = 0;
