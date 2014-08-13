@@ -75,12 +75,25 @@ static const uint8_t* rle_decode(
 static void pcx_decode(
     _In_ const uint8_t* start_iterator,
     _In_ const uint8_t* end_iterator,
-    unsigned int uncompressed_size,
     Color_rgb* bitmap, // TEMP?
+    unsigned int uncompressed_size,
     _In_opt_count_(256) const Color_rgb* palette)
 {
-    uint8_t* bitmapb = reinterpret_cast<uint8_t*>(bitmap);
     unsigned int running_size = 0;
+
+    // MSVC complains that fill_n is insecure.
+    // _SCL_SECURE_NO_WARNINGS or checked iterator required.
+    std::function<void (uint8_t, uint8_t)> fill_palette = [&running_size, bitmap, palette](uint8_t value, uint8_t run_count)
+    {
+        std::fill_n(bitmap + running_size, run_count, palette[value]);
+    };
+    std::function<void (uint8_t, uint8_t)> fill_no_palette = [&running_size, bitmap](uint8_t value, uint8_t run_count)
+    {
+        std::fill_n(reinterpret_cast<uint8_t*>(bitmap) + running_size, run_count, value);
+    };
+
+    auto fill = palette != nullptr ? fill_palette : fill_no_palette;
+
     do
     {
         uint8_t value;
@@ -89,18 +102,7 @@ static void pcx_decode(
 
         PortableRuntime::check_exception(running_size + run_count <= uncompressed_size);
 
-        if(palette != nullptr)
-        {
-            // MSVC complains that fill_n is insecure.
-            // _SCL_SECURE_NO_WARNINGS or checked iterator required.
-            std::fill_n(bitmap + running_size, run_count, palette[value]);
-        }
-        else
-        {
-            // MSVC complains that fill_n is insecure.
-            // _SCL_SECURE_NO_WARNINGS or checked iterator required.
-            std::fill_n(bitmapb + running_size, run_count, value);
-        }
+        fill(value, run_count);
 
         running_size += run_count;
     } while(running_size < uncompressed_size);
@@ -137,7 +139,7 @@ Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory,
     const uint8_t* start_iterator = pcx_memory + sizeof(PCX_header);
     const uint8_t* end_iterator = palette != nullptr ? reinterpret_cast<const uint8_t*>(palette) - 1 : start_iterator + size;
 
-    pcx_decode(start_iterator, end_iterator, uncompressed_size, &bitmap.bitmap[0], palette);
+    pcx_decode(start_iterator, end_iterator, &bitmap.bitmap[0], uncompressed_size, palette);
 
     return bitmap;
 }
