@@ -75,7 +75,7 @@ static const uint8_t* rle_decode(
 static void pcx_decode(
     _In_ const uint8_t* start_iterator,
     _In_ const uint8_t* end_iterator,
-    Color_rgb* bitmap, // TEMP?
+    uint8_t* bitmap,
     unsigned int uncompressed_size,
     _In_opt_count_(256) const Color_rgb* palette)
 {
@@ -85,11 +85,11 @@ static void pcx_decode(
     // _SCL_SECURE_NO_WARNINGS or checked iterator required.
     std::function<void (uint8_t, uint8_t)> fill_palette = [&running_size, bitmap, palette](uint8_t value, uint8_t run_count)
     {
-        std::fill_n(bitmap + running_size, run_count, palette[value]);
+        std::fill_n(reinterpret_cast<Color_rgb*>(bitmap) + running_size, run_count, palette[value]);
     };
     std::function<void (uint8_t, uint8_t)> fill_no_palette = [&running_size, bitmap](uint8_t value, uint8_t run_count)
     {
-        std::fill_n(reinterpret_cast<uint8_t*>(bitmap) + running_size, run_count, value);
+        std::fill_n(bitmap + running_size, run_count, value);
     };
 
     auto fill = palette != nullptr ? fill_palette : fill_no_palette;
@@ -139,7 +139,7 @@ Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory,
     const uint8_t* start_iterator = pcx_memory + sizeof(PCX_header);
     const uint8_t* end_iterator = palette != nullptr ? reinterpret_cast<const uint8_t*>(palette) - 1 : start_iterator + size;
 
-    pcx_decode(start_iterator, end_iterator, &bitmap.bitmap[0], uncompressed_size, palette);
+    pcx_decode(start_iterator, end_iterator, reinterpret_cast<uint8_t*>(&bitmap.bitmap[0]), uncompressed_size, palette);
 
     return bitmap;
 }
