@@ -3,6 +3,11 @@
 #include "Bitmap.h"
 #include <PortableRuntime/CheckException.h>
 
+// PCX spec:
+// http://www.fileformat.info/format/pcx/egff.htm
+namespace PCX
+{
+
 static enum PCX_manufacturer { PCX_magic = 10 };
 static enum PCX_version
 {
@@ -154,6 +159,9 @@ Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory,
 
     pcx_decode(start_iterator, end_iterator, &bitmap.bitmap[0], &bitmap.bitmap[0] + bitmap.bitmap.size(), palette);
 
-    return bitmap;
+    // Return value optimization expected.
+    return std::move(bitmap);
+}
+
 }
 

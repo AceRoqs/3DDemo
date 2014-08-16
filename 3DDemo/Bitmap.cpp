@@ -97,11 +97,11 @@ Bitmap bitmap_from_file(_In_z_ const char* file_name)
 
     if(file_has_extension_case_sensitive(file_name, ".pcx"))
     {
-        return decode_bitmap_from_pcx_memory(buffer.data(), size);
+        return PCX::decode_bitmap_from_pcx_memory(buffer.data(), size);
     }
     else if(file_has_extension_case_sensitive(file_name, ".tga"))
     {
-        return decode_bitmap_from_tga_memory(buffer.data(), size);
+        return TGA::decode_bitmap_from_tga_memory(buffer.data(), size);
     }
     throw std::exception();     // TODO: Use check_exception instead of naked throw.
 }

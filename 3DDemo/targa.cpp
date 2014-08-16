@@ -3,7 +3,12 @@
 #include "Bitmap.h"
 #include <PortableRuntime/CheckException.h>
 
-#define TRUEVISION_TARGA "TRUEVISION-TARGA"
+// Targa spec:
+// http://www.dca.fee.unicamp.br/~martino/disciplinas/ea978/tgaffs.pdf
+// http://www.fileformat.info/format/tga/egff.htm
+namespace TGA
+{
+
 const unsigned int max_dimension = 16384;
 
 static enum TGA_color_map
@@ -187,7 +192,8 @@ Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory,
         }
     }
 
-    return bitmap;
+    // Return value optimization expected.
+    return std::move(bitmap);
 }
 
 std::vector<uint8_t> encode_tga_from_bitmap(const Bitmap& bitmap)
@@ -208,6 +214,9 @@ std::vector<uint8_t> encode_tga_from_bitmap(const Bitmap& bitmap)
     const auto pixel_start = reinterpret_cast<const uint8_t*>(&bitmap.bitmap[0]);
     std::copy(pixel_start, pixel_start + bitmap.bitmap.size() * sizeof(Color_rgb), &tga[sizeof(TGA_header)]);
 
+    // Return value optimization expected.
     return std::move(tga);
+}
+
 }
 
