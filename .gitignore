@@ -8,6 +8,7 @@ Release/*
 3DDemo/Release/*
 Direct3D9Common/Debug/*
 Direct3D9Common/Release/*
+ipch/*
 PortableRuntime/Debug/*
 PortableRuntime/Release/*
 WindowsCommon/Debug/*
