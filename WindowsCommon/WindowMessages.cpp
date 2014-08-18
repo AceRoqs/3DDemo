@@ -243,6 +243,8 @@ static const struct Message_map
 
 static bool map_message_to_index(_In_ const Message_map* message_map, size_t map_size, unsigned int message, _Out_ size_t* final_index) NOEXCEPT
 {
+    // Binary search for message.
+    // TODO: Can this be changed to std::binary_search?
     size_t bottom = 0;
     size_t top = map_size - 1;
     bool found = false;
