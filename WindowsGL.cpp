@@ -6,6 +6,7 @@
 namespace WindowsCommon
 {
 
+#ifndef NDEBUG // These functions are not currently called in Release.  Avoid C4505: unreferenced local function has been removed.
 static std::vector<std::string> tokenize_string(_In_z_ const char* str, _In_z_ const char* delimiters)
 {
     std::vector<std::string> tokens;
@@ -46,6 +47,7 @@ static std::vector<std::string> get_opengl_extensions()
 
     return extensions;
 }
+#endif
 
 static void dprintf_gl_strings()
 {

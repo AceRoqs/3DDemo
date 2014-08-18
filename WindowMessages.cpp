@@ -271,6 +271,7 @@ static bool map_message_to_index(_In_ const Message_map* message_map, size_t map
     return found;
 }
 
+#ifndef NDEBUG // These functions are not currently called in Release.  Avoid C4505: unreferenced local function has been removed.
 static bool operator<(const Message_map& first, const Message_map& second)
 {
     return first.message < second.message;
@@ -289,6 +290,7 @@ static void validate_message_map_all_entries_accessible(_In_ const Message_map* 
         assert(entry.message == message_map[message_index].message);
     });
 }
+#endif
 
 void debug_validate_message_map() NOEXCEPT
 {
