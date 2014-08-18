@@ -37,7 +37,7 @@ public:
     WindowsCommon::WGL_state m_state;
 
 protected:
-    LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) NOEXCEPT;
+    LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) NOEXCEPT OVERRIDE;
 
 private:
     bool m_windowed;
