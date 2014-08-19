@@ -46,7 +46,7 @@
 // For ATL::CComPtr.  CComPtr is used (as opposed to _com_ptr_t) because it doesn't throw exceptions (unlike _com_ptr_t,
 // which throws exceptions not rooted in std::exception), it returns HRESULTs which integrates well with code that uses
 // DirectX, and doesn't release it's interface pointer in operator&.
-#include <atlbase.h>
+#include <atlcomcli.h>
 
 // Defines to decrease build times:
 // http://support.microsoft.com/kb/166474
