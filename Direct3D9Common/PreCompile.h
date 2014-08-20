@@ -35,9 +35,7 @@
 
 #endif  // WIN32
 
-#ifdef _MSC_VER
 #include <PortableRuntime/PreCPP11.h>
-#endif
 
 #endif
 
