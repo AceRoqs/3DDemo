@@ -8,9 +8,7 @@
 #include <cstdint>
 #include <string>
 
-#ifdef _MSC_VER
 #include "PreCPP11.h"
-#endif
 
 #endif
 
