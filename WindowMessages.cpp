@@ -241,42 +241,25 @@ static const struct Message_map
 };
 #undef MESSAGE
 
+static bool operator<(const Message_map& first, const Message_map& second)
+{
+    return first.message < second.message;
+}
+
 static bool map_message_to_index(_In_ const Message_map* message_map, size_t map_size, unsigned int message, _Out_ size_t* final_index) NOEXCEPT
 {
-    // Binary search for message.
-    // TODO: Can this be changed to std::binary_search?
-    size_t bottom = 0;
-    size_t top = map_size - 1;
-    bool found = false;
-    while(bottom <= top)
+    const Message_map value = { nullptr, message };
+    const auto iterator = std::lower_bound(message_map, message_map + map_size, value);
+    const bool found = (iterator != message_map + map_size) && (message == iterator->message);
+    if(found)
     {
-        size_t ix = (bottom + top) / 2;
-
-        if(message < message_map[ix].message)
-        {
-            top = ix - 1;
-        }
-        else if(message > message_map[ix].message)
-        {
-            bottom = ix + 1;
-        }
-        else
-        {
-            *final_index = ix;
-            found = true;
-            break;
-        }
+        *final_index = iterator - message_map;
     }
 
     return found;
 }
 
 #ifndef NDEBUG // These functions are not currently called in Release.  Avoid C4505: unreferenced local function has been removed.
-static bool operator<(const Message_map& first, const Message_map& second)
-{
-    return first.message < second.message;
-}
-
 static void validate_message_map_sorted(_In_ const Message_map* message_map, size_t map_size) NOEXCEPT
 {
     assert(std::is_sorted(message_map, message_map + map_size));
