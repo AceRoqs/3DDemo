@@ -13,8 +13,8 @@ Bitmap::Bitmap() :
 }
 
 // http://stackoverflow.com/questions/70013/how-to-detect-if-im-compiling-code-with-visual-studio-2008
-#if _MSC_VER == 1600 || _MSC_VER == 1700
-// Add default and move constructors as VS2010/2012 doesn't default define a move constructor.
+#if _MSC_VER <= 1800
+// Add default and move constructors as VS2010/2012/2013 doesn't default define a move constructor.
 Bitmap::Bitmap(Bitmap&& other) :
     bitmap(std::move(other.bitmap)),
     xsize(other.xsize),
