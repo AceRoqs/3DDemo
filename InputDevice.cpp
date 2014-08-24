@@ -28,7 +28,7 @@ Input_device::~Input_device()
     m_device->Unacquire();
 }
 
-void Input_device::get_input(_In_ Keyboard_state* keyboard_state) const
+void Input_device::get_input(_Out_ Keyboard_state* keyboard_state) const
 {
     if(SUCCEEDED(m_device->Acquire()))
     {
