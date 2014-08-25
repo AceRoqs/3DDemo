@@ -132,7 +132,15 @@ void initialize_gl_constants()
     const double BOTTOMCLIP = -0.5;
     const double TOPCLIP = 0.5;
     const double NEARCLIP = 0.5;
-    const double FARCLIP = 700;
+    const double FARCLIP = 700.0;
+
+    // TODO: 2014: Use these bounds once the world geometry collision has knowledge of the clip planes.
+    //const double LEFTCLIP = -1.0;
+    //const double RIGHTCLIP = 1.0;
+    //const double BOTTOMCLIP = -1.0;
+    //const double TOPCLIP = 1.0;
+    //const double NEARCLIP = 1.0;
+    //const double FARCLIP = 512.0;
     glFrustum(LEFTCLIP, RIGHTCLIP, BOTTOMCLIP, TOPCLIP, NEARCLIP, FARCLIP);
 
     // Enable backface culling and hidden surface removal.
