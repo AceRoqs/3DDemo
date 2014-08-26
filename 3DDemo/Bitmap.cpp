@@ -2,6 +2,7 @@
 #include "Bitmap.h"         // Pick up forward declarations to ensure correctness.
 #include "pcx.h"
 #include "targa.h"
+#include <PortableRuntime/CheckException.h>
 #include <WindowsCommon/CheckHR.h>
 #include <WindowsCommon/Wrappers.h>
 
@@ -92,7 +93,12 @@ Bitmap bitmap_from_file(_In_z_ const char* file_name)
     // TODO: truncates size.
     std::vector<uint8_t> buffer(size);
     DWORD size_read;
-    ReadFile(file, buffer.data(), size, &size_read, &overlapped);
+    PortableRuntime::check_exception(!ReadFile(file, buffer.data(), size, &size_read, &overlapped));
+    const HRESULT hr = WindowsCommon::hresult_from_last_error();
+    if(hr != HRESULT_FROM_WIN32(ERROR_IO_PENDING))
+    {
+        WindowsCommon::check_hr(hr);
+    }
     WaitForSingleObject(read_complete, INFINITE);
 
     if(file_has_extension_case_sensitive(file_name, ".pcx"))
