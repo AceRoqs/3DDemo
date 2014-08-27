@@ -246,7 +246,7 @@ static bool operator<(const Message_map& first, const Message_map& second)
     return first.message < second.message;
 }
 
-static bool map_message_to_index(_In_ const Message_map* message_map, size_t map_size, unsigned int message, _Out_ size_t* final_index) NOEXCEPT
+static _Success_(return) bool map_message_to_index(_In_ const Message_map* message_map, size_t map_size, unsigned int message, _Out_ size_t* final_index) NOEXCEPT
 {
     const Message_map value = { nullptr, message };
     const auto iterator = std::lower_bound(message_map, message_map + map_size, value);
