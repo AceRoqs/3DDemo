@@ -31,11 +31,12 @@ void throw_dx9err_buffer(HRESULT hr, ATL::CComPtr<ID3DXBuffer>& error_buffer)
     {
         // Copy to enforce null termination.
         char error_string[256];
-        StringCbCopyNA(error_string, sizeof(error_string), static_cast<char*>(error_buffer->GetBufferPointer()), error_buffer->GetBufferSize());
-
-        // Output the string before exception is thrown, as DirectX is shut down during exception processing.
-        // TODO: Use Tracing code instead of calling ODS.
-        OutputDebugStringA(error_string);
+        if(SUCCEEDED(StringCbCopyNA(error_string, sizeof(error_string), static_cast<char*>(error_buffer->GetBufferPointer()), error_buffer->GetBufferSize())))
+        {
+            // Output the string before exception is thrown, as DirectX is shut down during exception processing.
+            // TODO: Use Tracing code instead of calling ODS.
+            OutputDebugStringA(error_string);
+        }
     }
 
     check_dx9(hr);
