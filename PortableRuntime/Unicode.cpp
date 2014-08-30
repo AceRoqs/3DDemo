@@ -19,6 +19,11 @@ static UTF8_descriptor descriptor_from_utf8_index(const std::string& utf8_string
 
     // Convert UTF-8 character to code point.
 
+    PortableRuntime::check_exception(((utf8_string[index] & 0x80) == 0) ||
+                                     ((utf8_string[index] & 0xe0) == 0xc0) ||
+                                     ((utf8_string[index] & 0xf0) == 0xe0) ||
+                                     ((utf8_string[index] & 0xf8) == 0xf0));
+
     // U+0000 - U+007F.  One byte.
     if((utf8_string[index] & 0x80) == 0)
     {
@@ -38,14 +43,10 @@ static UTF8_descriptor descriptor_from_utf8_index(const std::string& utf8_string
         descriptor.sequence_length = 3;
     }
     // U+10000 - U+1FFFFF.  Four bytes.
-    else if((utf8_string[index] & 0xf8) == 0xf0)
+    else // utf8_string[index] & 0xf8) == 0xf0.
     {
         descriptor.code_point = utf8_string[index] & 7;
         descriptor.sequence_length = 4;
-    }
-    else
-    {
-        PortableRuntime::check_exception(false);
     }
 
     PortableRuntime::check_exception(index + descriptor.sequence_length <= length);
