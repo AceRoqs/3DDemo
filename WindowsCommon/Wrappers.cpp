@@ -121,11 +121,7 @@ Scoped_window create_window(
     const auto window_name_utf16 = PortableRuntime::utf16_from_utf8(window_name);
     const auto window = CreateWindowW(class_name_utf16.c_str(), window_name_utf16.c_str(), style, x, y, width, height, parent, menu, instance, param);
 
-    if(nullptr == window)
-    {
-        HRESULT hr = hresult_from_last_error();
-        WindowsCommon::check_hr(hr);
-    }
+    CHECK_WINDOWS_ERROR(nullptr != window);
 
     return make_scoped_window(window);
 }
@@ -151,11 +147,7 @@ Scoped_window create_normal_window(_In_ PCSTR class_name, _In_ PCSTR window_name
 Scoped_device_context get_device_context(_In_ HWND window)
 {
     const auto device_context = GetDC(window);
-
-    if(nullptr == device_context)
-    {
-        WindowsCommon::check_hr(E_FAIL);
-    }
+    CHECK_WINDOWS_ERROR_WITH_HR(nullptr != device_context, E_FAIL);
 
     return make_scoped_device_context(device_context, window);
 }
@@ -186,31 +178,19 @@ Scoped_gl_context create_gl_context(_In_ HDC device_context)
     };
 
     const int pixel_format = ChoosePixelFormat(device_context, &descriptor);
-    if(pixel_format == 0)
-    {
-        check_hr(hresult_from_last_error());
-    }
+    WindowsCommon::check_windows_error(pixel_format != 0);
 
-    if(!SetPixelFormat(device_context, pixel_format, &descriptor))
-    {
-        check_hr(hresult_from_last_error());
-    }
+    WindowsCommon::check_windows_error(!!SetPixelFormat(device_context, pixel_format, &descriptor));
 
     const auto rendering_context = wglCreateContext(device_context);
-    if(nullptr == rendering_context)
-    {
-        check_hr(hresult_from_last_error());
-    }
+    CHECK_WINDOWS_ERROR(nullptr != rendering_context);
 
     return make_scoped_gl_context(rendering_context);
 }
 
 Scoped_current_context create_current_context(_In_ HDC device_context, _In_ HGLRC gl_context)
 {
-    if(!wglMakeCurrent(device_context, gl_context))
-    {
-        check_hr(WindowsCommon::hresult_from_last_error());
-    }
+    WindowsCommon::check_windows_error(!!wglMakeCurrent(device_context, gl_context));
 
     return make_scoped_current_context(gl_context);
 }
@@ -232,11 +212,7 @@ Scoped_handle create_file(
                                     flags,
                                     template_file);
 
-    if(INVALID_HANDLE_VALUE == handle)
-    {
-        HRESULT hr = hresult_from_last_error();
-        WindowsCommon::check_hr(hr);
-    }
+    WindowsCommon::check_windows_error(INVALID_HANDLE_VALUE != handle);
 
     return make_scoped_handle(handle);
 }
@@ -252,11 +228,8 @@ Scoped_handle create_event(
                                      initial_state,
                                      name != nullptr ? PortableRuntime::utf16_from_utf8(name).c_str() : nullptr);
 
-    if(INVALID_HANDLE_VALUE == handle)
-    {
-        HRESULT hr = hresult_from_last_error();
-        WindowsCommon::check_hr(hr);
-    }
+    WindowsCommon::check_windows_error(INVALID_HANDLE_VALUE != handle);
+    assert(0 != handle);    // Per Win32 contract.
 
     return make_scoped_handle(handle);
 }

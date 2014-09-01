@@ -4,6 +4,8 @@
 namespace WindowsCommon
 {
 
+HRESULT hresult_from_last_error() NOEXCEPT;
+
 class HRESULT_exception : public std::exception
 {
 public:
@@ -17,6 +19,7 @@ public:
 
 inline void check_hr(HRESULT hr)
 {
+    assert(SUCCEEDED(hr));
     if(FAILED(hr))
     {
         assert(false);
@@ -24,7 +27,30 @@ inline void check_hr(HRESULT hr)
     }
 }
 
-HRESULT hresult_from_last_error() NOEXCEPT;
+inline void check_windows_error(bool result)
+{
+    assert(result);
+    if(!result)
+    {
+        HRESULT hr = hresult_from_last_error();
+        assert(FAILED(hr));
+        throw HRESULT_exception(hr);
+    }
+}
+
+inline void check_windows_error_with_hr(bool result, HRESULT hr)
+{
+    assert(result);
+    if(!result)
+    {
+        assert(FAILED(hr));
+        throw HRESULT_exception(hr);
+    }
+}
+
+// These macros should only be used to work around static analysis warnings.
+#define CHECK_WINDOWS_ERROR(expr) WindowsCommon::check_windows_error(expr); __analysis_assume(expr);
+#define CHECK_WINDOWS_ERROR_WITH_HR(expr, hr) WindowsCommon::check_windows_error_with_hr(expr, hr); __analysis_assume(expr);
 
 } // namespace WindowsCommon
 
