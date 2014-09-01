@@ -149,13 +149,11 @@ static Map load_world_data(
         {
             // TODO: 2014: Bounds check constant arrays.
             auto ix = poly.vertex_indices[jj];
-            PortableRuntime::check_exception(ix < ARRAYSIZE(world_vertices));
-            __analysis_assume(ix < ARRAYSIZE(world_vertices));      // TODO: 2014: Wrap check/assume in a macro.
+            CHECK_EXCEPTION(ix < ARRAYSIZE(world_vertices));
             vertices->push_back(world_vertices[ix]);
 
             ix = poly.texture_coordinates[jj];
-            PortableRuntime::check_exception(ix < ARRAYSIZE(world_texture_coords));
-            __analysis_assume(ix < ARRAYSIZE(world_texture_coords));
+            CHECK_EXCEPTION(ix < ARRAYSIZE(world_texture_coords));
             texture_coords->push_back(world_texture_coords[ix]);
         }
     }
