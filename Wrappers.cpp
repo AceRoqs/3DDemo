@@ -147,7 +147,7 @@ Scoped_window create_normal_window(_In_ PCSTR class_name, _In_ PCSTR window_name
 Scoped_device_context get_device_context(_In_ HWND window)
 {
     const auto device_context = GetDC(window);
-    CHECK_WINDOWS_ERROR_WITH_HR(nullptr != device_context, E_FAIL);
+    CHECK_WITH_CUSTOM_HR(nullptr != device_context, E_FAIL);
 
     return make_scoped_device_context(device_context, window);
 }
