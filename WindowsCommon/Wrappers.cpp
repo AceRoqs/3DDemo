@@ -180,7 +180,7 @@ Scoped_gl_context create_gl_context(_In_ HDC device_context)
     const int pixel_format = ChoosePixelFormat(device_context, &descriptor);
     WindowsCommon::check_windows_error(pixel_format != 0);
 
-    WindowsCommon::check_windows_error(!!SetPixelFormat(device_context, pixel_format, &descriptor));
+    WindowsCommon::check_windows_error(SetPixelFormat(device_context, pixel_format, &descriptor));
 
     const auto rendering_context = wglCreateContext(device_context);
     CHECK_WINDOWS_ERROR(nullptr != rendering_context);
@@ -190,7 +190,7 @@ Scoped_gl_context create_gl_context(_In_ HDC device_context)
 
 Scoped_current_context create_current_context(_In_ HDC device_context, _In_ HGLRC gl_context)
 {
-    WindowsCommon::check_windows_error(!!wglMakeCurrent(device_context, gl_context));
+    WindowsCommon::check_windows_error(wglMakeCurrent(device_context, gl_context));
 
     return make_scoped_current_context(gl_context);
 }

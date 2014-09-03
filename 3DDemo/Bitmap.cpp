@@ -95,10 +95,7 @@ Bitmap bitmap_from_file(_In_z_ const char* file_name)
     DWORD size_read;
     PortableRuntime::check_exception(!ReadFile(file, buffer.data(), size, &size_read, &overlapped));
     const HRESULT hr = WindowsCommon::hresult_from_last_error();
-    if(hr != HRESULT_FROM_WIN32(ERROR_IO_PENDING))
-    {
-        WindowsCommon::check_hr(hr);
-    }
+    WindowsCommon::check_with_custom_hr(hr == HRESULT_FROM_WIN32(ERROR_IO_PENDING), hr);
     WaitForSingleObject(read_complete, INFINITE);
 
     if(file_has_extension_case_sensitive(file_name, ".pcx"))
