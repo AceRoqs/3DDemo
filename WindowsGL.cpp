@@ -158,12 +158,9 @@ OpenGL_window::OpenGL_window(_In_ PCSTR window_title, _In_ HINSTANCE instance, b
         ShowCursor(false);
     }
 
-    if(!is_window_32bits_per_pixel(m_state.window))
-    {
-        // TODO: 2014: This message text is good - find some way to pass this via the exception.
-        //MessageBox(window, TEXT("3D Engine demo requires 32-bit color."), TEXT("System requirements"), MB_OK);
-        WindowsCommon::check_hr(E_FAIL);
-    }
+    // TODO: 2014: This message text is good - find some way to pass this via the exception.
+    //MessageBox(window, TEXT("3D Engine demo requires 32-bit color."), TEXT("System requirements"), MB_OK);
+    check_with_custom_hr(is_window_32bits_per_pixel(m_state.window), E_FAIL);
 
     m_state.device_context = get_device_context(m_state.window);
     m_state.gl_context = create_gl_context(m_state.device_context);

@@ -27,7 +27,7 @@ inline void check_hr(HRESULT hr)
     }
 }
 
-inline void check_windows_error(bool result)
+inline void check_windows_error(BOOL result)
 {
     assert(result);
     if(!result)
@@ -38,7 +38,7 @@ inline void check_windows_error(bool result)
     }
 }
 
-inline void check_with_custom_hr(bool result, HRESULT hr)
+inline void check_with_custom_hr(BOOL result, HRESULT hr)
 {
     assert(result);
     if(!result)
