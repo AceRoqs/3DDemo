@@ -19,10 +19,10 @@ static UTF8_descriptor descriptor_from_utf8_index(const std::string& utf8_string
 
     // Convert UTF-8 character to code point.
 
-    PortableRuntime::check_exception(((utf8_string[index] & 0x80) == 0) ||
-                                     ((utf8_string[index] & 0xe0) == 0xc0) ||
-                                     ((utf8_string[index] & 0xf0) == 0xe0) ||
-                                     ((utf8_string[index] & 0xf8) == 0xf0));
+    check_exception(((utf8_string[index] & 0x80) == 0) ||
+                    ((utf8_string[index] & 0xe0) == 0xc0) ||
+                    ((utf8_string[index] & 0xf0) == 0xe0) ||
+                    ((utf8_string[index] & 0xf8) == 0xf0));
 
     // U+0000 - U+007F.  One byte.
     if((utf8_string[index] & 0x80) == 0)
@@ -49,7 +49,7 @@ static UTF8_descriptor descriptor_from_utf8_index(const std::string& utf8_string
         descriptor.sequence_length = 4;
     }
 
-    PortableRuntime::check_exception(index + descriptor.sequence_length <= length);
+    check_exception(index + descriptor.sequence_length <= length);
 
     std::for_each(&utf8_string[index + 1], &utf8_string[index + descriptor.sequence_length], [&descriptor](char ch)
     {
@@ -57,7 +57,7 @@ static UTF8_descriptor descriptor_from_utf8_index(const std::string& utf8_string
         descriptor.code_point += ch & 0x3f;
 
         // Continuation bytes must have the top two bits set to 10.
-        PortableRuntime::check_exception((ch & 0xc0) == 0x80);
+        check_exception((ch & 0xc0) == 0x80);
     });
 
     return descriptor;
@@ -66,7 +66,7 @@ static UTF8_descriptor descriptor_from_utf8_index(const std::string& utf8_string
 static wchar_t utf16_from_bmp_code_point(uint32_t code_point)
 {
     // UTF-8 that encodes U+D800 to U+DFFF is an error per spec.
-    PortableRuntime::check_exception((code_point < 0xd800) || (code_point > 0xdfff));
+    check_exception((code_point < 0xd800) || (code_point > 0xdfff));
 
     return static_cast<wchar_t>(code_point);
 }
