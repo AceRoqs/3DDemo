@@ -34,7 +34,7 @@ public:
     OpenGL_window(_In_ PCSTR window_title, _In_ HINSTANCE instance, bool windowed);
     ~OpenGL_window();
 
-    WindowsCommon::WGL_state m_state;
+    WGL_state m_state;
 
 protected:
     LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) NOEXCEPT OVERRIDE;

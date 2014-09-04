@@ -10,7 +10,7 @@ static void unregister_atom(_In_ ATOM atom, _In_ HINSTANCE instance) NOEXCEPT
     BOOL result = UnregisterClass(MAKEINTATOM(atom), instance);
     if(!result)
     {
-        auto hr = WindowsCommon::hresult_from_last_error();
+        auto hr = hresult_from_last_error();
         (hr);
         assert(SUCCEEDED(hr));
     }
@@ -86,7 +86,7 @@ static void clear_gl_context(_In_opt_ HGLRC gl_context) NOEXCEPT
 
     if(!wglMakeCurrent(nullptr, nullptr))
     {
-        HRESULT hr = WindowsCommon::hresult_from_last_error();
+        HRESULT hr = hresult_from_last_error();
         (hr);
         assert(SUCCEEDED(hr));
     }

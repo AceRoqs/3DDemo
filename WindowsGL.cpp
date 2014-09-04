@@ -53,26 +53,26 @@ static void dprintf_gl_strings()
 {
 #ifndef NDEBUG
     const char* vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
-    WindowsCommon::dprintf("OpenGL vendor: %s\n", vendor != nullptr ? vendor : "");
+    dprintf("OpenGL vendor: %s\n", vendor != nullptr ? vendor : "");
 
     const char* renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
-    WindowsCommon::dprintf("OpenGL renderer: %s\n", renderer != nullptr ? renderer : "");
+    dprintf("OpenGL renderer: %s\n", renderer != nullptr ? renderer : "");
 
     const char* version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
-    WindowsCommon::dprintf("OpenGL version: %s\n", version != nullptr ? version : "");
+    dprintf("OpenGL version: %s\n", version != nullptr ? version : "");
 
     auto extensions = get_opengl_extensions();
-    WindowsCommon::dprintf("OpenGL extensions:\n");
+    dprintf("OpenGL extensions:\n");
     std::for_each(extensions.cbegin(), extensions.cend(), [](const std::string& extension)
     {
-        WindowsCommon::dprintf("%s\n", extension.c_str());
+        dprintf("%s\n", extension.c_str());
     });
 #endif
 }
 
 static bool is_window_32bits_per_pixel(_In_ HWND window)
 {
-    WindowsCommon::Scoped_device_context device_context = WindowsCommon::get_device_context(window);
+    Scoped_device_context device_context = get_device_context(window);
 
     if(::GetDeviceCaps(device_context, BITSPIXEL) < 32)
     {
@@ -120,13 +120,13 @@ OpenGL_window::OpenGL_window(_In_ PCSTR window_title, _In_ HINSTANCE instance, b
     const int window_width = 800;
     const int window_height = 600;
 
-    const Window_class window_class = WindowsCommon::get_default_blank_window_class(instance, WindowsCommon::Window_procedure::static_window_proc, window_title);
+    const Window_class window_class = get_default_blank_window_class(instance, Window_procedure::static_window_proc, window_title);
 
-    m_state.atom = WindowsCommon::register_window_class(window_class);
+    m_state.atom = register_window_class(window_class);
 
     if(windowed)
     {
-        m_state.window = WindowsCommon::create_normal_window(window_title, window_title, window_width, window_height, instance, this);
+        m_state.window = create_normal_window(window_title, window_title, window_width, window_height, instance, this);
     }
     else
     {
@@ -142,7 +142,7 @@ OpenGL_window::OpenGL_window(_In_ PCSTR window_title, _In_ HINSTANCE instance, b
         DevMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
         ChangeDisplaySettings(&DevMode, CDS_FULLSCREEN);
 
-        m_state.window = WindowsCommon::create_window(
+        m_state.window = create_window(
             window_title,
             window_title,
             WS_POPUP | WS_CLIPSIBLINGS,

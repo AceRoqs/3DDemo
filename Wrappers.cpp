@@ -10,7 +10,7 @@ namespace WindowsCommon
 
 LRESULT CALLBACK Window_procedure::static_window_proc(__in HWND window, UINT message, WPARAM w_param, LPARAM l_param) NOEXCEPT
 {
-    WindowsCommon::dprintf("%s\n", WindowsCommon::string_from_window_message(message));
+    dprintf("%s\n", string_from_window_message(message));
 
     // Sent by CreateWindow.
     if(message == WM_NCCREATE)
@@ -98,7 +98,7 @@ Scoped_atom register_window_class(const WNDCLASSEXW& window_class)
     {
         HRESULT hr = hresult_from_last_error();
         assert(HRESULT_FROM_WIN32(ERROR_CLASS_ALREADY_EXISTS) != hr);
-        WindowsCommon::check_hr(hr);
+        check_hr(hr);
     }
 
     return make_scoped_window_class(atom, window_class.hInstance);
@@ -178,9 +178,9 @@ Scoped_gl_context create_gl_context(_In_ HDC device_context)
     };
 
     const int pixel_format = ChoosePixelFormat(device_context, &descriptor);
-    WindowsCommon::check_windows_error(pixel_format != 0);
+    check_windows_error(pixel_format != 0);
 
-    WindowsCommon::check_windows_error(SetPixelFormat(device_context, pixel_format, &descriptor));
+    check_windows_error(SetPixelFormat(device_context, pixel_format, &descriptor));
 
     const auto rendering_context = wglCreateContext(device_context);
     CHECK_WINDOWS_ERROR(nullptr != rendering_context);
@@ -190,7 +190,7 @@ Scoped_gl_context create_gl_context(_In_ HDC device_context)
 
 Scoped_current_context create_current_context(_In_ HDC device_context, _In_ HGLRC gl_context)
 {
-    WindowsCommon::check_windows_error(wglMakeCurrent(device_context, gl_context));
+    check_windows_error(wglMakeCurrent(device_context, gl_context));
 
     return make_scoped_current_context(gl_context);
 }
@@ -212,7 +212,7 @@ Scoped_handle create_file(
                                     flags,
                                     template_file);
 
-    WindowsCommon::check_windows_error(INVALID_HANDLE_VALUE != handle);
+    check_windows_error(INVALID_HANDLE_VALUE != handle);
 
     return make_scoped_handle(handle);
 }
@@ -228,7 +228,7 @@ Scoped_handle create_event(
                                      initial_state,
                                      name != nullptr ? PortableRuntime::utf16_from_utf8(name).c_str() : nullptr);
 
-    WindowsCommon::check_windows_error(INVALID_HANDLE_VALUE != handle);
+    check_windows_error(INVALID_HANDLE_VALUE != handle);
     assert(0 != handle);    // Per Win32 contract.
 
     return make_scoped_handle(handle);
