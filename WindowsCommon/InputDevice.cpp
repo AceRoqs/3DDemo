@@ -8,8 +8,6 @@ namespace WindowsCommon
 Input_device::Input_device(_In_ HINSTANCE hInstance, _In_ HWND hwnd)
 {
     // Create DirectInput keyboard device.
-    using namespace WindowsCommon;
-
     ATL::CComPtr<IDirectInput8> direct_input;
     check_hr(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, reinterpret_cast<PVOID*>(&direct_input), nullptr));
     check_hr(direct_input->CreateDevice(GUID_SysKeyboard, &m_device, nullptr));
@@ -32,7 +30,7 @@ void Input_device::get_input(_Out_ Keyboard_state* keyboard_state) const
 {
     if(SUCCEEDED(m_device->Acquire()))
     {
-        WindowsCommon::check_hr(m_device->GetDeviceState(keyboard_state->size(), keyboard_state));
+        check_hr(m_device->GetDeviceState(keyboard_state->size(), keyboard_state));
     }
     else
     {
