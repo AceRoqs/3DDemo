@@ -49,8 +49,8 @@ inline void check_with_custom_hr(BOOL result, HRESULT hr)
 }
 
 // These macros should only be used to work around static analysis warnings.
-#define CHECK_WINDOWS_ERROR(expr) WindowsCommon::check_windows_error(expr); __analysis_assume(expr);
-#define CHECK_WITH_CUSTOM_HR(expr, hr) WindowsCommon::check_with_custom_hr(expr, hr); __analysis_assume(expr);
+#define CHECK_WINDOWS_ERROR(expr) { WindowsCommon::check_windows_error(expr); __analysis_assume(expr); }
+#define CHECK_WITH_CUSTOM_HR(expr, hr) { WindowsCommon::check_with_custom_hr(expr, hr); __analysis_assume(expr); }
 
 } // namespace WindowsCommon
 
