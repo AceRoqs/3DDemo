@@ -269,5 +269,7 @@ void draw_list(
 #else
     //glFinish();
 #endif
+
+    assert(glGetError() == GL_NO_ERROR);
 }
 
