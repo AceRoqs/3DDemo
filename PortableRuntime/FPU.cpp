@@ -7,7 +7,7 @@ namespace PortableRuntime
 {
 
 #if defined(_MSC_VER)
-Scoped_FPU_exception_control::Scoped_FPU_exception_control(unsigned int exception_mask = _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID)
+Scoped_FPU_exception_control::Scoped_FPU_exception_control(unsigned int exception_mask)
     : m_exception_mask(exception_mask & _MCW_EM)
 {
     assert((exception_mask & ~_MCW_EM) == 0);
