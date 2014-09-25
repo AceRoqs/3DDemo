@@ -7,11 +7,12 @@
 #include "Action.h"
 #include "Bezier.h"
 #include "Bitmap.h"
-#include <WindowsCommon/Clock.h>
 #include "DirectInputMap.h"
-#include <WindowsCommon/CheckHR.h>
-#include <WindowsCommon/InputDevice.h>
 #include "LinearAlgebra.h"
+#include <PortableRuntime/FPU.h>
+#include <WindowsCommon/CheckHR.h>
+#include <WindowsCommon/Clock.h>
+#include <WindowsCommon/InputDevice.h>
 #include <WindowsCommon/ThreadAffinity.h>
 #include <WindowsCommon/Tracing.h>
 #include <WindowsCommon/WindowMessages.h>
@@ -133,6 +134,11 @@ void app_run(HINSTANCE instance, int show_command)
 {
     try
     {
+#ifndef NDEBUG
+        PortableRuntime::Scoped_FPU_exception_control fpu(_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID);
+        fpu.enable(_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID);
+#endif
+
         // Start load first, to kick off async reads.
         std::vector<Bitmap> texture_list;
         std::vector<Vector3f> vertices;
