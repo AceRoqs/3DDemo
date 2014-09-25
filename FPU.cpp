@@ -1,0 +1,71 @@
+#include <PreCompile.h>
+#include "FPU.h"    // Pick up forward declarations to ensure correctness.
+#include <float.h>
+#include "CheckException.h"
+
+namespace PortableRuntime
+{
+
+#if defined(_MSC_VER)
+Scoped_FPU_exception_control::Scoped_FPU_exception_control(unsigned int exception_mask = _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID)
+    : m_exception_mask(exception_mask & _MCW_EM)
+{
+    assert((exception_mask & ~_MCW_EM) == 0);
+
+    errno_t err = _controlfp_s(&m_control, 0, 0);
+    check_exception(err == 0);
+
+    m_control &= m_exception_mask;
+}
+#else
+Scoped_FPU_exception_control::Scoped_FPU_exception_control(unsigned int exception_mask)
+{
+#error No platform support for FPU exception control.
+}
+#endif
+
+Scoped_FPU_exception_control::~Scoped_FPU_exception_control()
+{
+#if defined(_MSC_VER)
+    // Clear pending FPU exceptions, so enabling won't trigger them.
+    _clearfp();
+
+    errno_t err = _controlfp_s(nullptr, m_control, m_exception_mask);
+    (err);  // Prevent unreferenced parameter in Release build.
+    assert(err == 0);
+#else
+#error No platform support for FPU exception control.
+#endif
+}
+
+void Scoped_FPU_exception_control::enable(unsigned int fpu_exceptions)
+{
+#if defined(_MSC_VER)
+    assert(((m_exception_mask | fpu_exceptions) & ~m_exception_mask) == 0);
+
+    // Clear pending FPU exceptions, so enabling won't trigger them.
+    _clearfp();
+
+    // Clearing the bit enables exception.
+    errno_t err = _controlfp_s(nullptr, ~fpu_exceptions, m_exception_mask & fpu_exceptions);
+    check_exception(err == 0);
+#else
+#error No platform support for FPU exception control.
+#endif
+}
+
+void Scoped_FPU_exception_control::disable(unsigned int fpu_exceptions)
+{
+#if defined(_MSC_VER)
+    assert(((m_exception_mask | fpu_exceptions) & ~m_exception_mask) == 0);
+
+    // Setting the bit enables masking of exception.
+    errno_t err = _controlfp_s(nullptr, fpu_exceptions, m_exception_mask & fpu_exceptions);
+    check_exception(err == 0);
+#else
+#error No platform support for FPU exception control.
+#endif
+}
+
+}
+
