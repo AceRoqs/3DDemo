@@ -137,6 +137,7 @@ void app_run(HINSTANCE instance, int show_command)
 #ifndef NDEBUG
         PortableRuntime::Scoped_FPU_exception_control fpu(_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID);
         fpu.enable(_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID);
+        auto current_control = fpu.current_control();
 #endif
 
         // Start load first, to kick off async reads.
@@ -163,6 +164,10 @@ void app_run(HINSTANCE instance, int show_command)
 
         WindowsCommon::debug_validate_message_map();
         auto return_code = game_message_loop(map, clock, keyboard);
+
+#ifndef NDEBUG
+        assert(fpu.current_control() == current_control);
+#endif
 
         // _tWinMain return code is an int type.
         assert(INT_MAX > return_code);
