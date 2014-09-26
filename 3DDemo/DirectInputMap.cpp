@@ -42,3 +42,45 @@ std::list<std::pair<float, Action>> actions_from_keyboard_state(float ellapsed_m
     return actions;
 }
 
+// Experimental Xbox 360 controller code.
+#if 0
+#include <XInput.h>
+
+std::list<std::pair<float, Action>> actions_from_joystick_state(float ellapsed_milliseconds)
+{
+    std::list<std::pair<float, Action>> actions;
+
+    XINPUT_STATE state = {};
+    DWORD dwResult = XInputGetState(0, &state);
+    if(dwResult != ERROR_DEVICE_NOT_CONNECTED)
+    {
+        if((state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP) != 0)
+        {
+            actions.push_back(std::make_pair(ellapsed_milliseconds, Move_forward));
+        }
+        if((state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN) != 0)
+        {
+            actions.push_back(std::make_pair(ellapsed_milliseconds, Move_backward));
+        }
+        if((state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) != 0)
+        {
+            actions.push_back(std::make_pair(ellapsed_milliseconds, Strafe_right));
+        }
+        if((state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) != 0)
+        {
+            actions.push_back(std::make_pair(ellapsed_milliseconds, Strafe_left));
+        }
+        if(state.Gamepad.bLeftTrigger > 50)
+        {
+            actions.push_back(std::make_pair(ellapsed_milliseconds, Turn_left));
+        }
+        if(state.Gamepad.bRightTrigger > 50)
+        {
+            actions.push_back(std::make_pair(ellapsed_milliseconds, Turn_right));
+        }
+    }
+
+    return actions;
+}
+#endif
+
