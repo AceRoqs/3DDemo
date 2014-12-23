@@ -7,8 +7,6 @@
 // http://msdn.microsoft.com/en-us/library/ccdc34y7.aspx
 // http://support.microsoft.com/kb/126571
 
-// Declspec SAL is used instead of attribute SAL, as the WinMain declaration
-// in the system headers still uses declspec SAL.
 int WINAPI _tWinMain(_In_ HINSTANCE instance,   // Handle to the program instance.
                      _In_opt_ HINSTANCE,        // hInstPrev - Unused in Win32.
                      _In_ PTSTR command_line,   // Command line.
