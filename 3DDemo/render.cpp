@@ -158,7 +158,9 @@ void initialize_gl_world_data(
     const std::vector<Vector2f>& texture_coords)
 {
     // Load all texture data.
-    for(size_t ix = 0; ix < texture_list.size(); ++ix)
+    assert(texture_list.size() <= UINT_MAX);
+    const auto size = static_cast<unsigned int>(texture_list.size());
+    for(unsigned int ix = 0; ix < size; ++ix)
     {
         bind_bitmap_to_gl_texture(texture_list[ix], ix);
     }

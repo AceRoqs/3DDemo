@@ -30,7 +30,8 @@ void Input_device::get_input(_Out_ Keyboard_state* keyboard_state) const
 {
     if(SUCCEEDED(m_device->Acquire()))
     {
-        check_hr(m_device->GetDeviceState(keyboard_state->size(), keyboard_state));
+        assert(keyboard_state->size() <= MAXDWORD);
+        check_hr(m_device->GetDeviceState(static_cast<DWORD>(keyboard_state->size()), keyboard_state));
     }
     else
     {
