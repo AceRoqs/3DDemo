@@ -206,9 +206,8 @@ static bool test_case6()
     return utf16_string.compare(utf16_case6) == 0;
 }
 
-void test()
+bool test()
 {
-#ifndef NDEBUG
     const bool case1 = test_case1();
     const bool case2 = test_case2();
     const bool case3 = test_case3();
@@ -216,8 +215,7 @@ void test()
     const bool case5 = test_case5();
     const bool case6 = test_case6();
 
-    assert(case1 && case2 && case3 && case4 && case5 && case6);
-#endif
+    return case1 && case2 && case3 && case4 && case5 && case6;
 }
 
 }
