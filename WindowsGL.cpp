@@ -82,7 +82,7 @@ static bool is_window_32bits_per_pixel(_In_ HWND window)
     return true;
 }
 
-#if _MSC_VER == 1600 || _MSC_VER == 1700
+#if _MSC_VER <= 1800
 WGL_state::WGL_state()
 {
 }
