@@ -1,15 +1,19 @@
-*.sdf
-*.suo
+# Resource compiler artifacts.
+*.aps
+
+# Project file artifacts.
 *.user
-*.opensdf
-Debug/*
-Release/*
-3DDemo/Debug/*
-3DDemo/Release/*
-Direct3D9Common/Debug/*
-Direct3D9Common/Release/*
-ipch/*
-PortableRuntime/Debug/*
-PortableRuntime/Release/*
-WindowsCommon/Debug/*
-WindowsCommon/Release/*
+
+# Solution file artifacts.
+/*.sdf
+/*.suo
+/*.opensdf
+
+# Output folders.
+/ARM.*
+/Win32.*
+/x64.*
+
+# Intellisense artifacts.
+/ipch
+
