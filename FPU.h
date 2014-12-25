@@ -1,5 +1,4 @@
-#ifndef FPU_H
-#define FPU_H
+#pragma once
 
 namespace PortableRuntime
 {
@@ -27,6 +26,4 @@ public:
 };
 
 }
-
-#endif
 
