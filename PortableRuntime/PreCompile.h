@@ -4,6 +4,7 @@
 
 // C++ Standard Library.
 #include <algorithm>
+#include <cfloat>
 #include <cstdint>
 #include <string>
 
