@@ -1,5 +1,4 @@
-#ifndef PRECOMPILE_H
-#define PRECOMPILE_H
+#pragma once
 
 #include <cassert>
 
@@ -36,6 +35,4 @@
 #endif  // WIN32
 
 #include <PortableRuntime/PreCPP11.h>
-
-#endif
 

@@ -1,5 +1,4 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#pragma once
 
 // TODO: namespace
 
@@ -14,6 +13,4 @@ struct Camera
     Vector3f m_position;
     float m_degrees;
 };
-
-#endif
 

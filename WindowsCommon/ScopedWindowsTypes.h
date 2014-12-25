@@ -1,5 +1,4 @@
-#ifndef SCOPEDWINDOWSTYPES_H
-#define SCOPEDWINDOWSTYPES_H
+#pragma once
 
 namespace WindowsCommon
 {
@@ -90,6 +89,4 @@ Scoped_current_context make_scoped_current_context(_In_ HGLRC gl_context);
 Scoped_handle make_scoped_handle(_In_ HANDLE handle);
 
 }
-
-#endif
 

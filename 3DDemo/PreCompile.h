@@ -1,5 +1,4 @@
-#ifndef PRECOMPILE_H
-#define PRECOMPILE_H
+#pragma once
 
 // Prevent <windows.h> from defining min/max which is different from <algorithm>.
 // Must be included before headers that include WinDef.h.
@@ -63,6 +62,4 @@
 #include <PortableRuntime/PreCPP11.h>
 
 #include <gl/GL.h>
-
-#endif
 

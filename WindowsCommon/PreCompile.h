@@ -1,5 +1,4 @@
-#ifndef PRECOMPILE_H
-#define PRECOMPILE_H
+#pragma once
 
 #include <cassert>
 
@@ -45,6 +44,4 @@
 #include <PortableRuntime/PreCPP11.h>
 
 #include <gl/GL.h>
-
-#endif
 

@@ -1,5 +1,4 @@
-#ifndef WGLSTATE_H
-#define WGLSTATE_H
+#pragma once
 
 #include "ScopedWindowsTypes.h"
 #include "Wrappers.h"
@@ -44,6 +43,4 @@ private:
 };
 
 }
-
-#endif
 

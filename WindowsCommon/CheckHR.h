@@ -1,5 +1,4 @@
-#ifndef CHECKHR_H
-#define CHECKHR_H
+#pragma once
 
 namespace WindowsCommon
 {
@@ -53,6 +52,4 @@ inline void check_with_custom_hr(BOOL result, HRESULT hr)
 #define CHECK_WITH_CUSTOM_HR(expr, hr) { WindowsCommon::check_with_custom_hr(expr, hr); __analysis_assume(expr); }
 
 } // namespace WindowsCommon
-
-#endif
 

@@ -1,5 +1,4 @@
-#ifndef BEZIER_H
-#define BEZIER_H
+#pragma once
 
 const unsigned int quadratic_bezier_control_point_count = 3;
 struct Bezier_patch
@@ -9,6 +8,4 @@ struct Bezier_patch
 };
 
 std::vector<struct Vector3f> generate_quadratic_bezier_quads(const Bezier_patch& patch, unsigned int patch_count);
-
-#endif
 

@@ -1,5 +1,4 @@
-#ifndef ACTION_H
-#define ACTION_H
+#pragma once
 
 // TODO: namespace
 
@@ -14,6 +13,4 @@ enum Action
 };
 
 struct Camera apply_actions(const std::list<std::pair<float, Action>>& actions, const struct Camera& camera);
-
-#endif
 

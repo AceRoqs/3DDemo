@@ -1,5 +1,4 @@
-#ifndef PARTICLE_H
-#define PARTICLE_H
+#pragma once
 
 #include "LinearAlgebra.h"
 
@@ -42,6 +41,4 @@ public:
     std::vector<Particle>::const_iterator cbegin() const;
     std::vector<Particle>::const_iterator cend() const;
 };
-
-#endif
 

@@ -1,5 +1,4 @@
-#ifndef BITMAP_H
-#define BITMAP_H
+#pragma once
 
 #pragma pack(push)
 #pragma pack(1)
@@ -35,6 +34,4 @@ struct Bitmap
 };
 
 Bitmap bitmap_from_file(_In_z_ const char* file_name);
-
-#endif
 

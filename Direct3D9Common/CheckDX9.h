@@ -1,5 +1,4 @@
-#ifndef CHECKDX9_H
-#define CHECKDX9_H
+#pragma once
 
 #include <WindowsCommon/CheckHR.h>
 
@@ -27,6 +26,4 @@ void throw_dx9err_buffer(HRESULT hr, ATL::CComPtr<ID3DXBuffer>& error_buffer);
 
 } // namespace Direct3D9Common
 
-
-#endif
 

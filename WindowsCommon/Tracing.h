@@ -1,5 +1,4 @@
-#ifndef TRACING_H
-#define TRACING_H
+#pragma once
 
 namespace WindowsCommon
 {
@@ -7,6 +6,4 @@ namespace WindowsCommon
 void dprintf(_In_ PCSTR format, ...) NOEXCEPT;
 
 }
-
-#endif
 

@@ -1,5 +1,4 @@
-#ifndef PRECOMPILE_H
-#define PRECOMPILE_H
+#pragma once
 
 #include <cassert>
 
@@ -9,6 +8,4 @@
 #include <string>
 
 #include "PreCPP11.h"
-
-#endif
 

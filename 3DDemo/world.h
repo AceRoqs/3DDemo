@@ -1,5 +1,4 @@
-#ifndef WORLD_H
-#define WORLD_H
+#pragma once
 
 namespace Graphics
 {
@@ -35,6 +34,4 @@ Map start_load(
     std::vector<struct Bitmap>* texture_list,
     std::vector<struct Vector3f>* vertices,
     std::vector<struct Vector2f>* texture_coords);
-
-#endif
 
