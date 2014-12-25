@@ -1,5 +1,4 @@
-#ifndef CLOCK_H
-#define CLOCK_H
+#pragma once
 
 namespace WindowsCommon
 {
@@ -16,6 +15,4 @@ public:
 };
 
 }
-
-#endif
 

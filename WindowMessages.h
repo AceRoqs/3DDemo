@@ -1,5 +1,4 @@
-#ifndef WINDOWMESSAGES_H
-#define WINDOWMESSAGES_H
+#pragma once
 
 namespace WindowsCommon
 {
@@ -9,6 +8,4 @@ PCSTR string_from_window_message(UINT message) NOEXCEPT;
 bool dispatch_all_windows_messages(_Out_ MSG* message) NOEXCEPT;
 
 }
-
-#endif
 

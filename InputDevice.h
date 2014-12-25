@@ -1,5 +1,4 @@
-#ifndef INPUTDEVICE_H
-#define INPUTDEVICE_H
+#pragma once
 
 namespace WindowsCommon
 {
@@ -20,6 +19,4 @@ private:
 };
 
 }
-
-#endif
 

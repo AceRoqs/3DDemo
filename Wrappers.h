@@ -1,5 +1,4 @@
-#ifndef WINDOWCLASS_H
-#define WINDOWCLASS_H
+#pragma once
 
 #include "ScopedWindowsTypes.h"
 
@@ -43,6 +42,4 @@ Scoped_handle create_file(_In_ PCSTR file_name, DWORD desired_access, DWORD shar
 Scoped_handle create_event(_In_opt_ PSECURITY_ATTRIBUTES security_attributes, bool manual_reset, bool initial_state, _In_opt_ PCSTR name);
 
 }
-
-#endif
 
