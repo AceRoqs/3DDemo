@@ -2,7 +2,7 @@
 #include "world.h"
 #include "Bitmap.h"
 #include "LinearAlgebra.h"
-#include <PortableRuntime/CheckException.h>
+#include "CheckException.h"
 
 static const Vector3f world_vertices[] =
 {

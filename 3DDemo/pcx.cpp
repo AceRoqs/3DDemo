@@ -1,7 +1,7 @@
 #include "PreCompile.h"
 #include "pcx.h"
 #include "Bitmap.h"
-#include <PortableRuntime/CheckException.h>
+#include "CheckException.h"
 
 // PCX spec:
 // http://www.fileformat.info/format/pcx/egff.htm
