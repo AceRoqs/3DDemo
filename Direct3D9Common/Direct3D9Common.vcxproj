@@ -42,12 +42,15 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
+    <Import Project="$(SolutionDir)PropertySheets\Artifacts.props" />
+    <Import Project="$(SolutionDir)PropertySheets\PortableRuntime.props" />
+    <Import Project="$(SolutionDir)PropertySheets\WindowsCommon.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <OutDir>$(SolutionDir)$(Platform).$(Configuration).binaries\</OutDir>
-    <IntDir>$(SolutionDir)$(Platform).$(Configuration).objects\$(ProjectName)\</IntDir>
+    <OutDir>$(GlobalOutDir)</OutDir>
+    <IntDir>$(GlobalIntDir)</IntDir>
     <GeneratedFilesDir>$(IntDir)</GeneratedFilesDir>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisOutputBaseName Condition="'$(CodeAnalysisOutputBaseName)'==''">$(IntDir)$(TargetName)$(TargetExt)</CodeAnalysisOutputBaseName>
@@ -63,7 +66,7 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile>PreCompile.h</PrecompiledHeaderFile>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PortableRuntimeDir);$(WindowsCommonDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
