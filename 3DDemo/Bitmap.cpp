@@ -3,8 +3,8 @@
 #include "pcx.h"
 #include "targa.h"
 #include "CheckException.h"
-#include <WindowsCommon/CheckHR.h>
-#include <WindowsCommon/Wrappers.h>
+#include "CheckHR.h"
+#include "Wrappers.h"
 
 Bitmap::Bitmap() :
     xsize(0),

@@ -43,6 +43,7 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="$(SolutionDir)PropertySheets\Artifacts.props" />
     <Import Project="$(SolutionDir)PropertySheets\PortableRuntime.props" />
+    <Import Project="$(SolutionDir)PropertySheets\WindowsCommon.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -69,11 +70,11 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile>PreCompile.h</PrecompiledHeaderFile>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(PortableRuntimeDir);..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PortableRuntimeDir);$(WindowsCommonDir);</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(PortableRuntimeLibDir);$(OutDir)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(PortableRuntimeLibraries);WindowsCommon.lib;xinput.lib;dinput8.lib;dxguid.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(PortableRuntimeLibDir);$(WindowsCommonDir)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(PortableRuntimeLibraries);$(WindowsCommonLibraries);xinput.lib;dinput8.lib;dxguid.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>

@@ -9,14 +9,14 @@
 #include "Bitmap.h"
 #include "DirectInputMap.h"
 #include "LinearAlgebra.h"
-#include <PortableRuntime/FPU.h>
-#include <WindowsCommon/CheckHR.h>
-#include <WindowsCommon/Clock.h>
-#include <WindowsCommon/InputDevice.h>
-#include <WindowsCommon/ThreadAffinity.h>
-#include <WindowsCommon/Tracing.h>
-#include <WindowsCommon/WindowMessages.h>
-#include <WindowsCommon/WindowsGL.h>
+#include "FPU.h"
+#include "CheckHR.h"
+#include "Clock.h"
+#include "InputDevice.h"
+#include "ThreadAffinity.h"
+#include "Tracing.h"
+#include "WindowMessages.h"
+#include "WindowsGL.h"
 
 static bool s_fWindowed = true;
 

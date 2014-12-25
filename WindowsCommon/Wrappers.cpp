@@ -1,7 +1,7 @@
 #include "PreCompile.h"
 #include "Wrappers.h"       // Pick up forward declarations to ensure correctness.
 #include "CheckHR.h"
-#include <PortableRuntime/Unicode.h>
+#include "Unicode.h"
 #include "Tracing.h"
 #include "WindowMessages.h"
 
