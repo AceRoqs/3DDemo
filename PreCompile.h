@@ -41,7 +41,7 @@
 
 #endif  // WIN32
 
-#include <PortableRuntime/PreCPP11.h>
+#include "PreCPP11.h"
 
 #include <gl/GL.h>
 
