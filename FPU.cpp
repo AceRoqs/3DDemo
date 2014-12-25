@@ -1,6 +1,5 @@
-#include <PreCompile.h>
-#include "FPU.h"    // Pick up forward declarations to ensure correctness.
-#include <float.h>
+#include "PreCompile.h"
+#include "FPU.h"                // Pick up forward declarations to ensure correctness.
 #include "CheckException.h"
 
 namespace PortableRuntime
