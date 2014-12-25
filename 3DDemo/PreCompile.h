@@ -59,7 +59,7 @@
 
 #endif  // WIN32
 
-#include "PreCPP11.h"
-
 #include <gl/GL.h>
+
+#include "PreCPP11.h"
 
