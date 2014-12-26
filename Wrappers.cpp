@@ -230,6 +230,7 @@ Scoped_handle create_event(
 
     check_windows_error(INVALID_HANDLE_VALUE != handle);
     assert(0 != handle);    // Per Win32 contract.
+    _Analysis_assume_(0 != handle);
 
     return make_scoped_handle(handle);
 }
