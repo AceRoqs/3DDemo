@@ -8,7 +8,7 @@ DX9_exception::DX9_exception(HRESULT hr) : HRESULT_exception(hr)
 {
 }
 
-void DX9_exception::get_error_string(_Out_z_cap_(size) PTSTR error_string, size_t size) const
+void DX9_exception::get_error_string(_Out_writes_z_(size) PTSTR error_string, size_t size) const
 {
     PCTSTR const dx_message = DXGetErrorString(m_hr);
     if(CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, dx_message, -1, TEXT("Unknown"), -1) != CSTR_EQUAL)

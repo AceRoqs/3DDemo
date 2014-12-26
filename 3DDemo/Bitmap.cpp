@@ -44,7 +44,7 @@ Bitmap& Bitmap::operator=(Bitmap&& other) NOEXCEPT
 // This code is fine, but it is currently unused.
 #if 0
 static void generate_grid_texture_rgb(
-    _Out_cap_(xsize * ysize) uint8_t* bitmap,
+    _Out_writes_(xsize * ysize) uint8_t* bitmap,
     unsigned int xsize,
     unsigned int ysize) NOEXCEPT
 {

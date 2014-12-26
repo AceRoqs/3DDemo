@@ -246,7 +246,7 @@ static bool operator<(const Message_map& first, const Message_map& second)
     return first.message < second.message;
 }
 
-static _Success_(return) bool map_message_to_index(_In_ const Message_map* message_map, size_t map_size, unsigned int message, _Out_ size_t* final_index) NOEXCEPT
+static _Success_(return) bool map_message_to_index(_In_reads_(map_size) const Message_map* message_map, size_t map_size, unsigned int message, _Out_ size_t* final_index) NOEXCEPT
 {
     const Message_map value = { nullptr, message };
     const auto iterator = std::lower_bound(message_map, message_map + map_size, value);
@@ -260,12 +260,12 @@ static _Success_(return) bool map_message_to_index(_In_ const Message_map* messa
 }
 
 #ifndef NDEBUG // These functions are not currently called in Release.  Avoid C4505: unreferenced local function has been removed.
-static void validate_message_map_sorted(_In_ const Message_map* message_map, size_t map_size) NOEXCEPT
+static void validate_message_map_sorted(_In_reads_(map_size) const Message_map* message_map, size_t map_size) NOEXCEPT
 {
     assert(std::is_sorted(message_map, message_map + map_size));
 }
 
-static void validate_message_map_all_entries_accessible(_In_ const Message_map* message_map, size_t map_size) NOEXCEPT
+static void validate_message_map_all_entries_accessible(_In_reads_(map_size) const Message_map* message_map, size_t map_size) NOEXCEPT
 {
     std::for_each(message_map, message_map + map_size, [&](const Message_map& entry){
         size_t message_index;

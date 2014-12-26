@@ -77,9 +77,9 @@ static const uint8_t* rle_decode(
 }
 
 static void rle_decode_fill(
-    _In_count_x_(end_iterator - start_iterator) const uint8_t* start_iterator,
+    _In_reads_to_ptr_(end_iterator) const uint8_t* start_iterator,
     const uint8_t* end_iterator,
-    _Out_cap_x_(output_end_iterator - output_start_iterator) uint8_t* output_start_iterator,
+    _Out_writes_to_ptr_(output_end_iterator) uint8_t* output_start_iterator,
     uint8_t* output_end_iterator,
     const std::function<uint8_t* (uint8_t*, uint8_t*, uint8_t, uint8_t)>& fill_buffer)
 {
@@ -96,11 +96,11 @@ static void rle_decode_fill(
 }
 
 static void pcx_decode(
-    _In_count_x_(end_iterator - start_iterator) const uint8_t* start_iterator,
+    _In_reads_to_ptr_(end_iterator) const uint8_t* start_iterator,
     const uint8_t* end_iterator,
-    _Out_cap_x_(bitmap_end_iterator - bitmap_start_iterator) Color_rgb* bitmap_start_iterator,
+    _Out_writes_to_ptr_(bitmap_end_iterator) Color_rgb* bitmap_start_iterator,
     Color_rgb* bitmap_end_iterator,
-    _In_opt_count_(256) const Color_rgb* palette)
+    _In_reads_opt_(256) const Color_rgb* palette)
 {
     // MSVC complains that fill_n is insecure.
     // _SCL_SECURE_NO_WARNINGS or checked iterator required.
@@ -128,7 +128,7 @@ static void pcx_decode(
                     fill_buffer);
 }
 
-Bitmap decode_bitmap_from_pcx_memory(_In_count_(size) const uint8_t* pcx_memory, size_t size)
+Bitmap decode_bitmap_from_pcx_memory(_In_reads_(size) const uint8_t* pcx_memory, size_t size)
 {
     PortableRuntime::check_exception(size >= sizeof(PCX_header));
 
