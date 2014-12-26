@@ -11,7 +11,7 @@ public:
     HRESULT_exception(HRESULT hr);
 
     // Define a method besides exception::what() that doesn't require heap memory allocation.
-    virtual void get_error_string(_Out_z_cap_(size) PTSTR error_string, size_t size) const;
+    virtual void get_error_string(_Out_writes_z_(size) PTSTR error_string, size_t size) const;
 
     HRESULT m_hr;
 };
@@ -48,8 +48,8 @@ inline void check_with_custom_hr(BOOL result, HRESULT hr)
 }
 
 // These macros should only be used to work around static analysis warnings.
-#define CHECK_WINDOWS_ERROR(expr) { WindowsCommon::check_windows_error(expr); __analysis_assume(expr); }
-#define CHECK_WITH_CUSTOM_HR(expr, hr) { WindowsCommon::check_with_custom_hr(expr, hr); __analysis_assume(expr); }
+#define CHECK_WINDOWS_ERROR(expr) { WindowsCommon::check_windows_error(expr); _Analysis_assume_(expr); }
+#define CHECK_WITH_CUSTOM_HR(expr, hr) { WindowsCommon::check_with_custom_hr(expr, hr); _Analysis_assume_(expr); }
 
 } // namespace WindowsCommon
 
