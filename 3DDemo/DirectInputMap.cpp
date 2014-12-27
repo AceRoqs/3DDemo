@@ -2,6 +2,9 @@
 #include "DirectInputMap.h"
 #include "Action.h"
 
+namespace Demo
+{
+
 // TODO: 2014: Come up with a new name since "action map" is also a DirectInput concept.
 // TODO: 2014: Can't move this to Action.cpp yet, since Action.cpp should eventually be platform
 // agnostic, and not tied to the DirectInput enums below.
@@ -83,4 +86,6 @@ std::list<std::pair<float, Action>> actions_from_joystick_state(float ellapsed_m
     return actions;
 }
 #endif
+
+}
 

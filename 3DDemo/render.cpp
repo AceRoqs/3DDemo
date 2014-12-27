@@ -7,6 +7,9 @@
 #include "Camera.h"
 #include "LinearAlgebra.h"
 
+namespace Demo
+{
+
 // Vertices is a two dimensional array of patch vertices.  generate_quadratic_bezier_quads() creates the expected output.
 // TODO: 2014: This isn't very cache friendly, as the array isn't read in-order.  Vertex/Index arrays would also be an improvement.
 static void draw_patch(const std::vector<Vector3f>& vertices, unsigned int patch_count, unsigned int texture_id)
@@ -202,7 +205,7 @@ void draw_list(
     for(unsigned int ii = 0; ii < map.world_mesh.size(); ii++)
     {
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        const Graphics::Polygon* iter = &map.world_mesh[ii];
+        const Demo::Polygon* iter = &map.world_mesh[ii];
         glBindTexture(GL_TEXTURE_2D, iter->texture);
         glBlendFunc(GL_ONE, GL_ZERO);
         glDepthFunc(GL_LESS);
@@ -273,5 +276,7 @@ void draw_list(
 #endif
 
     assert(glGetError() == GL_NO_ERROR);
+}
+
 }
 

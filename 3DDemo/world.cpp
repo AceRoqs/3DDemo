@@ -4,6 +4,9 @@
 #include "LinearAlgebra.h"
 #include "CheckException.h"
 
+namespace Demo
+{
+
 static const Vector3f world_vertices[] =
 {
     { -2, -2, -10 },        // left lower front      0
@@ -53,18 +56,13 @@ static const Vector2f world_texture_coords[] =
     { 2.5, 1.0 },
 };
 
-namespace Graphics
-{
-
 Polygon::Polygon() :
     texture(0),
     lightmap(0)
 {
 }
 
-}
-
-std::istream& operator>>(std::istream& is, Graphics::Polygon& polygon)
+std::istream& operator>>(std::istream& is, Demo::Polygon& polygon)
 {
     // Clear and realloc vectors.
     std::vector<unsigned int>().swap(polygon.vertex_indices);
@@ -141,7 +139,7 @@ static Map load_world_data(
     Map map;
     for(ii = 0; ii < cPolys; ++ii)
     {
-        Graphics::Polygon poly;
+        Demo::Polygon poly;
         is >> poly;
         map.world_mesh.push_back(poly);
 
@@ -172,5 +170,7 @@ Map start_load(
     PortableRuntime::check_exception(fis.is_open());
 
     return load_world_data(fis, texture_list, vertices, texture_coords);
+}
+
 }
 

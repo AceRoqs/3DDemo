@@ -2,6 +2,9 @@
 
 #include "LinearAlgebra.h"
 
+namespace Demo
+{
+
 struct Particle_descriptor
 {
     float position_x_scale;
@@ -41,4 +44,6 @@ public:
     std::vector<Particle>::const_iterator cbegin() const;
     std::vector<Particle>::const_iterator cend() const;
 };
+
+}
 

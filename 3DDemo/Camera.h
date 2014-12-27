@@ -1,8 +1,9 @@
 #pragma once
 
-// TODO: namespace
-
 #include "LinearAlgebra.h"
+
+namespace Demo
+{
 
 struct Camera
 {
@@ -13,4 +14,6 @@ struct Camera
     Vector3f m_position;
     float m_degrees;
 };
+
+}
 

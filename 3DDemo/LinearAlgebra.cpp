@@ -1,6 +1,9 @@
 #include "PreCompile.h"
 #include "LinearAlgebra.h"
 
+namespace Demo
+{
+
 float& Vector2f::operator[](size_t ix)
 {
     return element[ix];
@@ -95,5 +98,7 @@ Vector3f& operator+=(Vector3f& v1, const Vector3f& v2)
     v1.z() += v2.z();
 
     return v1;
+}
+
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Graphics
+namespace Demo
 {
 
 struct Polygon
@@ -13,11 +13,9 @@ struct Polygon
     Polygon();
 };
 
-} // namespace
-
 struct Map
 {
-    std::vector<struct Graphics::Polygon> world_mesh;
+    std::vector<struct Demo::Polygon> world_mesh;
     //std::vector<struct Vector3f> vertices;
     //std::vector<struct Vector3f> vertices2;
     //unsigned int patch_count;
@@ -25,13 +23,19 @@ struct Map
     //class Emitter emitter;
 };
 
-std::istream& operator>>(std::istream& is, Graphics::Polygon& polygon);
+std::istream& operator>>(std::istream& is, Demo::Polygon& polygon);
 
 bool is_point_in_world(const struct Vector3f& point);
 
+struct Bitmap;
+struct Vector3f;
+struct Vector2f;
+
 Map start_load(
     _In_z_ const char* file_name,
-    std::vector<struct Bitmap>* texture_list,
-    std::vector<struct Vector3f>* vertices,
-    std::vector<struct Vector2f>* texture_coords);
+    std::vector<Bitmap>* texture_list,
+    std::vector<Vector3f>* vertices,
+    std::vector<Vector2f>* texture_coords);
+
+}
 

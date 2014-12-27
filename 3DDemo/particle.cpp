@@ -2,6 +2,9 @@
 #include "particle.h"
 #include "Camera.h"
 
+namespace Demo
+{
+
 static bool is_particle_alive(const Particle& particle)
 {
     return particle.life > 0.0f;
@@ -77,5 +80,7 @@ std::vector<Particle>::const_iterator Emitter::cbegin() const
 std::vector<Particle>::const_iterator Emitter::cend() const
 {
     return m_particles.cend();
+}
+
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
-// TODO: namespace
+namespace Demo
+{
 
 enum Action
 {
@@ -13,4 +14,6 @@ enum Action
 };
 
 struct Camera apply_actions(const std::list<std::pair<float, Action>>& actions, const struct Camera& camera);
+
+}
 

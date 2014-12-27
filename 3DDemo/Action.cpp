@@ -3,6 +3,9 @@
 #include "Camera.h"
 #include "world.h"
 
+namespace Demo
+{
+
 Camera apply_actions(const std::list<std::pair<float, Action>>& actions, const Camera& camera)
 {
     Camera new_camera = camera;
@@ -86,5 +89,7 @@ Camera apply_actions(const std::list<std::pair<float, Action>>& actions, const C
     new_camera.m_position.x() = updated_x;
 
     return new_camera;
+}
+
 }
 

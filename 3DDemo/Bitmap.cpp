@@ -6,6 +6,9 @@
 #include "CheckHR.h"
 #include "Wrappers.h"
 
+namespace Demo
+{
+
 Bitmap::Bitmap() :
     xsize(0),
     ysize(0),
@@ -107,5 +110,7 @@ Bitmap bitmap_from_file(_In_z_ const char* file_name)
         return TGA::decode_bitmap_from_tga_memory(buffer.data(), size);
     }
     throw std::exception();     // TODO: Use check_exception instead of naked throw.
+}
+
 }
 

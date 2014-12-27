@@ -18,6 +18,9 @@
 #include "WindowMessages.h"
 #include "WindowsGL.h"
 
+namespace Demo
+{
+
 static bool s_fWindowed = true;
 
 static const Particle_descriptor particle_descriptor =
@@ -130,7 +133,7 @@ protected:
     }
 };
 
-void app_run(HINSTANCE instance, int show_command)
+void app_run(_In_ HINSTANCE instance, int show_command)
 {
     try
     {
@@ -200,5 +203,7 @@ void app_run(HINSTANCE instance, int show_command)
         //MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
         WindowsCommon::check_hr(E_FAIL);
     }
+}
+
 }
 

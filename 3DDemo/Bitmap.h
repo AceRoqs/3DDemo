@@ -1,5 +1,8 @@
 #pragma once
 
+namespace Demo
+{
+
 #pragma pack(push)
 #pragma pack(1)
 struct Color_rgb
@@ -34,4 +37,6 @@ struct Bitmap
 };
 
 Bitmap bitmap_from_file(_In_z_ const char* file_name);
+
+}
 

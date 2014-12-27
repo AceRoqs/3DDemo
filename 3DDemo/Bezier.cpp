@@ -2,6 +2,9 @@
 #include "Bezier.h"
 #include "LinearAlgebra.h"
 
+namespace Demo
+{
+
 // http://en.wikipedia.org/wiki/B%C3%A9zier_curve
 // B0(t) = (1-t)^2
 // B1(t) = 2(1-t)t
@@ -73,5 +76,7 @@ std::vector<Vector3f> generate_quadratic_bezier_quads(const Bezier_patch& patch,
     }
 
     return vertices;
+}
+
 }
 
