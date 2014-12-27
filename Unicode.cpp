@@ -147,6 +147,11 @@ bool utf8_is_ascii(_In_z_ const char* utf8_string)
 }
 #endif
 
+// TODO: Think about if this should be a namespace and how it should interact
+// with a unit test toolkit.
+namespace Test
+{
+
 // Code point   UTF-16      UTF-8
 // U+007A       007A        7A
 // U+00E9       00E9        C3 A9
@@ -155,20 +160,20 @@ bool utf8_is_ascii(_In_z_ const char* utf8_string)
 // U+1D11E      D834 DD1E   F0 9D 84 9E
 // U+10FFFD     DBFF DFFD   F4 8F BF BD
 
-static char utf8_case1[] = "\x7a";
-static char utf8_case2[] = "\xc3\xa9";
-static char utf8_case3[] = "\xe6\xb0\xb4";
-static char utf8_case4[] = "\xf0\x90\x80\x80";
-static char utf8_case5[] = "\xf0\x9d\x84\x9e";
-static char utf8_case6[] = "\xf4\x8f\xbf\xbd";
+static const char utf8_case1[] = "\x7a";
+static const char utf8_case2[] = "\xc3\xa9";
+static const char utf8_case3[] = "\xe6\xb0\xb4";
+static const char utf8_case4[] = "\xf0\x90\x80\x80";
+static const char utf8_case5[] = "\xf0\x9d\x84\x9e";
+static const char utf8_case6[] = "\xf4\x8f\xbf\xbd";
 
 // TODO: Enforce encoding of these as little endian.
-static wchar_t utf16_case1[] = L"\x7a";
-static wchar_t utf16_case2[] = L"\x00e9";
-static wchar_t utf16_case3[] = L"\x6c34";
-static wchar_t utf16_case4[] = L"\xd800\xdc00";
-static wchar_t utf16_case5[] = L"\xd834\xdd1e";
-static wchar_t utf16_case6[] = L"\xdbff\xdffd";
+static const wchar_t utf16_case1[] = L"\x7a";
+static const wchar_t utf16_case2[] = L"\x00e9";
+static const wchar_t utf16_case3[] = L"\x6c34";
+static const wchar_t utf16_case4[] = L"\xd800\xdc00";
+static const wchar_t utf16_case5[] = L"\xd834\xdd1e";
+static const wchar_t utf16_case6[] = L"\xdbff\xdffd";
 
 static bool test_case1()
 {
@@ -216,6 +221,8 @@ bool test()
     const bool case6 = test_case6();
 
     return case1 && case2 && case3 && case4 && case5 && case6;
+}
+
 }
 
 }
