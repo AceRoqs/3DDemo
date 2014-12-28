@@ -3,7 +3,7 @@
 namespace Demo
 {
 
-enum Action
+enum class Action
 {
     Move_forward,
     Move_backward,

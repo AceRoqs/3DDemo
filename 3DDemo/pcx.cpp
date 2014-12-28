@@ -8,8 +8,8 @@
 namespace PCX
 {
 
-static enum PCX_manufacturer { PCX_magic = 10 };
-static enum PCX_version
+static enum class PCX_manufacturer : uint8_t { PCX_magic = 10 };
+static enum class PCX_version : uint8_t
 {
     PC_Paintbrush_2_5 = 0,          // PC Paintbrush 2.5.
     PC_Paintbrush_2_8_palette = 2,  // PC Paintbrush 2.8 with palette info.
@@ -17,15 +17,15 @@ static enum PCX_version
     PC_Paintbrush_Windows = 4,      // PC Paintbrush for Windows.
     PC_Paintbrush_3 = 5,            // PC Paintbrush 3.0+.
 };
-static enum PCX_encoding { RLE_encoding = 1 };
+static enum class PCX_encoding : uint8_t { RLE_encoding = 1 };
 
 #pragma pack(push)
 #pragma pack(1)
 struct PCX_header
 {
-    uint8_t  manufacturer;              // PCX_manufacturer.
-    uint8_t  version;                   // PCX_version.
-    uint8_t  encoding;                  // PCX_encoding.
+    PCX_manufacturer manufacturer;      // PCX_manufacturer.
+    PCX_version version;                // PCX_version.
+    PCX_encoding encoding;              // PCX_encoding.
     uint8_t  bits_per_pixel;            // Bits per pixel per plane - 1, 2, 4, or 8.
     uint16_t min_x;                     // Minimum X value - usually zero.
     uint16_t min_y;                     // Minimum Y value - usually zero.
@@ -46,8 +46,8 @@ struct PCX_header
 
 static void validate_pcx_header(_In_ const PCX_header* header)
 {
-    PortableRuntime::check_exception(header->manufacturer == PCX_magic);
-    PortableRuntime::check_exception(header->encoding == RLE_encoding);
+    PortableRuntime::check_exception(header->manufacturer == PCX_manufacturer::PCX_magic);
+    PortableRuntime::check_exception(header->encoding == PCX_encoding::RLE_encoding);
     PortableRuntime::check_exception(header->min_x < header->max_x);
     PortableRuntime::check_exception(header->min_y < header->max_y);
     PortableRuntime::check_exception((header->color_plane_count == 1) || (header->color_plane_count == 3));
@@ -136,7 +136,7 @@ Demo::Bitmap decode_bitmap_from_pcx_memory(_In_reads_(size) const uint8_t* pcx_m
     validate_pcx_header(header);
 
     const Demo::Color_rgb* palette = nullptr;
-    if(header->version == PC_Paintbrush_3 && header->color_plane_count == 1)
+    if(header->version == PCX_version::PC_Paintbrush_3 && header->color_plane_count == 1)
     {
         // Add space for palette + C0 marker byte.
         PortableRuntime::check_exception(size >= sizeof(PCX_header) + sizeof(Demo::Color_rgb) * 256 + 1);

@@ -14,16 +14,16 @@ const static struct Action_map
     Action action;
 } action_map[] =
 {
-    DIK_NUMPAD2, Move_backward,
-    DIK_DOWN,    Move_backward,
-    DIK_NUMPAD8, Move_forward,
-    DIK_UP,      Move_forward,
-    DIK_D,       Strafe_right,
-    DIK_A,       Strafe_left,
-    DIK_NUMPAD4, Turn_left,
-    DIK_LEFT,    Turn_left,
-    DIK_NUMPAD6, Turn_right,
-    DIK_RIGHT,   Turn_right,
+    DIK_NUMPAD2, Action::Move_backward,
+    DIK_DOWN,    Action::Move_backward,
+    DIK_NUMPAD8, Action::Move_forward,
+    DIK_UP,      Action::Move_forward,
+    DIK_D,       Action::Strafe_right,
+    DIK_A,       Action::Strafe_left,
+    DIK_NUMPAD4, Action::Turn_left,
+    DIK_LEFT,    Action::Turn_left,
+    DIK_NUMPAD6, Action::Turn_right,
+    DIK_RIGHT,   Action::Turn_right,
 };
 
 std::list<std::pair<float, Action>> actions_from_keyboard_state(float ellapsed_milliseconds, const WindowsCommon::Keyboard_state& keyboard_state)

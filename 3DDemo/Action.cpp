@@ -34,41 +34,41 @@ Camera apply_actions(const std::list<std::pair<float, Action>>& actions, const C
 
         switch(action.second)
         {
-            case Move_forward:
+            case Action::Move_forward:
             {
                 new_x -= sine;
                 new_z += cosine;
                 break;
             }
 
-            case Move_backward:
+            case Action::Move_backward:
             {
                 new_x += sine;
                 new_z -= cosine;
                 break;
             }
 
-            case Strafe_right:
+            case Action::Strafe_right:
             {
                 new_x -= cosine;
                 new_z -= sine;
                 break;
             }
 
-            case Strafe_left:
+            case Action::Strafe_left:
             {
                 new_x += cosine;
                 new_z += sine;
                 break;
             }
 
-            case Turn_right:
+            case Action::Turn_right:
             {
                 new_camera.m_degrees = fmod(new_camera.m_degrees + rotation_degrees, 360.f);
                 break;
             }
 
-            case Turn_left:
+            case Action::Turn_left:
             {
                 new_camera.m_degrees = fmod(new_camera.m_degrees - rotation_degrees + 360.f, 360.f);
                 break;

@@ -11,13 +11,13 @@ namespace TGA
 
 const unsigned int max_dimension = 16384;
 
-static enum TGA_color_map
+static enum class TGA_color_map : uint8_t
 {
     Has_no_color_map = 0,
     Has_color_map = 1,
 };
 
-static enum TGA_image_type
+static enum class TGA_image_type : uint8_t
 {
     No_image_data = 0,
     Color_mapped = 1,
@@ -28,7 +28,7 @@ static enum TGA_image_type
     RLE_black_and_white = 11,
 };
 
-static enum TGA_alpha_type
+static enum class TGA_alpha_type : uint8_t
 {
     No_alpha = 0,                       // No alpha data exists.
     Ignorable_alpha = 1,                // Alpha data can be ignored.
@@ -42,18 +42,18 @@ static enum TGA_alpha_type
 
 struct TGA_header
 {
-    uint8_t  id_length;                 // Length of the image ID field.
-    uint8_t  color_map_type;            // TGA_color_map.
-    uint8_t  image_type;                // TGA_image_type.
-    uint16_t color_map_first_index;     // Offset into color map table.
-    uint16_t color_map_length;          // Number of entries.
-    uint8_t  color_map_bits_per_pixel;  // Number of bits per pixel.
-    uint16_t x_origin;                  // Lower-left corner.
-    uint16_t y_origin;                  // Lower-left corner.
-    uint16_t image_width;               // Width in pixels.
-    uint16_t image_height;              // Height in pixels.
-    uint8_t  bits_per_pixel;            // Bits per pixel.
-    uint8_t  image_descriptor;          // Bits 0-3 are the alpha channel depth; bits 4-5 are the direction.
+    uint8_t        id_length;                   // Length of the image ID field.
+    TGA_color_map  color_map_type;              // TGA_color_map.
+    TGA_image_type image_type;                  // TGA_image_type.
+    uint16_t       color_map_first_index;       // Offset into color map table.
+    uint16_t       color_map_length;            // Number of entries.
+    uint8_t        color_map_bits_per_pixel;    // Number of bits per pixel.
+    uint16_t       x_origin;                    // Lower-left corner.
+    uint16_t       y_origin;                    // Lower-left corner.
+    uint16_t       image_width;                 // Width in pixels.
+    uint16_t       image_height;                // Height in pixels.
+    uint8_t        bits_per_pixel;              // Bits per pixel.
+    uint8_t        image_descriptor;            // Bits 0-3 are the alpha channel depth; bits 4-5 are the direction.
 };
 
 struct TGA_footer
@@ -108,7 +108,7 @@ struct TGA_extension_area
     uint32_t color_correction_offset;   // Offset in bytes from the beginning of the file.
     uint32_t thumbnail_image_offset;    // Offset in bytes from the beginning of the file.
     uint32_t scanline_table_offset;     // Offset in bytes from the beginning of the file
-    uint8_t  attributes_type;           // TGA_alpha_type.
+    TGA_alpha_type attributes_type;     // TGA_alpha_type.
 } ;
 
 #pragma pack(pop)
@@ -132,7 +132,7 @@ static void validate_tga_header(_In_ const TGA_header* header)
 {
     bool succeeded = true;
 
-    succeeded &= (header->image_type == True_color);
+    succeeded &= (header->image_type == TGA_image_type::True_color);
     succeeded &= (header->bits_per_pixel == 24);
     succeeded &= (header->color_map_length == 0);
     succeeded &= (header->color_map_bits_per_pixel == 0);
@@ -204,8 +204,8 @@ std::vector<uint8_t> encode_tga_from_bitmap(const Demo::Bitmap& bitmap)
     std::vector<uint8_t> tga(sizeof(TGA_header) + bitmap.bitmap.size() * sizeof(Demo::Color_rgb));
 
     TGA_header* header = reinterpret_cast<TGA_header*>(&tga[0]);
-    header->color_map_type = Has_no_color_map;
-    header->image_type = True_color;
+    header->color_map_type = TGA_color_map::Has_no_color_map;
+    header->image_type = TGA_image_type::True_color;
     header->image_width = static_cast<decltype(header->image_width)>(bitmap.xsize);
     header->image_height = static_cast<decltype(header->image_height)>(bitmap.ysize);
     header->bits_per_pixel = sizeof(Demo::Color_rgb) * 8;
