@@ -92,7 +92,7 @@ static void draw_emitter(const Emitter& emitter, const Camera& camera, unsigned 
     });
 }
 
-static void bind_bitmap_to_gl_texture(const Bitmap& bitmap, unsigned int texture_id)
+static void bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id)
 {
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -156,7 +156,7 @@ void initialize_gl_constants()
 }
 
 void initialize_gl_world_data(
-    const std::vector<Bitmap>& texture_list,
+    const std::vector<ImageProcessing::Bitmap>& texture_list,
     const std::vector<Vector3f>& vertices,
     const std::vector<Vector2f>& texture_coords)
 {

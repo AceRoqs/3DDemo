@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Demo
+namespace ImageProcessing
 {
 
 #pragma pack(push)

@@ -6,7 +6,7 @@
 #include "CheckHR.h"
 #include "Wrappers.h"
 
-namespace Demo
+namespace ImageProcessing
 {
 
 Bitmap::Bitmap() :
@@ -76,6 +76,7 @@ static void generate_grid_texture_rgb(
 
 // This function is case sensitive due to the lack of library support for
 // UTF-8 case insensitive matching.
+// TODO: Consider case insensitive for ASCII subset of UTF-8.
 static bool file_has_extension_case_sensitive(_In_z_ const char* file_name, _In_z_ const char* extension) NOEXCEPT
 {
     const size_t length_file = strlen(file_name);
@@ -83,6 +84,8 @@ static bool file_has_extension_case_sensitive(_In_z_ const char* file_name, _In_
     return ((length_file >= length_extension) && (strcmp(file_name + length_file - length_extension, extension) == 0));
 }
 
+// TODO: 2014: Revisit this design, as it doesn't seem appropriate
+// for ImageProcessing to have a dependency on WindowsCommon.
 Bitmap bitmap_from_file(_In_z_ const char* file_name)
 {
     const auto file = WindowsCommon::create_file(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr);
@@ -103,11 +106,11 @@ Bitmap bitmap_from_file(_In_z_ const char* file_name)
 
     if(file_has_extension_case_sensitive(file_name, ".pcx"))
     {
-        return PCX::decode_bitmap_from_pcx_memory(buffer.data(), size);
+        return ImageProcessing::decode_bitmap_from_pcx_memory(buffer.data(), size);
     }
     else if(file_has_extension_case_sensitive(file_name, ".tga"))
     {
-        return TGA::decode_bitmap_from_tga_memory(buffer.data(), size);
+        return ImageProcessing::decode_bitmap_from_tga_memory(buffer.data(), size);
     }
     throw std::exception();     // TODO: Use check_exception instead of naked throw.
 }

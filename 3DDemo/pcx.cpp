@@ -5,7 +5,7 @@
 
 // PCX spec:
 // http://www.fileformat.info/format/pcx/egff.htm
-namespace PCX
+namespace ImageProcessing
 {
 
 static enum class PCX_manufacturer : uint8_t { PCX_magic = 10 };
@@ -98,9 +98,9 @@ static void rle_decode_fill(
 static void pcx_decode(
     _In_reads_to_ptr_(end_iterator) const uint8_t* start_iterator,
     const uint8_t* end_iterator,
-    _Out_writes_to_ptr_(bitmap_end_iterator) Demo::Color_rgb* bitmap_start_iterator,
-    Demo::Color_rgb* bitmap_end_iterator,
-    _In_reads_opt_(256) const Demo::Color_rgb* palette)
+    _Out_writes_to_ptr_(bitmap_end_iterator) Color_rgb* bitmap_start_iterator,
+    Color_rgb* bitmap_end_iterator,
+    _In_reads_opt_(256) const Color_rgb* palette)
 {
     // MSVC complains that fill_n is insecure.
     // _SCL_SECURE_NO_WARNINGS or checked iterator required.
@@ -109,8 +109,8 @@ static void pcx_decode(
     const std::function<uint8_t* (uint8_t*, uint8_t*, uint8_t, uint8_t)> fill_palette =
     [palette](uint8_t* output_start_iterator, uint8_t* output_end_iterator, uint8_t value, uint8_t run_count) -> uint8_t*
     {
-        PortableRuntime::check_exception(output_start_iterator + (run_count * sizeof(Demo::Color_rgb)) <= output_end_iterator);
-        std::fill_n(reinterpret_cast<Demo::Color_rgb*>(output_start_iterator), run_count, palette[value]);
+        PortableRuntime::check_exception(output_start_iterator + (run_count * sizeof(Color_rgb)) <= output_end_iterator);
+        std::fill_n(reinterpret_cast<Color_rgb*>(output_start_iterator), run_count, palette[value]);
         return output_start_iterator + (run_count * sizeof(palette[0]));
     };
 
@@ -128,26 +128,26 @@ static void pcx_decode(
                     fill_buffer);
 }
 
-Demo::Bitmap decode_bitmap_from_pcx_memory(_In_reads_(size) const uint8_t* pcx_memory, size_t size)
+Bitmap decode_bitmap_from_pcx_memory(_In_reads_(size) const uint8_t* pcx_memory, size_t size)
 {
     PortableRuntime::check_exception(size >= sizeof(PCX_header));
 
     const PCX_header* header = reinterpret_cast<const PCX_header*>(pcx_memory);
     validate_pcx_header(header);
 
-    const Demo::Color_rgb* palette = nullptr;
+    const Color_rgb* palette = nullptr;
     if(header->version == PCX_version::PC_Paintbrush_3 && header->color_plane_count == 1)
     {
         // Add space for palette + C0 marker byte.
-        PortableRuntime::check_exception(size >= sizeof(PCX_header) + sizeof(Demo::Color_rgb) * 256 + 1);
+        PortableRuntime::check_exception(size >= sizeof(PCX_header) + sizeof(Color_rgb) * 256 + 1);
 
-        palette = reinterpret_cast<const Demo::Color_rgb*>(pcx_memory + size - sizeof(Demo::Color_rgb) * 256);
+        palette = reinterpret_cast<const Color_rgb*>(pcx_memory + size - sizeof(Color_rgb) * 256);
 
         // Validate 0C byte.  Some documentation incorrectly says this byte is C0 instead of 0C.
         PortableRuntime::check_exception(reinterpret_cast<const uint8_t*>(palette)[-1] == 0x0c);
     }
 
-    Demo::Bitmap bitmap;
+    Bitmap bitmap;
     bitmap.xsize = static_cast<unsigned int>(header->max_x) - header->min_x + 1;
     bitmap.ysize = static_cast<unsigned int>(header->max_y) - header->min_y + 1;
     bitmap.filtered = true;

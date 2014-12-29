@@ -118,7 +118,7 @@ bool is_point_in_world(const Vector3f& point)
 
 static Map load_world_data(
     std::istream& is,
-    std::vector<Bitmap>* texture_list,
+    std::vector<ImageProcessing::Bitmap>* texture_list,
     std::vector<Vector3f>* vertices,
     std::vector<Vector2f>* texture_coords)
 {
@@ -130,7 +130,7 @@ static Map load_world_data(
     {
         char file_name[MAX_PATH];
         is >> file_name;
-        texture_list->push_back(bitmap_from_file(file_name));
+        texture_list->push_back(ImageProcessing::bitmap_from_file(file_name));
     }
 
     unsigned int cPolys;
@@ -161,7 +161,7 @@ static Map load_world_data(
 
 Map start_load(
     _In_z_ const char* file_name,
-    std::vector<Bitmap>* texture_list,
+    std::vector<ImageProcessing::Bitmap>* texture_list,
     std::vector<Vector3f>* vertices,
     std::vector<Vector2f>* texture_coords)
 {

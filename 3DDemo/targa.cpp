@@ -6,7 +6,7 @@
 // Targa spec:
 // http://www.dca.fee.unicamp.br/~martino/disciplinas/ea978/tgaffs.pdf
 // http://www.fileformat.info/format/tga/egff.htm
-namespace TGA
+namespace ImageProcessing
 {
 
 const unsigned int max_dimension = 16384;
@@ -154,21 +154,22 @@ static size_t get_pixel_data_offset(_In_ const TGA_header* header)
            static_cast<size_t>(header->color_map_length) * (header->color_map_bits_per_pixel / 8);
 }
 
-Demo::Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory, size_t size)
+Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory, size_t size)
 {
     PortableRuntime::check_exception(size >= sizeof(TGA_header));
 
     const TGA_header* header = reinterpret_cast<const TGA_header*>(tga_memory);
     validate_tga_header(header);
 
-    Demo::Bitmap bitmap;
+    Bitmap bitmap;
     bitmap.xsize = header->image_width;
     bitmap.ysize = header->image_height;
     bitmap.filtered = true;
 
     const size_t pixel_data_offset = get_pixel_data_offset(header);
-    const auto pixel_start = reinterpret_cast<const Demo::Color_rgb*>(tga_memory + pixel_data_offset);
-    const size_t pixel_count = static_cast<size_t>(header->image_width) * header->image_height * (header->bits_per_pixel / 8) / sizeof(Demo::Color_rgb);
+    const auto pixel_start = reinterpret_cast<const Color_rgb*>(tga_memory + pixel_data_offset);
+    const size_t pixel_count = static_cast<size_t>(header->image_width) * header->image_height *
+                               (header->bits_per_pixel / 8) / sizeof(Color_rgb);
 
     PortableRuntime::check_exception((pixel_start + pixel_count >= pixel_start) && (tga_memory + size >= tga_memory));
     PortableRuntime::check_exception(reinterpret_cast<const uint8_t*>(pixel_start + pixel_count) <= (tga_memory + size));
@@ -188,7 +189,9 @@ Demo::Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_m
         for(decltype(header->image_height) iy = 0; iy < header->image_height; ++iy)
         {
             const auto row_offset = row_length * iy;
-            std::copy(pixel_start + row_offset, pixel_start + row_offset + row_length, &bitmap.bitmap[pixel_count - row_offset - row_length]);
+            std::copy(pixel_start + row_offset,
+                      pixel_start + row_offset + row_length,
+                      &bitmap.bitmap[pixel_count - row_offset - row_length]);
         }
     }
 
@@ -196,23 +199,23 @@ Demo::Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_m
     return std::move(bitmap);
 }
 
-std::vector<uint8_t> encode_tga_from_bitmap(const Demo::Bitmap& bitmap)
+std::vector<uint8_t> encode_tga_from_bitmap(const Bitmap& bitmap)
 {
     PortableRuntime::check_exception(bitmap.xsize <= max_dimension);
     PortableRuntime::check_exception(bitmap.ysize <= max_dimension);
 
-    std::vector<uint8_t> tga(sizeof(TGA_header) + bitmap.bitmap.size() * sizeof(Demo::Color_rgb));
+    std::vector<uint8_t> tga(sizeof(TGA_header) + bitmap.bitmap.size() * sizeof(Color_rgb));
 
     TGA_header* header = reinterpret_cast<TGA_header*>(&tga[0]);
     header->color_map_type = TGA_color_map::Has_no_color_map;
     header->image_type = TGA_image_type::True_color;
     header->image_width = static_cast<decltype(header->image_width)>(bitmap.xsize);
     header->image_height = static_cast<decltype(header->image_height)>(bitmap.ysize);
-    header->bits_per_pixel = sizeof(Demo::Color_rgb) * 8;
+    header->bits_per_pixel = sizeof(Color_rgb) * 8;
     header->image_descriptor |= top_to_bottom_bit();
 
     const auto pixel_start = reinterpret_cast<const uint8_t*>(&bitmap.bitmap[0]);
-    std::copy(pixel_start, pixel_start + bitmap.bitmap.size() * sizeof(Demo::Color_rgb), &tga[sizeof(TGA_header)]);
+    std::copy(pixel_start, pixel_start + bitmap.bitmap.size() * sizeof(Color_rgb), &tga[sizeof(TGA_header)]);
 
     // Return value optimization expected.
     return std::move(tga);

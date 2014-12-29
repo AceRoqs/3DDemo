@@ -144,7 +144,7 @@ void app_run(_In_ HINSTANCE instance, int show_command)
 #endif
 
         // Start load first, to kick off async reads.
-        std::vector<Bitmap> texture_list;
+        std::vector<ImageProcessing::Bitmap> texture_list;
         std::vector<Vector3f> vertices;
         std::vector<Vector2f> texture_coords;
         Map map = start_load("polydefs.txt", &texture_list, &vertices, &texture_coords);
