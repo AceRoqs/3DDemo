@@ -1,6 +1,6 @@
 #include "PreCompile.h"
 #include "world.h"
-#include "Bitmap.h"
+#include "BitmapReader.h"
 #include "LinearAlgebra.h"
 #include "CheckException.h"
 
@@ -130,7 +130,7 @@ static Map load_world_data(
     {
         char file_name[MAX_PATH];
         is >> file_name;
-        texture_list->push_back(ImageProcessing::bitmap_from_file(file_name));
+        texture_list->push_back(bitmap_from_file(file_name));
     }
 
     unsigned int cPolys;
