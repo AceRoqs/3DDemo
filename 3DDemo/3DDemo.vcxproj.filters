@@ -29,9 +29,6 @@
     <ClCompile Include="Bezier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Bitmap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DirectInputMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -41,16 +38,10 @@
     <ClCompile Include="particle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pcx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PreCompile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="render.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="targa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="winmain.cpp">
@@ -73,9 +64,6 @@
     <ClInclude Include="Bezier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Bitmap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -88,9 +76,6 @@
     <ClInclude Include="particle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pcx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PreCompile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -98,9 +83,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="targa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="world.h">

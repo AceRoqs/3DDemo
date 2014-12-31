@@ -19,14 +19,12 @@
 #define _USE_MATH_DEFINES   // M_PI definition.
 #include <array>
 #include <algorithm>
-#include <cstdint>
 #include <cmath>
 #include <memory>
 #include <random>
 #include <functional>
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <list>
 
 // Windows API.
