@@ -138,7 +138,7 @@ void app_run(_In_ HINSTANCE instance, int show_command)
     try
     {
 #ifndef NDEBUG
-        PortableRuntime::Scoped_FPU_exception_control fpu(_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID);
+        WindowsCommon::Scoped_FPU_exception_control fpu(_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID);
         fpu.enable(_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID);
         auto current_control = fpu.current_control();
 #endif
