@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClInclude Include="Clock.h" />
     <ClInclude Include="CheckHR.h" />
+    <ClInclude Include="FPU.h" />
     <ClInclude Include="InputDevice.h" />
     <ClInclude Include="PreCompile.h" />
     <ClInclude Include="ScopedWindowsTypes.h" />
@@ -103,6 +104,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Clock.cpp" />
+    <ClCompile Include="FPU.cpp" />
     <ClCompile Include="InputDevice.cpp" />
     <ClCompile Include="ThreadAffinity.cpp" />
     <ClCompile Include="Tracing.cpp" />
