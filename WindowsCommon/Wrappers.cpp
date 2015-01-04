@@ -10,7 +10,7 @@ namespace WindowsCommon
 
 LRESULT CALLBACK Window_procedure::static_window_proc(__in HWND window, UINT message, WPARAM w_param, LPARAM l_param) NOEXCEPT
 {
-    dprintf("%s\n", string_from_window_message(message));
+    PortableRuntime::dprintf("%s\n", string_from_window_message(message));
 
     // Sent by CreateWindow.
     if(message == WM_NCCREATE)

@@ -288,6 +288,7 @@ PCSTR string_from_window_message(UINT message) NOEXCEPT
 {
     PCSTR text;
 
+    // TODO: Add %04x to the strings below to track the message number.
     size_t index;
     if(message >= WM_APP)       // WM_APP = 0x8000.
     {

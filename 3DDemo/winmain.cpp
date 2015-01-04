@@ -1,6 +1,8 @@
 #include "PreCompile.h"
 #include "app.h"
 #include "CheckHR.h"
+#include "DebuggerTracing.h"
+#include "Tracing.h"
 
 // The command line and environment can also be accessed
 // via __argc, __targv, and _tenviron.
@@ -13,6 +15,8 @@ int WINAPI _tWinMain(_In_ HINSTANCE instance,   // Handle to the program instanc
                      _In_ int show_command)     // How the window is to be displayed.
 {
     UNREFERENCED_PARAMETER(command_line);
+
+    PortableRuntime::set_dprintf(WindowsCommon::debugger_dprintf);
 
     // Default the return code to 0, which is registered as ERRORLEVEL=0 in
     // a batch file.  This means running the app was successful.

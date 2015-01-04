@@ -23,9 +23,6 @@
     <ClInclude Include="WindowsGL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Tracing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="InputDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -44,6 +41,9 @@
     <ClInclude Include="WindowMessages.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DebuggerTracing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FPU.cpp">
@@ -56,9 +56,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WindowsGL.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tracing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InputDevice.cpp">
@@ -77,6 +74,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WindowMessages.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DebuggerTracing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

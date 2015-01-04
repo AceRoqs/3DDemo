@@ -53,19 +53,19 @@ static void dprintf_gl_strings()
 {
 #ifndef NDEBUG
     const char* vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
-    dprintf("OpenGL vendor: %s\n", vendor != nullptr ? vendor : "");
+    PortableRuntime::dprintf("OpenGL vendor: %s\n", vendor != nullptr ? vendor : "");
 
     const char* renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
-    dprintf("OpenGL renderer: %s\n", renderer != nullptr ? renderer : "");
+    PortableRuntime::dprintf("OpenGL renderer: %s\n", renderer != nullptr ? renderer : "");
 
     const char* version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
-    dprintf("OpenGL version: %s\n", version != nullptr ? version : "");
+    PortableRuntime::dprintf("OpenGL version: %s\n", version != nullptr ? version : "");
 
     auto extensions = get_opengl_extensions();
-    dprintf("OpenGL extensions:\n");
+    PortableRuntime::dprintf("OpenGL extensions:\n");
     std::for_each(extensions.cbegin(), extensions.cend(), [](const std::string& extension)
     {
-        dprintf("%s\n", extension.c_str());
+        PortableRuntime::dprintf("%s\n", extension.c_str());
     });
 #endif
 }
