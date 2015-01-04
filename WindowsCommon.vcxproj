@@ -89,7 +89,7 @@
     <ClInclude Include="PreCompile.h" />
     <ClInclude Include="ScopedWindowsTypes.h" />
     <ClInclude Include="ThreadAffinity.h" />
-    <ClInclude Include="Tracing.h" />
+    <ClInclude Include="DebuggerTracing.h" />
     <ClInclude Include="WindowMessages.h" />
     <ClInclude Include="WindowsGL.h" />
     <ClInclude Include="Wrappers.h" />
@@ -99,7 +99,7 @@
     <ClCompile Include="FPU.cpp" />
     <ClCompile Include="InputDevice.cpp" />
     <ClCompile Include="ThreadAffinity.cpp" />
-    <ClCompile Include="Tracing.cpp" />
+    <ClCompile Include="DebuggerTracing.cpp" />
     <ClCompile Include="CheckHR.cpp" />
     <ClCompile Include="PreCompile.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
