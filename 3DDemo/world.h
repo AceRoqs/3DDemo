@@ -1,13 +1,12 @@
 #pragma once
 
-// TODO: 2014: Need to define rules on when to include a header vs. when to use forward declarations.
-namespace ImageProcessing
-{
-    struct Bitmap;
-}
+#include "Bitmap.h"
 
 namespace Demo
 {
+
+struct Vector3f;
+struct Vector2f;
 
 struct Polygon
 {
@@ -32,9 +31,6 @@ struct Map
 std::istream& operator>>(std::istream& is, Demo::Polygon& polygon);
 
 bool is_point_in_world(const struct Vector3f& point);
-
-struct Vector3f;
-struct Vector2f;
 
 Map start_load(
     _In_z_ const char* file_name,

@@ -1,10 +1,6 @@
 #pragma once
 
-// TODO: 2014: Need to define rules on when to include a header vs. when to use forward declarations.
-namespace ImageProcessing
-{
-    struct Bitmap;
-}
+#include "Bitmap.h"
 
 namespace Demo
 {
