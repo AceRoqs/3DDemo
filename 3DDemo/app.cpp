@@ -90,7 +90,7 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
         WindowsCommon::Keyboard_state keyboard_state;
         keyboard.get_input(&keyboard_state);
 
-        std::list<std::pair<float, Action>> actions = actions_from_keyboard_state(elapsed_milliseconds, keyboard_state);
+        const std::vector<std::pair<float, Action>> actions = actions_from_keyboard_state(elapsed_milliseconds, keyboard_state);
         camera = apply_actions(actions, camera);
 
         // Set level-of-detail.

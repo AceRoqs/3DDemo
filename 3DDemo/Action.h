@@ -13,7 +13,7 @@ enum class Action
     Turn_left
 };
 
-struct Camera apply_actions(const std::list<std::pair<float, Action>>& actions, const struct Camera& camera);
+struct Camera apply_actions(const std::vector<std::pair<float, Action>>& actions, const struct Camera& camera);
 
 }
 

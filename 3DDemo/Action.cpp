@@ -6,7 +6,7 @@
 namespace Demo
 {
 
-Camera apply_actions(const std::list<std::pair<float, Action>>& actions, const Camera& camera)
+Camera apply_actions(const std::vector<std::pair<float, Action>>& actions, const Camera& camera)
 {
     Camera new_camera = camera;
     float new_x = new_camera.m_position.x();

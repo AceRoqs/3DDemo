@@ -25,7 +25,7 @@
 #include <functional>
 #include <iostream>
 #include <fstream>
-#include <list>
+#include <vector>
 
 // Windows API.
 #ifdef WIN32

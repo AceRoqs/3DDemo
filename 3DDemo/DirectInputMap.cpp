@@ -26,11 +26,11 @@ const static struct Action_map
     DIK_RIGHT,   Action::Turn_right,
 };
 
-std::list<std::pair<float, Action>> actions_from_keyboard_state(float ellapsed_milliseconds, const WindowsCommon::Keyboard_state& keyboard_state)
+std::vector<std::pair<float, Action>> actions_from_keyboard_state(float ellapsed_milliseconds, const WindowsCommon::Keyboard_state& keyboard_state)
 {
     // TODO: 2014: should this be an input map of all inputs (mouse, keyboard, network, time)
     // rather than an action map?
-    std::list<std::pair<float, Action>> actions;
+    std::vector<std::pair<float, Action>> actions;
     std::for_each(action_map, action_map + ARRAYSIZE(action_map), [&](const Action_map& map)
     {
         if(keyboard_state[map.input])
@@ -39,8 +39,8 @@ std::list<std::pair<float, Action>> actions_from_keyboard_state(float ellapsed_m
         }
     });
 
-    actions.sort();
-    actions.unique();
+    std::sort(std::begin(actions), std::end(actions));
+    std::unique(std::begin(actions), std::end(actions));
 
     return actions;
 }
@@ -49,9 +49,9 @@ std::list<std::pair<float, Action>> actions_from_keyboard_state(float ellapsed_m
 #if 0
 #include <XInput.h>
 
-std::list<std::pair<float, Action>> actions_from_joystick_state(float ellapsed_milliseconds)
+std::vector<std::pair<float, Action>> actions_from_joystick_state(float ellapsed_milliseconds)
 {
-    std::list<std::pair<float, Action>> actions;
+    std::vector<std::pair<float, Action>> actions;
 
     XINPUT_STATE state = {};
     DWORD dwResult = XInputGetState(0, &state);
