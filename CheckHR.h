@@ -3,7 +3,7 @@
 namespace WindowsCommon
 {
 
-// TODO: Move bodies to .cpp, and move type definitions above function 
+// TODO: Move bodies to .cpp, and move type definitions above function prototypes.
 HRESULT hresult_from_last_error() NOEXCEPT;
 
 class HRESULT_exception : public std::exception
