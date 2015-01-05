@@ -3,52 +3,24 @@
 namespace WindowsCommon
 {
 
-// TODO: Move bodies to .cpp, and move type definitions above function prototypes.
-HRESULT hresult_from_last_error() NOEXCEPT;
-
 class HRESULT_exception : public std::exception
 {
 public:
-    HRESULT_exception(HRESULT hr);
+    HRESULT_exception(HRESULT hr) NOEXCEPT;
 
     // Define a method besides exception::what() that doesn't require heap memory allocation.
-    virtual void get_error_string(_Out_writes_z_(size) PTSTR error_string, size_t size) const;
+    virtual void get_error_string(_Out_writes_z_(size) PTSTR error_string, size_t size) const NOEXCEPT;
 
     HRESULT m_hr;
 };
 
-inline void check_hr(HRESULT hr)
-{
-    assert(SUCCEEDED(hr));
-    if(FAILED(hr))
-    {
-        assert(false);
-        throw HRESULT_exception(hr);
-    }
-}
-
-inline void check_windows_error(BOOL result)
-{
-    assert(result);
-    if(!result)
-    {
-        HRESULT hr = hresult_from_last_error();
-        assert(FAILED(hr));
-        throw HRESULT_exception(hr);
-    }
-}
-
-inline void check_with_custom_hr(BOOL result, HRESULT hr)
-{
-    assert(result);
-    if(!result)
-    {
-        assert(FAILED(hr));
-        throw HRESULT_exception(hr);
-    }
-}
+HRESULT hresult_from_last_error() NOEXCEPT;
+void check_hr(HRESULT hr);
+void check_windows_error(BOOL result);
+void check_with_custom_hr(BOOL result, HRESULT hr);
 
 // These macros should only be used to work around static analysis warnings.
+// TODO: Passing a function as expr is not valid.  Check this.
 #define CHECK_WINDOWS_ERROR(expr) { WindowsCommon::check_windows_error(expr); _Analysis_assume_(expr); }
 #define CHECK_WITH_CUSTOM_HR(expr, hr) { WindowsCommon::check_with_custom_hr(expr, hr); _Analysis_assume_(expr); }
 
