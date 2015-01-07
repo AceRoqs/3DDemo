@@ -6,17 +6,17 @@
 #include "Camera.h"
 #include "Action.h"
 #include "Bezier.h"
-#include <ImageProcessing/Bitmap.h>
 #include "DirectInputMap.h"
 #include "LinearAlgebra.h"
-#include "FPU.h"
-#include "CheckHR.h"
-#include "Clock.h"
-#include "InputDevice.h"
-#include "ThreadAffinity.h"
 #include "Tracing.h"
-#include "WindowMessages.h"
-#include "WindowsGL.h"
+#include <ImageProcessing/Bitmap.h>
+#include <WindowsCommon/FPU.h>
+#include <WindowsCommon/CheckHR.h>
+#include <WindowsCommon/Clock.h>
+#include <WindowsCommon/InputDevice.h>
+#include <WindowsCommon/ThreadAffinity.h>
+#include <WindowsCommon/WindowMessages.h>
+#include <WindowsCommon/WindowsGL.h>
 
 namespace Demo
 {

@@ -3,8 +3,8 @@
 #include <ImageProcessing/pcx.h>
 #include <ImageProcessing/targa.h>
 #include "CheckException.h"
-#include "CheckHR.h"
-#include "Wrappers.h"
+#include <WindowsCommon/CheckHR.h>
+#include <WindowsCommon/Wrappers.h>
 
 namespace Demo
 {

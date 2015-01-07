@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CheckHR.h"
+#include <WindowsCommon/CheckHR.h>
 
 namespace Direct3D9Common
 {

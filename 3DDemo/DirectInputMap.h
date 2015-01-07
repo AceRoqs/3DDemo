@@ -1,7 +1,7 @@
 #pragma once
 
 // TODO: can this header be removed somehow?
-#include "InputDevice.h"
+#include <WindowsCommon/InputDevice.h>
 
 namespace Demo
 {
