@@ -2,9 +2,9 @@
 #include "BitmapReader.h"       // Pick up forward declarations to ensure correctness.
 #include <ImageProcessing/pcx.h>
 #include <ImageProcessing/targa.h>
-#include "CheckException.h"
 #include <WindowsCommon/CheckHR.h>
 #include <WindowsCommon/Wrappers.h>
+#include <PortableRuntime/CheckException.h>
 
 namespace Demo
 {

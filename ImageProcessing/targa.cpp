@@ -1,7 +1,7 @@
 #include "PreCompile.h"
 #include "targa.h"
 #include "Bitmap.h"
-#include "CheckException.h"
+#include <PortableRuntime/CheckException.h>
 
 // Targa spec:
 // http://www.dca.fee.unicamp.br/~martino/disciplinas/ea978/tgaffs.pdf

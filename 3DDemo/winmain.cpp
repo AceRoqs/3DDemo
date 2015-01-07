@@ -2,7 +2,7 @@
 #include "app.h"
 #include <WindowsCommon/CheckHR.h>
 #include <WindowsCommon/DebuggerTracing.h>
-#include "Tracing.h"
+#include <PortableRuntime/Tracing.h>
 
 // The command line and environment can also be accessed
 // via __argc, __targv, and _tenviron.

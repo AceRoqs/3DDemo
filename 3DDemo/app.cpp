@@ -8,7 +8,6 @@
 #include "Bezier.h"
 #include "DirectInputMap.h"
 #include "LinearAlgebra.h"
-#include "Tracing.h"
 #include <ImageProcessing/Bitmap.h>
 #include <WindowsCommon/FPU.h>
 #include <WindowsCommon/CheckHR.h>
@@ -17,6 +16,7 @@
 #include <WindowsCommon/ThreadAffinity.h>
 #include <WindowsCommon/WindowMessages.h>
 #include <WindowsCommon/WindowsGL.h>
+#include <PortableRuntime/Tracing.h>
 
 namespace Demo
 {

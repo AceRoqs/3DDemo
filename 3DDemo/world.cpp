@@ -2,7 +2,7 @@
 #include "world.h"
 #include "BitmapReader.h"
 #include "LinearAlgebra.h"
-#include "CheckException.h"
+#include <PortableRuntime/CheckException.h>
 
 namespace Demo
 {
