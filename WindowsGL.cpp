@@ -1,7 +1,7 @@
 #include "PreCompile.h"
 #include "WindowsGL.h"      // Pick up forward declarations to ensure correctness.
 #include "CheckHR.h"
-#include "Tracing.h"
+#include <PortableRuntime/Tracing.h>
 
 namespace WindowsCommon
 {

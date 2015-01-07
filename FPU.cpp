@@ -1,6 +1,6 @@
 #include "PreCompile.h"
 #include "FPU.h"                // Pick up forward declarations to ensure correctness.
-#include "CheckException.h"
+#include <PortableRuntime/CheckException.h>
 
 namespace WindowsCommon
 {
