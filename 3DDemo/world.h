@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Bitmap.h"
+#include <ImageProcessing/Bitmap.h>
 
 namespace Demo
 {

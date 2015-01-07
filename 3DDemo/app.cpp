@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "Action.h"
 #include "Bezier.h"
-#include "Bitmap.h"
+#include <ImageProcessing/Bitmap.h>
 #include "DirectInputMap.h"
 #include "LinearAlgebra.h"
 #include "FPU.h"

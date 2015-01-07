@@ -3,7 +3,7 @@
 #include "particle.h"
 #include "world.h"
 #include "Bezier.h"
-#include "Bitmap.h"
+#include <ImageProcessing/Bitmap.h>
 #include "Camera.h"
 #include "LinearAlgebra.h"
 

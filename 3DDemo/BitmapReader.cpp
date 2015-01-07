@@ -1,7 +1,7 @@
 #include "PreCompile.h"
 #include "BitmapReader.h"       // Pick up forward declarations to ensure correctness.
-#include "pcx.h"
-#include "targa.h"
+#include <ImageProcessing/pcx.h>
+#include <ImageProcessing/targa.h>
 #include "CheckException.h"
 #include "CheckHR.h"
 #include "Wrappers.h"
