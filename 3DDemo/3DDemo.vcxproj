@@ -47,12 +47,11 @@
     <Import Project="$(SolutionDir)PropertySheets\WindowsCommon.props" />
     <Import Project="$(SolutionDir)PropertySheets\DisableCRTWarnings.props" />
     <Import Project="$(SolutionDir)PropertySheets\DefaultExeSettings.props" />
+    <Import Project="$(SolutionDir)PropertySheets\DirectX9.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup>
-    <LibraryPath>$(DXSDK_DIR)\Lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemDefinitionGroup>
     <Link>
       <AdditionalLibraryDirectories>$(PortableRuntimeLibDir);$(ImageProcessingLibDir);$(WindowsCommonDir)</AdditionalLibraryDirectories>

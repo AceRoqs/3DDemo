@@ -45,13 +45,11 @@
     <Import Project="$(SolutionDir)PropertySheets\PortableRuntime.props" />
     <Import Project="$(SolutionDir)PropertySheets\WindowsCommon.props" />
     <Import Project="$(SolutionDir)PropertySheets\DefaultLibSettings.props" />
+    <Import Project="$(SolutionDir)PropertySheets\DirectX9.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup>
-    <IncludePath>$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(DXSDK_DIR)\Lib\$(PlatformShortName);$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemDefinitionGroup />
   <ItemGroup>
     <ClInclude Include="CheckDX9.h" />
