@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <OutDir>$(GlobalOutDir)</OutDir>
+    <IntDir>$(GlobalIntDir)</IntDir>
+    <GeneratedFilesDir>$(IntDir)</GeneratedFilesDir>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisOutputBaseName Condition="'$(CodeAnalysisOutputBaseName)'==''">$(IntDir)$(TargetName)$(TargetExt)</CodeAnalysisOutputBaseName>
+    <CodeAnalysisLogFile Condition="'$(CodeAnalysisLogFile)'==''">$(CodeAnalysisOutputBaseName).CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisSucceededFile Condition="'$(CodeAnalysisSucceededFile)'==''">$(CodeAnalysisOutputBaseName).lastcodeanalysissucceeded</CodeAnalysisSucceededFile>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PrecompiledHeaderFile>PreCompile.h</PrecompiledHeaderFile>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/Zo %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>
