@@ -5,4 +5,9 @@
     <PortableRuntimeLibDir>$(GlobalOutDir)</PortableRuntimeLibDir>
     <PortableRuntimeLibraries>PortableRuntime.lib</PortableRuntimeLibraries>
   </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(PortableRuntimeDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
 </Project>
