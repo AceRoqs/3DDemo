@@ -41,7 +41,7 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="$(SolutionDir)PropertySheets\Project2.Default.props" />
     <Import Project="$(SolutionDir)PropertySheets\PortableRuntime.props" />
-    <Import Project="$(SolutionDir)PropertySheets\DisableCRTWarnings.props" />
+    <Import Project="$(SolutionDir)PropertySheets\CRTWarnings.Disable.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
