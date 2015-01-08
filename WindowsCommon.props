@@ -5,4 +5,9 @@
     <WindowsCommonLibDir>$(GlobalOutDir)</WindowsCommonLibDir>
     <WindowsCommonLibraries>WindowsCommon.lib</WindowsCommonLibraries>
   </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(WindowsCommonDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
 </Project>
