@@ -5,4 +5,9 @@
     <ImageProcessingLibDir>$(GlobalOutDir)</ImageProcessingLibDir>
     <ImageProcessingLibraries>ImageProcessing.lib</ImageProcessingLibraries>
   </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ImageProcessingDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
 </Project>
