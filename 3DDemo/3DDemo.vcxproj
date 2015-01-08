@@ -35,7 +35,7 @@
     <Import Project="$(SolutionDir)PropertySheets\PortableRuntime.props" />
     <Import Project="$(SolutionDir)PropertySheets\ImageProcessing.props" />
     <Import Project="$(SolutionDir)PropertySheets\WindowsCommon.props" />
-    <Import Project="$(SolutionDir)PropertySheets\DisableCRTWarnings.props" />
+    <Import Project="$(SolutionDir)PropertySheets\CRTWarnings.Disable.props" />
     <Import Project="$(SolutionDir)PropertySheets\DirectX9.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
