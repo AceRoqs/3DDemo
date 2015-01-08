@@ -18,13 +18,12 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <Import Project="$(SolutionDir)PropertySheets\DefaultGlobals.props" />
+  <Import Project="$(SolutionDir)PropertySheets\Project.Default.props" />
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8551B751-B7FF-443B-AC88-87F8A57E3FC4}</ProjectGuid>
     <RootNamespace>3DDemo</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <Import Project="$(SolutionDir)PropertySheets\DefaultConfiguration.props" />
   <PropertyGroup Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
@@ -32,7 +31,6 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(SolutionDir)PropertySheets\Artifacts.props" />
     <Import Project="$(SolutionDir)PropertySheets\PortableRuntime.props" />
     <Import Project="$(SolutionDir)PropertySheets\ImageProcessing.props" />
     <Import Project="$(SolutionDir)PropertySheets\WindowsCommon.props" />
