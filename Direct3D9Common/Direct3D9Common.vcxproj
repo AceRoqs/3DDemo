@@ -28,8 +28,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="PropertySheets">
     <Import Project="$(PropertySheetsDir)Project2.Default.props" />
     <Import Project="$(PropertySheetsDir)DirectX9.props" />
@@ -43,14 +42,11 @@
   <ItemGroup>
     <ClInclude Include="CheckDX9.h" />
     <ClInclude Include="PreCompile.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="CheckDX9.cpp" />
     <ClCompile Include="PreCompile.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

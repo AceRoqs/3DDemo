@@ -28,8 +28,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="PropertySheets">
     <Import Project="$(PropertySheetsDir)Project2.Default.props" />
     <Import Project="$(PropertySheetsDir)PortableRuntime.props" />
@@ -53,8 +52,6 @@
     <ClInclude Include="WindowMessages.h" />
     <ClInclude Include="WindowsGL.h" />
     <ClInclude Include="Wrappers.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="FPU.cpp" />
     <ClCompile Include="InputDevice.cpp" />
@@ -70,6 +67,5 @@
     <ClCompile Include="WindowsGL.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

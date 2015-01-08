@@ -28,8 +28,7 @@
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="PropertySheets">
     <Import Project="$(PropertySheetsDir)Project2.Default.props" />
     <Import Project="$(PropertySheetsDir)CRTWarnings.Disable.props" />
@@ -48,8 +47,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ResourceCompile Include="3DDemo.rc" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="Action.cpp" />
     <ClCompile Include="app.cpp" />
     <ClCompile Include="Bezier.cpp" />
@@ -63,8 +60,6 @@
     <ClCompile Include="render.cpp" />
     <ClCompile Include="winmain.cpp" />
     <ClCompile Include="world.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Action.h" />
     <ClInclude Include="app.h" />
     <ClInclude Include="Bezier.h" />
@@ -77,12 +72,9 @@
     <ClInclude Include="render.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="world.h" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="icon1.ico" />
     <None Include="polydefs.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>
