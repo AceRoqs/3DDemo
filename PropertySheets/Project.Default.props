@@ -19,7 +19,9 @@
     <WindowsAppContainer>true</WindowsAppContainer>
   </PropertyGroup>
   <ImportGroup Label="PropertySheets" />
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="UserMacros">
+    <PropertySheetsDir>$(SolutionDir)PropertySheets\</PropertySheetsDir>
+  </PropertyGroup>
   <PropertyGroup>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisOutputBaseName Condition="'$(CodeAnalysisOutputBaseName)'==''">$(IntDir)$(TargetName)$(TargetExt)</CodeAnalysisOutputBaseName>

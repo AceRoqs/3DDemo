@@ -31,12 +31,12 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(SolutionDir)PropertySheets\Project2.Default.props" />
-    <Import Project="$(SolutionDir)PropertySheets\PortableRuntime.props" />
-    <Import Project="$(SolutionDir)PropertySheets\ImageProcessing.props" />
-    <Import Project="$(SolutionDir)PropertySheets\WindowsCommon.props" />
-    <Import Project="$(SolutionDir)PropertySheets\CRTWarnings.Disable.props" />
-    <Import Project="$(SolutionDir)PropertySheets\DirectX9.props" />
+    <Import Project="$(PropertySheetsDir)Project2.Default.props" />
+    <Import Project="$(PropertySheetsDir)CRTWarnings.Disable.props" />
+    <Import Project="$(PropertySheetsDir)DirectX9.props" />
+    <Import Project="$(PropertySheetsDir)ImageProcessing.props" />
+    <Import Project="$(PropertySheetsDir)PortableRuntime.props" />
+    <Import Project="$(PropertySheetsDir)WindowsCommon.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
