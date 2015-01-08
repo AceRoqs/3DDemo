@@ -54,8 +54,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalLibraryDirectories>$(PortableRuntimeLibDir);$(ImageProcessingLibDir);$(WindowsCommonDir)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(PortableRuntimeLibraries);$(ImageProcessingLibraries);$(WindowsCommonLibraries);xinput.lib;dinput8.lib;dxguid.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>xinput.lib;dinput8.lib;dxguid.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
