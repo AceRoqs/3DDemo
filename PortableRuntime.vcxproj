@@ -36,8 +36,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="PropertySheets">
     <Import Project="$(PropertySheetsDir)Project2.Default.props" />
     <Import Project="$(PropertySheetsDir)CRTWarnings.Disable.props" />
@@ -55,8 +54,6 @@
     <ClInclude Include="PreCPP11.h" />
     <ClInclude Include="Tracing.h" />
     <ClInclude Include="Unicode.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="PreCompile.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -64,6 +61,5 @@
     <ClCompile Include="Unicode.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>
