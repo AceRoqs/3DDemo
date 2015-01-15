@@ -1,5 +1,10 @@
 #pragma once
 
+// Prevent <windows.h> from defining min/max which is different from <algorithm>.
+// Must be included before headers that include WinDef.h.
+// http://support.microsoft.com/kb/143208
+#define NOMINMAX
+
 #include <cassert>
 
 // C++ Standard Library.
@@ -8,6 +13,7 @@
 #include <cstdint>
 #include <exception>
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -33,7 +39,9 @@
 // http://support.microsoft.com/kb/166474
 #define WIN32_LEAN_AND_MEAN
 
-#include <windows.h>
+#include <Windows.h>
+#include <windowsx.h>
+#include <shellapi.h>
 #include <strsafe.h>
 
 #define DIRECTINPUT_VERSION 0x0800
@@ -43,5 +51,6 @@
 
 #include <gl/GL.h>
 
+// PreCPP11.h, being a non-system header, always goes last.
 #include <PortableRuntime/PreCPP11.h>
 

@@ -2,6 +2,7 @@
 #include "Wrappers.h"       // Pick up forward declarations to ensure correctness.
 #include "CheckHR.h"
 #include "WindowMessages.h"
+#include <PortableRuntime/CheckException.h>
 #include <PortableRuntime/Unicode.h>
 #include <PortableRuntime/Tracing.h>
 
@@ -149,7 +150,7 @@ Scoped_device_context get_device_context(_In_ HWND window)
     const auto device_context = GetDC(window);
     CHECK_WITH_CUSTOM_HR(nullptr != device_context, E_FAIL);
 
-    return make_scoped_device_context(device_context, window);
+    return make_scoped_device_context(device_context, release_device_context_functor(window));
 }
 
 Scoped_handle create_file(
@@ -186,10 +187,34 @@ Scoped_handle create_event(
                                      name != nullptr ? PortableRuntime::utf16_from_utf8(name).c_str() : nullptr);
 
     check_windows_error(INVALID_HANDLE_VALUE != handle);
-    assert(0 != handle);    // Per Win32 contract.
-    _Analysis_assume_(0 != handle);
+    assert(handle != 0);    // Per Win32 contract.
+    _Analysis_assume_(handle != 0);
 
     return make_scoped_handle(handle);
+}
+
+Scoped_font select_font(_In_ HFONT font, _In_ HDC device_context)
+{
+    const auto old_font = static_cast<HFONT>(SelectObject(device_context, static_cast<HGDIOBJ>(font)));
+    CHECK_WITH_CUSTOM_HR(old_font != nullptr, E_FAIL);
+
+    return make_scoped_font(old_font, select_object_functor(device_context));
+}
+
+Scoped_font create_font_indirect(_In_ LOGFONT* log_font)
+{
+    const HFONT font = CreateFontIndirect(log_font);
+    CHECK_WITH_CUSTOM_HR(font != nullptr, E_FAIL);
+
+    return make_scoped_font(font);
+}
+
+Scoped_device_context begin_paint(_In_ HWND window, _Out_ PAINTSTRUCT* paint_struct)
+{
+    const auto device_context = BeginPaint(window, paint_struct);
+    CHECK_WITH_CUSTOM_HR(device_context != nullptr, E_FAIL);
+
+    return make_scoped_device_context(device_context, end_paint_functor(window, paint_struct));
 }
 
 }
