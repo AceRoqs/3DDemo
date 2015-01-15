@@ -8,7 +8,7 @@ namespace PortableRuntime
 std::wstring utf16_from_utf8(const std::string& utf8_string)
 {
     std::wstring utf16_string;
-    utf16_string = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().from_bytes(utf8_string);
+    utf16_string = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>().from_bytes(utf8_string);
 
     return utf16_string;
 }
