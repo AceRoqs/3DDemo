@@ -16,7 +16,9 @@ int WINAPI _tWinMain(_In_ HINSTANCE instance,   // Handle to the program instanc
 {
     UNREFERENCED_PARAMETER(command_line);
 
+#ifndef NDEBUG
     PortableRuntime::set_dprintf(WindowsCommon::debugger_dprintf);
+#endif
 
     // Default the return code to 0, which is registered as ERRORLEVEL=0 in
     // a batch file.  This means running the app was successful.
