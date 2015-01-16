@@ -16,9 +16,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PortableRuntime", "PortableRuntime\PortableRuntime.vcxproj", "{0D716D67-7339-4780-9764-F48808DB8DAE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageProcessing", "ImageProcessing\ImageProcessing.vcxproj", "{07192AC8-2BCA-4F84-8ADE-BA47F038A2B6}"
-	ProjectSection(ProjectDependencies) = postProject
-		{0D716D67-7339-4780-9764-F48808DB8DAE} = {0D716D67-7339-4780-9764-F48808DB8DAE}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
