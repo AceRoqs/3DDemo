@@ -26,7 +26,7 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <Import Project="$(SolutionDir)PropertySheets\Project.Default.props" />
+  <Import Project="$(SolutionDir)Configurations\Project.Default.props" />
   <PropertyGroup Label="Globals">
     <ProjectGuid>{07192AC8-2BCA-4F84-8ADE-BA47F038A2B6}</ProjectGuid>
     <RootNamespace>ImageProcessing</RootNamespace>
@@ -38,10 +38,10 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(PropertySheetsDir)Project2.Default.props" />
-    <Import Project="$(PropertySheetsDir)CRTWarnings.Disable.props" />
-    <Import Project="$(PropertySheetsDir)ImageProcessing.props" />
-    <Import Project="$(PropertySheetsDir)PortableRuntime.props" />
+    <Import Project="$(ConfigurationsDir)Project2.Default.props" />
+    <Import Project="$(ConfigurationsDir)CRTWarnings.Disable.props" />
+    <Import Project="$(ConfigurationsDir)ImageProcessing.props" />
+    <Import Project="$(ConfigurationsDir)PortableRuntime.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
