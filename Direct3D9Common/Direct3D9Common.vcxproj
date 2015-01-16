@@ -18,7 +18,7 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <Import Project="$(SolutionDir)PropertySheets\Project.Default.props" />
+  <Import Project="$(SolutionDir)Configurations\Project.Default.props" />
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F7B0044A-AF74-4FC1-B877-76438F568131}</ProjectGuid>
     <RootNamespace>Direct3D9Common</RootNamespace>
@@ -30,10 +30,10 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(PropertySheetsDir)Project2.Default.props" />
-    <Import Project="$(PropertySheetsDir)DirectX9.props" />
-    <Import Project="$(PropertySheetsDir)PortableRuntime.props" />
-    <Import Project="$(PropertySheetsDir)WindowsCommon.props" />
+    <Import Project="$(ConfigurationsDir)Project2.Default.props" />
+    <Import Project="$(ConfigurationsDir)DirectX9.props" />
+    <Import Project="$(ConfigurationsDir)PortableRuntime.props" />
+    <Import Project="$(ConfigurationsDir)WindowsCommon.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
