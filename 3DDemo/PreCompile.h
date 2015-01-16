@@ -1,6 +1,6 @@
 #pragma once
 
-// Prevent <windows.h> from defining min/max which is different from <algorithm>.
+// Prevent <Windows.h> from defining min/max which is different from <algorithm>.
 // Must be included before headers that include WinDef.h.
 // http://support.microsoft.com/kb/143208
 #define NOMINMAX
@@ -59,5 +59,6 @@
 
 #include <gl/GL.h>
 
+// PreCPP11.h, being a non-system header, always goes last.
 #include <PortableRuntime/PreCPP11.h>
 
