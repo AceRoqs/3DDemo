@@ -7,7 +7,7 @@ namespace WindowsCommon
 
 static void unregister_atom(_In_ ATOM atom, _In_ HINSTANCE instance) NOEXCEPT
 {
-    BOOL result = UnregisterClass(MAKEINTATOM(atom), instance);
+    BOOL result = UnregisterClassW(MAKEINTATOM(atom), instance);
     if(!result)
     {
         auto hr = hresult_from_last_error();

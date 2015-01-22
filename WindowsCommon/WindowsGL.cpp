@@ -130,17 +130,16 @@ OpenGL_window::OpenGL_window(_In_ PCSTR window_title, _In_ HINSTANCE instance, b
     }
     else
     {
-        DEVMODE DevMode;
-        ZeroMemory(&DevMode, sizeof(DEVMODE));
+        DEVMODEW DevMode = {};
         DevMode.dmSize = sizeof(DEVMODE);
         DevMode.dmBitsPerPel = 32;
         DevMode.dmPelsWidth = 640;
         DevMode.dmPelsHeight = 480;
         DevMode.dmFields = DM_BITSPERPEL;
 
-        ChangeDisplaySettings(&DevMode, CDS_FULLSCREEN);
+        ChangeDisplaySettingsW(&DevMode, CDS_FULLSCREEN);
         DevMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
-        ChangeDisplaySettings(&DevMode, CDS_FULLSCREEN);
+        ChangeDisplaySettingsW(&DevMode, CDS_FULLSCREEN);
 
         m_state.window = create_window(
             window_title,
@@ -174,7 +173,7 @@ OpenGL_window::~OpenGL_window()
     // TODO: 2014: This is just a placeholder - the fullscreen OpenGL code isn't currently exercised.
     if(!m_windowed)
     {
-        ::ChangeDisplaySettings(nullptr, 0);
+        ChangeDisplaySettingsW(nullptr, 0);
     }
 }
 
@@ -187,9 +186,9 @@ LRESULT OpenGL_window::window_proc(_In_ HWND window, UINT message, WPARAM w_para
         case WM_SIZE:
         {
             RECT client_rectangle;
-            ::GetClientRect(window, &client_rectangle);
+            GetClientRect(window, &client_rectangle);
 
-            ::glViewport(client_rectangle.left, client_rectangle.top, client_rectangle.right, client_rectangle.bottom);
+            glViewport(client_rectangle.left, client_rectangle.top, client_rectangle.right, client_rectangle.bottom);
 
             break;
         }
