@@ -17,7 +17,7 @@ int WINAPI _tWinMain(_In_ HINSTANCE instance,   // Handle to the program instanc
     UNREFERENCED_PARAMETER(command_line);
 
 #ifndef NDEBUG
-    PortableRuntime::set_dprintf(WindowsCommon::debugger_dprintf);
+    PortableRuntime::set_dprintf(WindowsCommon::debugger_dprintf_fast);
 #endif
 
     // Default the return code to 0, which is registered as ERRORLEVEL=0 in
