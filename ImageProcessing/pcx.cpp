@@ -8,8 +8,8 @@
 namespace ImageProcessing
 {
 
-static enum class PCX_manufacturer : uint8_t { PCX_magic = 10 };
-static enum class PCX_version : uint8_t
+enum class PCX_manufacturer : uint8_t { PCX_magic = 10 };
+enum class PCX_version : uint8_t
 {
     PC_Paintbrush_2_5 = 0,          // PC Paintbrush 2.5.
     PC_Paintbrush_2_8_palette = 2,  // PC Paintbrush 2.8 with palette info.
@@ -17,7 +17,7 @@ static enum class PCX_version : uint8_t
     PC_Paintbrush_Windows = 4,      // PC Paintbrush for Windows.
     PC_Paintbrush_3 = 5,            // PC Paintbrush 3.0+.
 };
-static enum class PCX_encoding : uint8_t { RLE_encoding = 1 };
+enum class PCX_encoding : uint8_t { RLE_encoding = 1 };
 
 #pragma pack(push)
 #pragma pack(1)

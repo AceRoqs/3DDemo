@@ -11,13 +11,13 @@ namespace ImageProcessing
 
 const unsigned int max_dimension = 16384;
 
-static enum class TGA_color_map : uint8_t
+enum class TGA_color_map : uint8_t
 {
     Has_no_color_map = 0,
     Has_color_map = 1,
 };
 
-static enum class TGA_image_type : uint8_t
+enum class TGA_image_type : uint8_t
 {
     No_image_data = 0,
     Color_mapped = 1,
@@ -28,7 +28,7 @@ static enum class TGA_image_type : uint8_t
     RLE_black_and_white = 11,
 };
 
-static enum class TGA_alpha_type : uint8_t
+enum class TGA_alpha_type : uint8_t
 {
     No_alpha = 0,                       // No alpha data exists.
     Ignorable_alpha = 1,                // Alpha data can be ignored.
