@@ -6,7 +6,7 @@
 #include <exception>
 
 // Windows API.
-#ifdef WIN32
+#ifdef _WIN32
 
 // Define to prevent using namespace ATL by default.
 // http://msdn.microsoft.com/en-us/library/a477k694.aspx
@@ -32,7 +32,7 @@
 #include <d3dx9.h>
 #include <DxErr.h>
 
-#endif  // WIN32
+#endif  // _WIN32
 
 #include <PortableRuntime/PreCPP11.h>
 
