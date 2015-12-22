@@ -244,7 +244,7 @@ static void delete_gl_context(_In_ HGLRC gl_context) NOEXCEPT
 
 Scoped_gl_context make_scoped_gl_context(_In_ HGLRC gl_context)
 {
-    return std::move(Scoped_gl_context(gl_context, std::function<void (HGLRC)>(delete_gl_context)));
+    return Scoped_gl_context(gl_context, std::function<void (HGLRC)>(delete_gl_context));
 }
 
 static void clear_gl_context(_In_opt_ HGLRC gl_context) NOEXCEPT
@@ -263,7 +263,7 @@ Scoped_current_context make_scoped_current_context(_In_ HGLRC gl_context)
 {
     // TODO: I can't think of a better way than to pass a gl_context, even though it is unused.
     // A non-null variable is required for the deleter to be part of move construction.
-    return std::move(Scoped_current_context(gl_context, std::function<void (HGLRC)>(clear_gl_context)));
+    return Scoped_current_context(gl_context, std::function<void (HGLRC)>(clear_gl_context));
 }
 
 }
