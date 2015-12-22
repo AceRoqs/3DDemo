@@ -160,7 +160,7 @@ Bitmap decode_bitmap_from_pcx_memory(_In_reads_(size) const uint8_t* pcx_memory,
     pcx_decode(start_iterator, end_iterator, &bitmap.bitmap[0], &bitmap.bitmap[0] + bitmap.bitmap.size(), palette);
 
     // Return value optimization expected.
-    return std::move(bitmap);
+    return bitmap;
 }
 
 }

@@ -196,7 +196,7 @@ Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory,
     }
 
     // Return value optimization expected.
-    return std::move(bitmap);
+    return bitmap;
 }
 
 std::vector<uint8_t> encode_tga_from_bitmap(const Bitmap& bitmap)
@@ -218,7 +218,7 @@ std::vector<uint8_t> encode_tga_from_bitmap(const Bitmap& bitmap)
     std::copy(pixel_start, pixel_start + bitmap.bitmap.size() * sizeof(Color_rgb), &tga[sizeof(TGA_header)]);
 
     // Return value optimization expected.
-    return std::move(tga);
+    return tga;
 }
 
 }
