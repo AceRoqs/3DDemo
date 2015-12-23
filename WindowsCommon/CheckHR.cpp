@@ -4,11 +4,11 @@
 namespace WindowsCommon
 {
 
-HRESULT_exception::HRESULT_exception(HRESULT hr) NOEXCEPT : m_hr(hr)
+HRESULT_exception::HRESULT_exception(HRESULT hr) noexcept : m_hr(hr)
 {
 }
 
-void HRESULT_exception::get_error_string(_Out_writes_z_(size) PTSTR error_string, size_t size) const NOEXCEPT
+void HRESULT_exception::get_error_string(_Out_writes_z_(size) PTSTR error_string, size_t size) const noexcept
 {
 #ifdef _D3D9_H_
     // D3D errors should use D3D9_exception.
@@ -31,7 +31,7 @@ void HRESULT_exception::get_error_string(_Out_writes_z_(size) PTSTR error_string
     StringCchPrintf(error_string, size, TEXT("Error: %08x: %s"), m_hr, message);
 }
 
-HRESULT hresult_from_last_error() NOEXCEPT
+HRESULT hresult_from_last_error() noexcept
 {
     DWORD error = GetLastError();
     HRESULT hr = HRESULT_FROM_WIN32(error);
