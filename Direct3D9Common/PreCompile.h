@@ -34,5 +34,3 @@
 
 #endif  // _WIN32
 
-#include <PortableRuntime/PreCPP11.h>
-
