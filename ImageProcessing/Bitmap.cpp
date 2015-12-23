@@ -18,7 +18,7 @@ Bitmap::Bitmap() :
 static void generate_grid_texture_rgb(
     _Out_writes_(xsize * ysize) uint8_t* bitmap,
     unsigned int xsize,
-    unsigned int ysize) NOEXCEPT
+    unsigned int ysize) noexcept
 {
     for(unsigned int iy = 0; iy < ysize; ++iy)
     {
