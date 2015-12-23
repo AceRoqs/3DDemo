@@ -115,12 +115,12 @@ class App_window : public WindowsCommon::OpenGL_window
 {
 public:
     App_window(_In_ HINSTANCE instance, bool windowed) :
-        OpenGL_window(UTF8("3D Demo 1999 (Updated for C++11)"), instance, windowed)
+        OpenGL_window(u8"3D Demo 1999 (Updated for C++11)", instance, windowed)
     {
     }
 
 protected:
-    LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) NOEXCEPT OVERRIDE
+    LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) noexcept override
     {
         LRESULT return_value = OpenGL_window::window_proc(window, message, w_param, l_param);
 

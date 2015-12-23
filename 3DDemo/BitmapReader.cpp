@@ -12,7 +12,7 @@ namespace Demo
 // This function is case sensitive due to the lack of library support for
 // UTF-8 case insensitive matching.
 // TODO: Consider case insensitive for ASCII subset of UTF-8.
-static bool file_has_extension_case_sensitive(_In_z_ const char* file_name, _In_z_ const char* extension) NOEXCEPT
+static bool file_has_extension_case_sensitive(_In_z_ const char* file_name, _In_z_ const char* extension) noexcept
 {
     const size_t length_file = strlen(file_name);
     const size_t length_extension = strlen(extension);
