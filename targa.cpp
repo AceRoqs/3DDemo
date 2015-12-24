@@ -11,13 +11,13 @@ namespace ImageProcessing
 
 const unsigned int max_dimension = 16384;
 
-static enum class TGA_color_map : uint8_t
+enum class TGA_color_map : uint8_t
 {
     Has_no_color_map = 0,
     Has_color_map = 1,
 };
 
-static enum class TGA_image_type : uint8_t
+enum class TGA_image_type : uint8_t
 {
     No_image_data = 0,
     Color_mapped = 1,
@@ -28,7 +28,7 @@ static enum class TGA_image_type : uint8_t
     RLE_black_and_white = 11,
 };
 
-static enum class TGA_alpha_type : uint8_t
+enum class TGA_alpha_type : uint8_t
 {
     No_alpha = 0,                       // No alpha data exists.
     Ignorable_alpha = 1,                // Alpha data can be ignored.
@@ -196,7 +196,7 @@ Bitmap decode_bitmap_from_tga_memory(_In_count_(size) const uint8_t* tga_memory,
     }
 
     // Return value optimization expected.
-    return std::move(bitmap);
+    return bitmap;
 }
 
 std::vector<uint8_t> encode_tga_from_bitmap(const Bitmap& bitmap)
@@ -218,7 +218,7 @@ std::vector<uint8_t> encode_tga_from_bitmap(const Bitmap& bitmap)
     std::copy(pixel_start, pixel_start + bitmap.bitmap.size() * sizeof(Color_rgb), &tga[sizeof(TGA_header)]);
 
     // Return value optimization expected.
-    return std::move(tga);
+    return tga;
 }
 
 }
