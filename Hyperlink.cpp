@@ -347,12 +347,12 @@ void Hyperlink_control::navigate() NOEXCEPT
     // attempts to call WinExec() if ShellExecute() fails.  Use the simple
     // version until a modern browser is discovered where it doesn't work.
     // http://www.drdobbs.com/184416463
-    ShellExecute(m_window,              // Window.
-                 L"open",               // Operation.
-                 m_link_name.c_str(),   // File.
-                 nullptr,               // Parameters.
-                 nullptr,               // Directory.
-                 SW_SHOWNORMAL);        // Show command.
+    ShellExecuteW(m_window,             // Window.
+                  L"open",              // Operation.
+                  m_link_name.c_str(),  // File.
+                  nullptr,              // Parameters.
+                  nullptr,              // Directory.
+                  SW_SHOWNORMAL);       // Show command.
 }
 
 RECT Hyperlink_control::get_hit_rect(_In_ HDC device_context)

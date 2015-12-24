@@ -322,10 +322,10 @@ bool dispatch_all_windows_messages(_Out_ MSG* message) NOEXCEPT
             break;
         }
 
-        ::TranslateMessage(message);
-        DispatchMessage(message);
+        TranslateMessage(message);
+        DispatchMessageW(message);
 
-        message_exists = PeekMessage(message, nullptr, 0, 0, PM_REMOVE);
+        message_exists = PeekMessageW(message, nullptr, 0, 0, PM_REMOVE);
     }
 
     return !message_exists || (WM_QUIT != message->message);

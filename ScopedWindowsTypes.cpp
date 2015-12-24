@@ -7,7 +7,7 @@ namespace WindowsCommon
 
 static void unregister_atom(_In_ ATOM atom, _In_ HINSTANCE instance) NOEXCEPT
 {
-    BOOL result = UnregisterClass(MAKEINTATOM(atom), instance);
+    BOOL result = UnregisterClassW(MAKEINTATOM(atom), instance);
     if(!result)
     {
         auto hr = hresult_from_last_error();
@@ -114,6 +114,21 @@ void delete_object(_In_ HFONT font) NOEXCEPT
 Scoped_font make_scoped_font(_In_ HFONT font, std::function<void (HFONT)> deleter)
 {
     return std::move(Scoped_font(font, std::move(deleter)));
+}
+
+static void local_free(_In_ HLOCAL local) NOEXCEPT
+{
+    if(LocalFree(local) != nullptr)
+    {
+        auto hr = hresult_from_last_error();
+        (hr);
+        assert(SUCCEEDED(hr));
+    }
+}
+
+Scoped_local make_scoped_local(_In_ HLOCAL local)
+{
+    return std::move(Scoped_local(local, std::function<void (HLOCAL)>(local_free)));
 }
 
 }
