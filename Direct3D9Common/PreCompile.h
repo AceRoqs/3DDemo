@@ -4,6 +4,7 @@
 
 // C++ Standard Library.
 #include <exception>
+#include <memory>
 
 // Windows API.
 #ifdef _WIN32
