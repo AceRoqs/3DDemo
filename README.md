@@ -3,7 +3,7 @@ This is crap code. Let's get that out of the way.
 In 1999, I wrote a quick 3D demo using OpenGL for class over a period of a couple
 of weeks. It was originally written with Borland C++ Builder, which I soon
 converted to VC6. Since then, I pull it up once every couple of years and tinker
-with it for a few hours. Currently, it's VC2010, with some C++11 constructs.
+with it for a few hours. Currently, it's VC2015, with some C++11 constructs.
 
 The general goal with this code is to refactor it into something sane, and perhaps
 pull out some of the more general code into libraries. The general engine code I
