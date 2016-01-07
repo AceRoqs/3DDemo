@@ -147,11 +147,11 @@ static Map load_world_data(
         {
             // TODO: 2014: Bounds check constant arrays.
             auto ix = poly.vertex_indices[jj];
-            CHECK_EXCEPTION(ix < ARRAYSIZE(world_vertices));
+            CHECK_EXCEPTION(ix < ARRAYSIZE(world_vertices), u8"world_vertices too small for index");
             vertices->push_back(world_vertices[ix]);
 
             ix = poly.texture_coordinates[jj];
-            CHECK_EXCEPTION(ix < ARRAYSIZE(world_texture_coords));
+            CHECK_EXCEPTION(ix < ARRAYSIZE(world_texture_coords), u8"world_texture_coords too small for index");
             texture_coords->push_back(world_texture_coords[ix]);
         }
     }
@@ -159,6 +159,7 @@ static Map load_world_data(
     return map;
 }
 
+// TODO: Ensure file_name is UTF-8.
 Map start_load(
     _In_z_ const char* file_name,
     std::vector<ImageProcessing::Bitmap>* texture_list,
@@ -167,7 +168,7 @@ Map start_load(
 {
     std::ifstream fis;
     fis.open(file_name);
-    PortableRuntime::check_exception(fis.is_open());
+    PortableRuntime::check_exception(fis.is_open(), (std::string("Could not open file:") + file_name).c_str());
 
     return load_world_data(fis, texture_list, vertices, texture_coords);
 }

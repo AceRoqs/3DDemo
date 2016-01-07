@@ -21,6 +21,7 @@ static bool file_has_extension_case_sensitive(_In_z_ const char* file_name, _In_
 
 // TODO: 2014: Previously, ImageProcessing had a dependency on WindowsCommon before this function was removed.
 // Figure out how to handle this type of glue code, and where code like this should live.
+// TODO: Ensure passed in file name is UTF-8.
 ImageProcessing::Bitmap bitmap_from_file(_In_z_ const char* file_name)
 {
     const auto file = WindowsCommon::create_file(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr);
@@ -34,7 +35,7 @@ ImageProcessing::Bitmap bitmap_from_file(_In_z_ const char* file_name)
     // TODO: truncates size.
     std::vector<uint8_t> buffer(size);
     DWORD size_read;
-    PortableRuntime::check_exception(!ReadFile(file, buffer.data(), size, &size_read, &overlapped));
+    PortableRuntime::check_exception(!ReadFile(file, buffer.data(), size, &size_read, &overlapped), (std::string("Failure to read: ") + file_name).c_str());
     const HRESULT hr = WindowsCommon::hresult_from_last_error();
     WindowsCommon::check_with_custom_hr(hr == HRESULT_FROM_WIN32(ERROR_IO_PENDING), hr);
     WaitForSingleObject(read_complete, INFINITE);
