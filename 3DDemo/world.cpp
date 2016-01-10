@@ -168,7 +168,7 @@ Map start_load(
 {
     std::ifstream fis;
     fis.open(file_name);
-    PortableRuntime::check_exception(fis.is_open(), (std::string("Could not open file:") + file_name).c_str());
+    CHECK_EXCEPTION(fis.is_open(), std::string("Could not open file:") + file_name);
 
     return load_world_data(fis, texture_list, vertices, texture_coords);
 }

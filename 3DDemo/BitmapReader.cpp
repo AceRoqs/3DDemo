@@ -35,7 +35,7 @@ ImageProcessing::Bitmap bitmap_from_file(_In_z_ const char* file_name)
     // TODO: truncates size.
     std::vector<uint8_t> buffer(size);
     DWORD size_read;
-    PortableRuntime::check_exception(!ReadFile(file, buffer.data(), size, &size_read, &overlapped), (std::string("Failure to read: ") + file_name).c_str());
+    CHECK_EXCEPTION(!ReadFile(file, buffer.data(), size, &size_read, &overlapped), std::string("Failure to read: ") + file_name);
     const HRESULT hr = WindowsCommon::hresult_from_last_error();
     WindowsCommon::check_with_custom_hr(hr == HRESULT_FROM_WIN32(ERROR_IO_PENDING), hr);
     WaitForSingleObject(read_complete, INFINITE);
@@ -44,11 +44,13 @@ ImageProcessing::Bitmap bitmap_from_file(_In_z_ const char* file_name)
     {
         return ImageProcessing::decode_bitmap_from_pcx_memory(buffer.data(), size);
     }
-    else if(file_has_extension_case_sensitive(file_name, ".tga"))
+    else
     {
+        const bool is_targa = file_has_extension_case_sensitive(file_name, ".tga");
+        CHECK_EXCEPTION(is_targa, std::string("Unsupported file type: ") + file_name);
+
         return ImageProcessing::decode_bitmap_from_tga_memory(buffer.data(), size);
     }
-    throw std::exception();     // TODO: Use check_exception instead of naked throw.
 }
 
 }
