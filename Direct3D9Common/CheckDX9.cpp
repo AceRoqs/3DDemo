@@ -25,7 +25,7 @@ void DX9_exception::get_error_string(_Out_writes_z_(size) PTSTR error_string, si
 // Reference used so that the DX call can be used inline in the function.
 // ex: throw_dx9err_buffer(D3DXCompileShader(..., &error_buffer, ...), error_buffer).
 // Without the reference, the undefined order of parameter evaluation could cause nullptr to be passed for the second error_buffer parameter.
-void throw_dx9err_buffer(HRESULT hr, ATL::CComPtr<ID3DXBuffer>& error_buffer)
+void throw_dx9err_buffer(HRESULT hr, Microsoft::WRL::ComPtr<ID3DXBuffer>& error_buffer)
 {
     if(FAILED(hr) && (nullptr != error_buffer))
     {
