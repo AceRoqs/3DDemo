@@ -218,8 +218,8 @@ void draw_list(
         allIndices[1] = static_cast<unsigned char>(ii * 4 + 1);
         allIndices[2] = static_cast<unsigned char>(ii * 4 + 2);
         allIndices[3] = static_cast<unsigned char>(ii * 4 + 3);
-//        glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_BYTE, allIndices);
-        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, allIndices);
+//        glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_BYTE, &allIndices[0]);
+        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, &allIndices[0]);
 /*
         glBegin(GL_QUADS);
         {
@@ -244,7 +244,7 @@ void draw_list(
 //      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
 
-        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, allIndices);
+        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, &allIndices[0]);
 //        glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_BYTE, allIndices);
 /*
         glBegin(GL_QUADS);

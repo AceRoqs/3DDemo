@@ -31,7 +31,7 @@ std::vector<std::pair<float, Action>> actions_from_keyboard_state(float ellapsed
     // TODO: 2014: should this be an input map of all inputs (mouse, keyboard, network, time)
     // rather than an action map?
     std::vector<std::pair<float, Action>> actions;
-    std::for_each(action_map, action_map + ARRAYSIZE(action_map), [&](const Action_map& map)
+    std::for_each(&action_map[0], &action_map[0] + ARRAYSIZE(action_map), [&](const Action_map& map)
     {
         if(keyboard_state[map.input])
         {
