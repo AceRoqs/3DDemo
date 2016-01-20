@@ -130,7 +130,7 @@ static Map load_world_data(
     {
         char file_name[MAX_PATH];
         is >> file_name;
-        texture_list->push_back(bitmap_from_file(&file_name[0]));
+        texture_list->push_back(bitmap_from_file(file_name));
     }
 
     unsigned int cPolys;
