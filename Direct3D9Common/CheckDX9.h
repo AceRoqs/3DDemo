@@ -8,17 +8,16 @@ namespace Direct3D9Common
 class DX9_exception : public WindowsCommon::HRESULT_exception
 {
 public:
-    DX9_exception(HRESULT hr);
-
-    virtual void get_error_string(_Out_writes_z_(size) PTSTR error_string, size_t size) const noexcept override;
+    DX9_exception(HRESULT hr, _In_z_ const char* file_name, int line);
 };
 
 inline void check_dx9(HRESULT hr)
 {
     if(FAILED(hr))
     {
+        // TODO: The file/line info are just dummies now to keep this compiling.
         assert(false);
-        throw DX9_exception(hr);
+        throw DX9_exception(hr, __FILE__, __LINE__);
     }
 }
 

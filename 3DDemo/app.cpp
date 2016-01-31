@@ -135,74 +135,52 @@ protected:
 
 void app_run(_In_ HINSTANCE instance, int show_command)
 {
-    try
-    {
 #ifndef NDEBUG
-        WindowsCommon::Scoped_FPU_exception_control fpu(_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID);
-        fpu.enable(_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID);
-        auto current_control = fpu.current_control();
+    WindowsCommon::Scoped_FPU_exception_control fpu(_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID);
+    fpu.enable(_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID);
+    auto current_control = fpu.current_control();
 #endif
 
-        // Start load first, to kick off async reads.
-        std::vector<ImageProcessing::Bitmap> texture_list;
-        std::vector<Vector3f> vertices;
-        std::vector<Vector2f> texture_coords;
-        Map map = start_load("polydefs.txt", &texture_list, &vertices, &texture_coords);
+    // Start load first, to kick off async reads.
+    std::vector<ImageProcessing::Bitmap> texture_list;
+    std::vector<Vector3f> vertices;
+    std::vector<Vector2f> texture_coords;
+    Map map = start_load("polydefs.txt", &texture_list, &vertices, &texture_coords);
 
-        App_window app(instance, true);
+    App_window app(instance, true);
 
-        // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
-        initialize_gl_constants();
-        initialize_gl_world_data(texture_list, vertices, texture_coords);
+    // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
+    initialize_gl_constants();
+    initialize_gl_world_data(texture_list, vertices, texture_coords);
 
-        // Set thread affinity to the first available processor, so that QPC
-        // will always be done on the same processor.
-        WindowsCommon::lock_thread_to_first_processor();
-        WindowsCommon::Clock clock;
+    // Set thread affinity to the first available processor, so that QPC
+    // will always be done on the same processor.
+    WindowsCommon::lock_thread_to_first_processor();
+    WindowsCommon::Clock clock;
 
-        WindowsCommon::Input_device keyboard(instance, app.m_state.window);
+    WindowsCommon::Input_device keyboard(instance, app.m_state.window);
 
-        ShowWindow(app.m_state.window, show_command);
-        UpdateWindow(app.m_state.window);
+    ShowWindow(app.m_state.window, show_command);
+    UpdateWindow(app.m_state.window);
 
-        WindowsCommon::debug_validate_message_map();
-        auto return_code = game_message_loop(map, clock, keyboard);
+    WindowsCommon::debug_validate_message_map();
+    auto return_code = game_message_loop(map, clock, keyboard);
 
 #ifndef NDEBUG
-        assert(fpu.current_control() == current_control);
+    assert(fpu.current_control() == current_control);
 #endif
 
-        // _tWinMain return code is an int type.
-        assert(INT_MAX > return_code);
+    // _tWinMain return code is an int type.
+    assert(INT_MAX > return_code);
 
-        // Window procedure doesn't currently have a reason to return non-zero.
-        assert(0 == return_code);
+    // Window procedure doesn't currently have a reason to return non-zero.
+    assert(0 == return_code);
 
-        // This would be the legal part of the return code.
-        //static_cast<int>(return_code);
-        UNREFERENCED_PARAMETER(return_code);
+    // This would be the legal part of the return code.
+    //static_cast<int>(return_code);
+    UNREFERENCED_PARAMETER(return_code);
 
-        assert((nullptr == app.m_state.window) && "window handle was never released.");
-    }
-    // Convert exceptions to a OS native error type for later display.
-    catch(const WindowsCommon::HRESULT_exception& ex)
-    {
-        UNREFERENCED_PARAMETER(ex);
-
-        throw;
-    }
-    catch(const std::bad_alloc& ex)
-    {
-        UNREFERENCED_PARAMETER(ex);
-
-        throw WindowsCommon::HRESULT_exception(E_OUTOFMEMORY, __FILE__, __LINE__);
-    }
-    catch(...)
-    {
-        // TODO: uninitialize isn't always the correct text.
-        //MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
-        throw WindowsCommon::HRESULT_exception(E_FAIL, __FILE__, __LINE__);
-    }
+    assert((nullptr == app.m_state.window) && "window handle was never released.");
 }
 
 }

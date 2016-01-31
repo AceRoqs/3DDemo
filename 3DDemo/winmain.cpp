@@ -3,6 +3,7 @@
 #include <WindowsCommon/CheckHR.h>
 #include <WindowsCommon/DebuggerTracing.h>
 #include <PortableRuntime/Tracing.h>
+#include <PortableRuntime/Unicode.h>
 
 // The command line and environment can also be accessed
 // via __argc, __targv, and _tenviron.
@@ -26,14 +27,9 @@ int WINAPI _tWinMain(_In_ HINSTANCE instance,   // Handle to the program instanc
     {
         Demo::app_run(instance, show_command);
     }
-    catch(const WindowsCommon::HRESULT_exception& ex)
+    catch(const std::exception& ex)
     {
-        // This is the last chance to display information to the user, so
-        // do not localize the error string, as that can fail.  Also, do
-        // not use types like ostringstream which dynamically allocate memory.
-        TCHAR message[128];
-        ex.get_error_string(message, ARRAYSIZE(message));
-        MessageBox(nullptr, message, TEXT("Error"), MB_OK | MB_ICONERROR);
+        MessageBox(nullptr, PortableRuntime::utf16_from_utf8(ex.what()).c_str(), L"Error", MB_OK | MB_ICONERROR);
 
         // Set the ERRORLEVEL to 1, indicating an error.
         return_code = 1;
