@@ -37,7 +37,11 @@ ImageProcessing::Bitmap bitmap_from_file(_In_z_ const char* file_name)
     DWORD size_read;
     CHECK_EXCEPTION(!ReadFile(file, buffer.data(), size, &size_read, &overlapped), std::string("Failure to read: ") + file_name);
     const HRESULT hr = WindowsCommon::hresult_from_last_error();
-    WindowsCommon::check_with_custom_hr(hr == HRESULT_FROM_WIN32(ERROR_IO_PENDING), hr);
+    if(hr != HRESULT_FROM_WIN32(ERROR_IO_PENDING))
+    {
+        CHECK_EXCEPTION(FAILED(hr), u8"False success returned on overlapped read.");
+        CHECK_HR(hr);
+    }
     WaitForSingleObject(read_complete, INFINITE);
 
     if(file_has_extension_case_sensitive(file_name, ".pcx"))
