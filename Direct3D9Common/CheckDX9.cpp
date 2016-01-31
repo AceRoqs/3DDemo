@@ -4,7 +4,8 @@
 namespace Direct3D9Common
 {
 
-DX9_exception::DX9_exception(HRESULT hr) : HRESULT_exception(hr)
+// TODO: File/line should be passed in, as currently it is meaningless.  It's only provided now to keep this building.
+DX9_exception::DX9_exception(HRESULT hr) : HRESULT_exception(hr, __FILE__, __LINE__)
 {
 }
 
