@@ -195,13 +195,13 @@ void app_run(_In_ HINSTANCE instance, int show_command)
     {
         UNREFERENCED_PARAMETER(ex);
 
-        WindowsCommon::check_hr(E_OUTOFMEMORY);
+        throw WindowsCommon::HRESULT_exception(E_OUTOFMEMORY, __FILE__, __LINE__);
     }
     catch(...)
     {
         // TODO: uninitialize isn't always the correct text.
         //MessageBox(nullptr, TEXT("Unable to initialize engine."), TEXT("Exiting"), MB_OK);
-        WindowsCommon::check_hr(E_FAIL);
+        throw WindowsCommon::HRESULT_exception(E_FAIL, __FILE__, __LINE__);
     }
 }
 
