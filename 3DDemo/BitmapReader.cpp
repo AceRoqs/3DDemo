@@ -36,7 +36,7 @@ ImageProcessing::Bitmap bitmap_from_file(_In_z_ const char* file_name)
     std::vector<uint8_t> buffer(size);
     DWORD size_read;
     CHECK_EXCEPTION(!ReadFile(file, buffer.data(), size, &size_read, &overlapped), std::string("Failure to read: ") + file_name);
-    const HRESULT hr = WindowsCommon::hresult_from_last_error();
+    const auto hr = WindowsCommon::hresult_from_last_error();
     if(hr != HRESULT_FROM_WIN32(ERROR_IO_PENDING))
     {
         CHECK_EXCEPTION(FAILED(hr), u8"False success returned on overlapped read.");
