@@ -12,13 +12,20 @@ namespace Demo
 
 // Vertices is a two dimensional array of patch vertices.  generate_quadratic_bezier_quads() creates the expected output.
 // TODO: 2014: This isn't very cache friendly, as the array isn't read in-order.  Vertex/Index arrays would also be an improvement.
-static void draw_patch(const std::vector<Vector3f>& vertices, unsigned int patch_count, unsigned int texture_id)
+static void draw_patch(const Camera& camera, const std::vector<Vector3f>& vertices, unsigned int patch_count, unsigned int texture_id)
 {
-    const float scale = 1.0f / patch_count;
-    const auto curve_vertex_count = patch_count + 1;
+    // GL_MODELVIEW assumed.
+    glLoadIdentity();
+    glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
+    glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
 
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glDepthFunc(GL_LESS);
     glBlendFunc(GL_ONE, GL_ZERO);
     glBindTexture(GL_TEXTURE_2D, texture_id);
+
+    const float scale = 1.0f / patch_count;
+    const auto curve_vertex_count = patch_count + 1;
 
     glBegin(GL_QUADS);
     for(unsigned int l = 0; l < patch_count; ++l)
@@ -50,6 +57,7 @@ static void draw_patch(const std::vector<Vector3f>& vertices, unsigned int patch
 static void draw_billboard(const Camera& camera, const Vector3f& position, float size, unsigned int texture_id)
 {
     // Transform to location.
+    // GL_MODELVIEW assumed.
     glLoadIdentity();
     glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
     glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
@@ -59,10 +67,9 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
     glRotatef(-camera.m_degrees, 0.0f, 1.0f, 0.0f);
 
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-//  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//  glBlendFunc(GL_ONE, GL_ZERO);
+    glDepthFunc(GL_LESS);
     glBlendFunc(GL_ONE, GL_ONE);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
     glBegin(GL_QUADS);
     {
         const float half_size = size / 2.0f;
@@ -88,6 +95,7 @@ static void draw_emitter(const Emitter& emitter, const Camera& camera, unsigned 
 {
     std::for_each(emitter.cbegin(), emitter.cend(), [&, texture_id](const Particle& particle)
     {
+        // TODO: 2016: size should be a member of Emitter.
         draw_billboard(camera, particle.position, 0.5f, texture_id);
     });
 }
@@ -97,8 +105,13 @@ static void bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap, uns
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    // GL_REPEAT seems like a good idea, but something about GL_LINEAR is causing
+    // v=0 to actually wrap the texture at least vertically one line.  Likely this is
+    // a bug in the renderer itself, as it happens in more than one OpenGL implementation.
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
     if(bitmap.filtered)
     {
         // Bilinear filtering.
@@ -146,6 +159,8 @@ void initialize_gl_constants()
     //const double FARCLIP = 512.0;
     glFrustum(LEFTCLIP, RIGHTCLIP, BOTTOMCLIP, TOPCLIP, NEARCLIP, FARCLIP);
 
+    glMatrixMode(GL_MODELVIEW);
+
     // Enable backface culling and hidden surface removal.
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -188,92 +203,51 @@ void draw_list(
 {
     glClearDepth(1.0);
     glClear(GL_DEPTH_BUFFER_BIT);
-//    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-//    glClear(GL_COLOR_BUFFER_BIT);
 
-    glMatrixMode(GL_MODELVIEW);
+    // GL_MODELVIEW assumed.
     glLoadIdentity();
     glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
     glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
-    // first pass texturing
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     // single loop multi pass textured lighting
     // this is done is one pass because of visibility
     // problems on a second light pass once the world is drawn
-    //    glLockArraysEXT(0, 43);
-    for(unsigned int ii = 0; ii < map.world_mesh.size(); ii++)
+    for(unsigned int ii = 0; ii < map.world_mesh.size(); ++ii)
     {
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        const Demo::Polygon* iter = &map.world_mesh[ii];
-        glBindTexture(GL_TEXTURE_2D, iter->texture);
-        glBlendFunc(GL_ONE, GL_ZERO);
-        glDepthFunc(GL_LESS);
-
-        // TODO: Just draw the whole world as one call
-        unsigned char allIndices[4];
-        // TODO11: remove the need for these casts.
         assert(map.world_mesh.size() * 4 < 256);
+
+        unsigned char allIndices[4];
         allIndices[0] = static_cast<unsigned char>(ii * 4);
         allIndices[1] = static_cast<unsigned char>(ii * 4 + 1);
         allIndices[2] = static_cast<unsigned char>(ii * 4 + 2);
         allIndices[3] = static_cast<unsigned char>(ii * 4 + 3);
-//        glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_BYTE, allIndices);
+
+        const Polygon* iter = &map.world_mesh[ii];
+
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        glDepthFunc(GL_LESS);
+        glBlendFunc(GL_ONE, GL_ZERO);
+        glBindTexture(GL_TEXTURE_2D, iter->texture);
+
         glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, allIndices);
-/*
-        glBegin(GL_QUADS);
-        {
-            for(unsigned int i = 0; i < iter->getNumPoints(); ++i)
-            {
-                // TODO: texture coordinates should be an a texture array
-//                glTexCoord2f(WorldTexture[iter->getTexCoord(i) * 2], WorldTexture[iter->getTexCoord(i) * 2 + 1]);
-//                glArrayElement(iter->getPoint(i));
-                glArrayElement(ii * 4 + i);
-            }
-        }
-        glEnd();
-*/
+
         if(iter->lightmap == 0)
         {
             continue;
         }
 
-        glDepthFunc(GL_EQUAL);
         glColor4f(0.0f, 0.0f, 0.0f, 0.25f);
-        glBindTexture(GL_TEXTURE_2D, iter->lightmap);
-//      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthFunc(GL_EQUAL);
         glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
+        glBindTexture(GL_TEXTURE_2D, iter->lightmap);
 
         glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, allIndices);
-//        glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_BYTE, allIndices);
-/*
-        glBegin(GL_QUADS);
-        {
-            for(unsigned int i = 0; i < iter->getNumPoints(); ++i)
-            {
-                // TODO: texture coordinates should be an a texture array
-//                glTexCoord2f(WorldTexture[iter->getTexCoord(i) * 2], WorldTexture[iter->getTexCoord(i) * 2 + 1]);
-//                glArrayElement(iter->getPoint(i));
-                glArrayElement(ii * 4 + i);
-            }
-        }
-        glEnd();
-*/
     }
 
-    draw_patch(vertices, patch_count, patch_texture_id);
-    draw_patch(vertices2, patch_count, patch_texture_id);
+    draw_patch(camera, vertices, patch_count, patch_texture_id);
+    draw_patch(camera, vertices2, patch_count, patch_texture_id);
 
-//    glUnlockArraysEXT();
-//  glDisable(GL_CULL_FACE);
     draw_emitter(emitter, camera, 6);
-
-    //swap_buffers();
-#if 1
-    //glFlush();
-#else
-    //glFinish();
-#endif
 
     assert(glGetError() == GL_NO_ERROR);
 }
