@@ -8,6 +8,8 @@ data\light3.pcx
 data\fire1-1.pcx
 data\fire1.pcx
 
+2
+
 13
 
 4

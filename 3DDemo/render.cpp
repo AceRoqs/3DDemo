@@ -197,7 +197,6 @@ void draw_list(
     const std::vector<Vector3f>& vertices,
     const std::vector<Vector3f>& vertices2,
     unsigned int patch_count,
-    unsigned int patch_texture_id,
     const class Emitter& emitter,
     const struct Camera& camera)
 {
@@ -244,8 +243,8 @@ void draw_list(
         glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, allIndices);
     }
 
-    draw_patch(camera, vertices, patch_count, patch_texture_id);
-    draw_patch(camera, vertices2, patch_count, patch_texture_id);
+    draw_patch(camera, vertices, patch_count, map.patch_texture_id);
+    draw_patch(camera, vertices2, patch_count, map.patch_texture_id);
 
     draw_emitter(emitter, camera, 6);
 

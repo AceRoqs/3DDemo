@@ -102,7 +102,7 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
 
         emitter.update(elapsed_milliseconds);
 
-        draw_list(map, vertices, vertices2, patch_count, 2, emitter, camera);
+        draw_list(map, vertices, vertices2, patch_count, emitter, camera);
 
         const HDC device_context = wglGetCurrentDC();
         SwapBuffers(device_context);

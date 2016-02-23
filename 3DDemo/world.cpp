@@ -133,10 +133,15 @@ static Map load_world_data(
         texture_list->push_back(bitmap_from_file(file_name));
     }
 
+    unsigned int patch_texture_id;
+    is >> patch_texture_id;
+
     unsigned int cPolys;
     is >> cPolys;
 
     Map map;
+    map.patch_texture_id = patch_texture_id;
+
     for(ii = 0; ii < cPolys; ++ii)
     {
         Demo::Polygon poly;

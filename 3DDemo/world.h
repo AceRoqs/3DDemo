@@ -24,7 +24,7 @@ struct Map
     //std::vector<struct Vector3f> vertices;
     //std::vector<struct Vector3f> vertices2;
     //unsigned int patch_count;
-    //unsigned int patch_texture_id;
+    unsigned int patch_texture_id;
     //class Emitter emitter;
 };
 
