@@ -190,15 +190,14 @@ void initialize_gl_world_data(
     glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
 }
 
-// TODO: add more flushes
 // TODO: modularize into separate functions
-void draw_list(
+void draw_map(
     const Map& map,
+    const struct Camera& camera,
     const std::vector<Vector3f>& vertices,
     const std::vector<Vector3f>& vertices2,
     unsigned int patch_count,
-    const class Emitter& emitter,
-    const struct Camera& camera)
+    const class Emitter& emitter)
 {
     glClearDepth(1.0);
     glClear(GL_DEPTH_BUFFER_BIT);
