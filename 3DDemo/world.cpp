@@ -118,9 +118,7 @@ bool is_point_in_world(const Vector3f& point)
 
 static Map load_world_data(
     std::istream& is,
-    std::vector<ImageProcessing::Bitmap>* texture_list,
-    std::vector<Vector3f>* vertices,
-    std::vector<Vector2f>* texture_coords)
+    std::vector<ImageProcessing::Bitmap>* texture_list)
 {
     unsigned int cTextures;
     is >> cTextures;
@@ -153,11 +151,11 @@ static Map load_world_data(
             // TODO: 2014: Bounds check constant arrays.
             auto ix = poly.vertex_indices[jj];
             CHECK_EXCEPTION(ix < ARRAYSIZE(world_vertices), u8"world_vertices too small for index");
-            vertices->push_back(world_vertices[ix]);
+            map.vertices.push_back(world_vertices[ix]);
 
             ix = poly.texture_coordinates[jj];
             CHECK_EXCEPTION(ix < ARRAYSIZE(world_texture_coords), u8"world_texture_coords too small for index");
-            texture_coords->push_back(world_texture_coords[ix]);
+            map.texture_coords.push_back(world_texture_coords[ix]);
         }
     }
 
@@ -167,15 +165,13 @@ static Map load_world_data(
 // TODO: Ensure file_name is UTF-8.
 Map start_load(
     _In_z_ const char* file_name,
-    std::vector<ImageProcessing::Bitmap>* texture_list,
-    std::vector<Vector3f>* vertices,
-    std::vector<Vector2f>* texture_coords)
+    std::vector<ImageProcessing::Bitmap>* texture_list)
 {
     std::ifstream fis;
     fis.open(file_name);
     CHECK_EXCEPTION(fis.is_open(), std::string("Could not open file:") + file_name);
 
-    return load_world_data(fis, texture_list, vertices, texture_coords);
+    return load_world_data(fis, texture_list);
 }
 
 }

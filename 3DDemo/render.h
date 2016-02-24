@@ -13,7 +13,7 @@ class Emitter;
 struct Camera;
 
 void initialize_gl_constants();
-void initialize_gl_world_data(const std::vector<ImageProcessing::Bitmap>& texture_list, const std::vector<Vector3f>& vertices, const std::vector<Vector2f>& texture_coords);
+void initialize_gl_world_data(const std::vector<ImageProcessing::Bitmap>& texture_list);
 void draw_map(const Map& map, const Camera& camera, const std::vector<Vector3f>& vertices, const std::vector<Vector3f>& vertices2, unsigned int patch_count, const Emitter& emitter);
 
 }

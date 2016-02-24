@@ -143,15 +143,13 @@ void app_run(_In_ HINSTANCE instance, int show_command)
 
     // Start load first, to kick off async reads.
     std::vector<ImageProcessing::Bitmap> texture_list;
-    std::vector<Vector3f> vertices;
-    std::vector<Vector2f> texture_coords;
-    Map map = start_load("polydefs.txt", &texture_list, &vertices, &texture_coords);
+    Map map = start_load("polydefs.txt", &texture_list);
 
     App_window app(instance, true);
 
     // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
     initialize_gl_constants();
-    initialize_gl_world_data(texture_list, vertices, texture_coords);
+    initialize_gl_world_data(texture_list);
 
     // Set thread affinity to the first available processor, so that QPC
     // will always be done on the same processor.

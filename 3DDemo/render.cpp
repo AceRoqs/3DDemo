@@ -168,12 +168,14 @@ void initialize_gl_constants()
     glCullFace(GL_BACK);
 
     glEnable(GL_BLEND);
+
+    // Enable vertex arrays.
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 void initialize_gl_world_data(
-    const std::vector<ImageProcessing::Bitmap>& texture_list,
-    const std::vector<Vector3f>& vertices,
-    const std::vector<Vector2f>& texture_coords)
+    const std::vector<ImageProcessing::Bitmap>& texture_list)
 {
     // Load all texture data.
     assert(texture_list.size() <= UINT_MAX);
@@ -182,12 +184,6 @@ void initialize_gl_world_data(
     {
         bind_bitmap_to_gl_texture(texture_list[ix], ix);
     }
-
-    // Enable vertex arrays.
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
-    glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
 }
 
 // TODO: modularize into separate functions
@@ -206,6 +202,9 @@ void draw_map(
     glLoadIdentity();
     glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
     glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
+
+    glVertexPointer(3, GL_FLOAT, 0, &map.vertices[0]);
+    glTexCoordPointer(2, GL_FLOAT, 0, &map.texture_coords[0]);
 
     // single loop multi pass textured lighting
     // this is done is one pass because of visibility
