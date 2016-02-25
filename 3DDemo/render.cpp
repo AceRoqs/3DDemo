@@ -54,6 +54,8 @@ static void draw_patch(const Camera& camera, const std::vector<Vector3f>& vertic
     glEnd();
 }
 
+// TODO: This isn't a true billboard, in the sense that the camera is assumed to never go above or below
+// it's original plane.
 static void draw_billboard(const Camera& camera, const Vector3f& position, float size, unsigned int texture_id)
 {
     // Transform to location.
@@ -70,24 +72,22 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
     glDepthFunc(GL_LESS);
     glBlendFunc(GL_ONE, GL_ONE);
     glBindTexture(GL_TEXTURE_2D, texture_id);
-    glBegin(GL_QUADS);
-    {
-        const float half_size = size / 2.0f;
 
-        // Begin in upper-left corner, and draw counterclockwise.
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(-half_size, half_size, 0.0f);
+    const float half_size = size / 2.0f;
+    const Vector3f vertices[] = {{ -half_size,  half_size, 0.0f},
+                                 { -half_size, -half_size, 0.0f},
+                                 {  half_size, -half_size, 0.0f},
+                                 {  half_size,  half_size, 0.0f}};
+    glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
 
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(-half_size, -half_size, 0.0f);
+    const Vector2f texture_coords[] = {{ 0.0f, 0.0f },
+                                       { 0.0f, 1.0f },
+                                       { 1.0f, 1.0f },
+                                       { 1.0f, 0.0f }};
+    glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
 
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(half_size, -half_size, 0.0f);
-
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(half_size, half_size, 0.0f);
-    }
-    glEnd();
+    const uint8_t allIndices[4] = { 0, 1, 2, 3 };
+    glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, allIndices);
 }
 
 // TODO: 2014: Drawing should be done against a vertex/index array.
@@ -211,13 +211,13 @@ void draw_map(
     // problems on a second light pass once the world is drawn
     for(unsigned int ii = 0; ii < map.world_mesh.size(); ++ii)
     {
-        assert(map.world_mesh.size() * 4 < 256);
+        assert(map.world_mesh.size() < 256 / 4);
 
-        unsigned char allIndices[4];
-        allIndices[0] = static_cast<unsigned char>(ii * 4);
-        allIndices[1] = static_cast<unsigned char>(ii * 4 + 1);
-        allIndices[2] = static_cast<unsigned char>(ii * 4 + 2);
-        allIndices[3] = static_cast<unsigned char>(ii * 4 + 3);
+        uint8_t allIndices[4];
+        allIndices[0] = static_cast<uint8_t>(ii * 4);
+        allIndices[1] = static_cast<uint8_t>(ii * 4 + 1);
+        allIndices[2] = static_cast<uint8_t>(ii * 4 + 2);
+        allIndices[3] = static_cast<uint8_t>(ii * 4 + 3);
 
         const Polygon* iter = &map.world_mesh[ii];
 
