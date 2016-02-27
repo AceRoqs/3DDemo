@@ -11,7 +11,8 @@ namespace Demo
 {
 
 // Vertices is a two dimensional array of patch vertices.  generate_quadratic_bezier_quads() creates the expected output.
-// TODO: 2014: This isn't very cache friendly, as the array isn't read in-order.  Vertex/Index arrays would also be an improvement.
+// TODO: 2016: generate_quadratic_bezier_quads doesn't generate quads.  It generates a patch_count x patch_count array of vertices.
+// TODO: 2016: Pass in a Patch object, with verts, textures (id and coords), and patch_count.
 static void draw_patch(const Camera& camera, const std::vector<Vector3f>& vertices, unsigned int patch_count, unsigned int texture_id)
 {
     // GL_MODELVIEW assumed.
@@ -27,49 +28,47 @@ static void draw_patch(const Camera& camera, const std::vector<Vector3f>& vertic
     const float scale = 1.0f / patch_count;
     const auto curve_vertex_count = patch_count + 1;
 
+    // TODO: 2016: index_array and texture_coords (and vertices) can be cached, as long as patch_count doesn't change between frames.
+    // TODO: 2016: Calculate this stuff at the same time the vertices are calculated.
+    // TODO: 2016: When reusing arrays, can precalculate the reserve to be the largest expected size, so reallocation never happens.
     std::vector<uint16_t> index_array;
-    index_array.reserve(patch_count * patch_count * 4);
-
-    std::vector<Vector3f> vertex_coords;
-    vertex_coords.reserve(patch_count * patch_count * 4);
+    index_array.reserve(patch_count * patch_count * 6);     // Six push_backs per loop iteration.
 
     std::vector<Vector2f> texture_coords;
-    texture_coords.reserve(patch_count * patch_count * 4);
+    texture_coords.reserve(curve_vertex_count * curve_vertex_count);
 
     for(unsigned int vv = 0; vv < patch_count; ++vv)
     {
         for(unsigned int uu = 0; uu < patch_count; ++uu)
         {
-            // TODO: 2016: It would be useful to calculate an index_array indexing into the passed in vertices.
-            // This way, vertex_coords could go away.  texture_coords would also likely need to be recalculated.
-            // Consider this after glDrawElements is passing a GL_TRIANGLES.
-            index_array.push_back(static_cast<uint16_t>((vv * patch_count + uu) * 4));
-            index_array.push_back(static_cast<uint16_t>((vv * patch_count + uu) * 4 + 1));
-            index_array.push_back(static_cast<uint16_t>((vv * patch_count + uu) * 4 + 2));
-            index_array.push_back(static_cast<uint16_t>((vv * patch_count + uu) * 4 + 3));
-
-            vertex_coords.push_back(vertices[(uu + 0) + (vv + 0) * curve_vertex_count]);
-            vertex_coords.push_back(vertices[(uu + 0) + (vv + 1) * curve_vertex_count]);
-            vertex_coords.push_back(vertices[(uu + 1) + (vv + 1) * curve_vertex_count]);
-            vertex_coords.push_back(vertices[(uu + 1) + (vv + 0) * curve_vertex_count]);
-
-            texture_coords.push_back({ (uu + 0) * scale, (vv + 0) * scale });
-            texture_coords.push_back({ (uu + 0) * scale, (vv + 1) * scale });
-            texture_coords.push_back({ (uu + 1) * scale, (vv + 1) * scale });
-            texture_coords.push_back({ (uu + 1) * scale, (vv + 0) * scale });
+            index_array.push_back(static_cast<uint16_t>((uu + 0) + (vv + 0) * curve_vertex_count));
+            index_array.push_back(static_cast<uint16_t>((uu + 0) + (vv + 1) * curve_vertex_count));
+            index_array.push_back(static_cast<uint16_t>((uu + 1) + (vv + 0) * curve_vertex_count));
+            index_array.push_back(static_cast<uint16_t>((uu + 1) + (vv + 0) * curve_vertex_count));
+            index_array.push_back(static_cast<uint16_t>((uu + 0) + (vv + 1) * curve_vertex_count));
+            index_array.push_back(static_cast<uint16_t>((uu + 1) + (vv + 1) * curve_vertex_count));
         }
     }
 
-    glVertexPointer(3, GL_FLOAT, 0, &vertex_coords[0]);
+    for(unsigned int vv = 0; vv < curve_vertex_count; ++vv)
+    {
+        for(unsigned int uu = 0; uu < curve_vertex_count; ++uu)
+        {
+            texture_coords.push_back({uu * scale, vv * scale});
+        }
+    }
+
+    glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
     glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
 
     assert(index_array.size() < INT_MAX);   // GLsizei == int
-    glDrawElements(GL_QUADS, static_cast<GLsizei>(index_array.size()), GL_UNSIGNED_SHORT, &index_array[0]);
-
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(index_array.size()), GL_UNSIGNED_SHORT, &index_array[0]);
 }
 
-// TODO: This isn't a true billboard, in the sense that the camera is assumed to never go above or below
-// it's original plane.
+// TODO: 2016: This isn't a true billboard, in the sense that it's only billboarded against the vertical axis.
+// TODO: 2016: Pass in a Billboard object, with center_position, vertices, texture (ID and coords).
+// TODO: 2016: Precalculate a full vertex array for the Emitter.  Texture and index array will be static.  Then,
+// compare the draw_billboard function with draw_patch, and see if there are any material differences left.
 static void draw_billboard(const Camera& camera, const Vector3f& position, float size, unsigned int texture_id)
 {
     // Transform to location.
@@ -82,12 +81,15 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
     // Billboard the sprite.
     glRotatef(-camera.m_degrees, 0.0f, 1.0f, 0.0f);
 
+    // TODO: 2016: Understand why glColor4f only passes red.
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
     glDepthFunc(GL_LESS);
     glBlendFunc(GL_ONE, GL_ONE);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
     // Vertices are specified counterclockwise from the upper-left corner.
+    // TODO: 2016: Specify vertices in a flat array, like patch.
+    // TODO: 2016: Eliminate half_size and just premultiply size by 0.5f.
     const float half_size = size / 2.0f;
     const Vector3f vertices[] = {{ -half_size,  half_size, 0.0f },
                                  { -half_size, -half_size, 0.0f },
@@ -115,6 +117,7 @@ static void draw_emitter(const Emitter& emitter, const Camera& camera, unsigned 
     });
 }
 
+// TODO: 2016: Move non-draw functions to the top of this module.
 static void bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id)
 {
     glEnable(GL_TEXTURE_2D);
@@ -226,6 +229,7 @@ void draw_map(
     // problems on a second light pass once the world is drawn
     for(unsigned int ii = 0; ii < map.world_mesh.size(); ++ii)
     {
+        // TODO: 2016: Convert all index arrays to 16-bit.
         assert(map.world_mesh.size() < 256 / 4);
 
         const uint8_t allIndices[] =
@@ -243,6 +247,7 @@ void draw_map(
         glBlendFunc(GL_ONE, GL_ZERO);
         glBindTexture(GL_TEXTURE_2D, iter->texture);
 
+        // TODO: 2016: Make this GL_TRIANGLES.  This might require changes to the persisted formats?
         glDrawElements(GL_QUADS, ARRAYSIZE(allIndices), GL_UNSIGNED_BYTE, allIndices);
 
         if(iter->lightmap == 0)
