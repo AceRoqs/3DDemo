@@ -73,11 +73,12 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
     glBlendFunc(GL_ONE, GL_ONE);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
+    // Vertices are specified counterclockwise from the upper-left corner.
     const float half_size = size / 2.0f;
-    const Vector3f vertices[] = {{ -half_size,  half_size, 0.0f},
-                                 { -half_size, -half_size, 0.0f},
-                                 {  half_size, -half_size, 0.0f},
-                                 {  half_size,  half_size, 0.0f}};
+    const Vector3f vertices[] = {{ -half_size,  half_size, 0.0f },
+                                 { -half_size, -half_size, 0.0f },
+                                 {  half_size, -half_size, 0.0f },
+                                 {  half_size,  half_size, 0.0f }};
     glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
 
     const Vector2f texture_coords[] = {{ 0.0f, 0.0f },
@@ -86,8 +87,8 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
                                        { 1.0f, 0.0f }};
     glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
 
-    const uint8_t allIndices[4] = { 0, 1, 2, 3 };
-    glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, allIndices);
+    const uint8_t allIndices[] = { 0, 1, 3, 3, 1, 2 };
+    glDrawElements(GL_TRIANGLES, ARRAYSIZE(allIndices), GL_UNSIGNED_BYTE, allIndices);
 }
 
 // TODO: 2014: Drawing should be done against a vertex/index array.
@@ -106,7 +107,7 @@ static void bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap, uns
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    // GL_REPEAT seems like a good idea, but something about GL_LINEAR is causing
+    // TODO: GL_REPEAT seems like a good idea, but something about GL_LINEAR is causing
     // v=0 to actually wrap the texture at least vertically one line.  Likely this is
     // a bug in the renderer itself, as it happens in more than one OpenGL implementation.
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -213,11 +214,13 @@ void draw_map(
     {
         assert(map.world_mesh.size() < 256 / 4);
 
-        uint8_t allIndices[4];
-        allIndices[0] = static_cast<uint8_t>(ii * 4);
-        allIndices[1] = static_cast<uint8_t>(ii * 4 + 1);
-        allIndices[2] = static_cast<uint8_t>(ii * 4 + 2);
-        allIndices[3] = static_cast<uint8_t>(ii * 4 + 3);
+        const uint8_t allIndices[] =
+        {
+            static_cast<uint8_t>(ii * 4),
+            static_cast<uint8_t>(ii * 4 + 1),
+            static_cast<uint8_t>(ii * 4 + 2),
+            static_cast<uint8_t>(ii * 4 + 3)
+        };
 
         const Polygon* iter = &map.world_mesh[ii];
 
@@ -226,7 +229,7 @@ void draw_map(
         glBlendFunc(GL_ONE, GL_ZERO);
         glBindTexture(GL_TEXTURE_2D, iter->texture);
 
-        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, allIndices);
+        glDrawElements(GL_QUADS, ARRAYSIZE(allIndices), GL_UNSIGNED_BYTE, allIndices);
 
         if(iter->lightmap == 0)
         {
@@ -238,7 +241,7 @@ void draw_map(
         glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D, iter->lightmap);
 
-        glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, allIndices);
+        glDrawElements(GL_QUADS, ARRAYSIZE(allIndices), GL_UNSIGNED_BYTE, allIndices);
     }
 
     draw_patch(camera, vertices, patch_count, map.patch_texture_id);
