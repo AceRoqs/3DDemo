@@ -18,6 +18,11 @@ struct Polygon
     Polygon();
 };
 
+struct Patch
+{
+    std::vector<Vector3f> vertices;
+};
+
 struct Map
 {
     std::vector<struct Demo::Polygon> world_mesh;

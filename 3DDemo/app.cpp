@@ -97,12 +97,13 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
         const unsigned int MAX_GENERATED_POINTS = 10;
         unsigned int patch_count = (unsigned int)(MAX_GENERATED_POINTS * 4 / (point_distance(camera.m_position, make_vector(2.0f, 0.0f, 10.0f)))) - 1;
         patch_count = std::min(std::max(2u, patch_count), MAX_GENERATED_POINTS - 1);
-        std::vector<Vector3f> vertices = generate_quadratic_bezier_quads(patches[0], patch_count);
-        std::vector<Vector3f> vertices2 = generate_quadratic_bezier_quads(patches[1], patch_count);
+        Patch patch1, patch2;
+        patch1.vertices = generate_quadratic_bezier_quads(patches[0], patch_count);
+        patch2.vertices = generate_quadratic_bezier_quads(patches[1], patch_count);
 
         emitter.update(elapsed_milliseconds);
 
-        draw_map(map, camera, vertices, vertices2, patch_count, emitter);
+        draw_map(map, camera, patch1, patch2, patch_count, emitter);
 
         const HDC device_context = wglGetCurrentDC();
         SwapBuffers(device_context);

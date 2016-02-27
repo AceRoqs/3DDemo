@@ -13,7 +13,7 @@ namespace Demo
 // Vertices is a two dimensional array of patch vertices.  generate_quadratic_bezier_quads() creates the expected output.
 // TODO: 2016: generate_quadratic_bezier_quads doesn't generate quads.  It generates a curve_vertex_count x curve_vertex_count array of vertices.
 // TODO: 2016: Pass in a Patch object, with verts, textures (id and coords), and patch_count.
-static void draw_patch(const Camera& camera, const std::vector<Vector3f>& vertices, unsigned int patch_count, unsigned int texture_id)
+static void draw_patch(const Camera& camera, const Patch& patch, unsigned int patch_count, unsigned int texture_id)
 {
     const float scale = 1.0f / patch_count;
     const auto curve_vertex_count = patch_count + 1;
@@ -58,7 +58,7 @@ static void draw_patch(const Camera& camera, const std::vector<Vector3f>& vertic
     glBlendFunc(GL_ONE, GL_ZERO);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
-    glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
+    glVertexPointer(3, GL_FLOAT, 0, &patch.vertices[0]);
     glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
 
     assert(index_array.size() < INT_MAX);   // GLsizei == int
@@ -210,8 +210,8 @@ void initialize_gl_world_data(
 void draw_map(
     const Map& map,
     const struct Camera& camera,
-    const std::vector<Vector3f>& vertices,
-    const std::vector<Vector3f>& vertices2,
+    const Patch& patch1,
+    const Patch& patch2,
     unsigned int patch_count,
     const class Emitter& emitter)
 {
@@ -265,8 +265,8 @@ void draw_map(
         glDrawElements(GL_QUADS, ARRAYSIZE(index_array), GL_UNSIGNED_BYTE, index_array);
     }
 
-    draw_patch(camera, vertices, patch_count, map.patch_texture_id);
-    draw_patch(camera, vertices2, patch_count, map.patch_texture_id);
+    draw_patch(camera, patch1, patch_count, map.patch_texture_id);
+    draw_patch(camera, patch2, patch_count, map.patch_texture_id);
 
     draw_emitter(emitter, camera, 6);
 
