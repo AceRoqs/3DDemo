@@ -27,31 +27,45 @@ static void draw_patch(const Camera& camera, const std::vector<Vector3f>& vertic
     const float scale = 1.0f / patch_count;
     const auto curve_vertex_count = patch_count + 1;
 
-    glBegin(GL_QUADS);
-    for(unsigned int l = 0; l < patch_count; ++l)
+    std::vector<uint16_t> index_array;
+    index_array.reserve(patch_count * patch_count * 4);
+
+    std::vector<Vector3f> vertex_coords;
+    vertex_coords.reserve(patch_count * patch_count * 4);
+
+    std::vector<Vector2f> texture_coords;
+    texture_coords.reserve(patch_count * patch_count * 4);
+
+    for(unsigned int vv = 0; vv < patch_count; ++vv)
     {
-        for(unsigned int k = 0; k < patch_count; ++k)
+        for(unsigned int uu = 0; uu < patch_count; ++uu)
         {
-            const Vector3f& p1 = vertices[l * curve_vertex_count + k];
-            const Vector3f& p2 = vertices[l * curve_vertex_count + k + 1];
-            const Vector3f& p3 = vertices[(l + 1) * curve_vertex_count + k + 1];
-            const Vector3f& p4 = vertices[(l + 1) * curve_vertex_count + k];
+            // TODO: 2016: It would be useful to calculate an index_array indexing into the passed in vertices.
+            // This way, vertex_coords could go away.  texture_coords would also likely need to be recalculated.
+            // Consider this after glDrawElements is passing a GL_TRIANGLES.
+            index_array.push_back(static_cast<uint16_t>((vv * patch_count + uu) * 4));
+            index_array.push_back(static_cast<uint16_t>((vv * patch_count + uu) * 4 + 1));
+            index_array.push_back(static_cast<uint16_t>((vv * patch_count + uu) * 4 + 2));
+            index_array.push_back(static_cast<uint16_t>((vv * patch_count + uu) * 4 + 3));
 
-            // Begin in upper-left corner, and draw counterclockwise.
-            glTexCoord2f(k * scale, l * scale);
-            glVertex3f(p1.x(), p1.y(), p1.z());
+            vertex_coords.push_back(vertices[(uu + 0) + (vv + 0) * curve_vertex_count]);
+            vertex_coords.push_back(vertices[(uu + 0) + (vv + 1) * curve_vertex_count]);
+            vertex_coords.push_back(vertices[(uu + 1) + (vv + 1) * curve_vertex_count]);
+            vertex_coords.push_back(vertices[(uu + 1) + (vv + 0) * curve_vertex_count]);
 
-            glTexCoord2f(k * scale, (l + 1) * scale);
-            glVertex3f(p4.x(), p4.y(), p4.z());
-
-            glTexCoord2f((k + 1) * scale, (l + 1) * scale);
-            glVertex3f(p3.x(), p3.y(), p3.z());
-
-            glTexCoord2f((k + 1) * scale, l * scale);
-            glVertex3f(p2.x(), p2.y(), p2.z());
+            texture_coords.push_back({ (uu + 0) * scale, (vv + 0) * scale });
+            texture_coords.push_back({ (uu + 0) * scale, (vv + 1) * scale });
+            texture_coords.push_back({ (uu + 1) * scale, (vv + 1) * scale });
+            texture_coords.push_back({ (uu + 1) * scale, (vv + 0) * scale });
         }
     }
-    glEnd();
+
+    glVertexPointer(3, GL_FLOAT, 0, &vertex_coords[0]);
+    glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
+
+    assert(index_array.size() < INT_MAX);   // GLsizei == int
+    glDrawElements(GL_QUADS, static_cast<GLsizei>(index_array.size()), GL_UNSIGNED_SHORT, &index_array[0]);
+
 }
 
 // TODO: This isn't a true billboard, in the sense that the camera is assumed to never go above or below
