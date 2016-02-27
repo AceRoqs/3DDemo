@@ -11,20 +11,10 @@ namespace Demo
 {
 
 // Vertices is a two dimensional array of patch vertices.  generate_quadratic_bezier_quads() creates the expected output.
-// TODO: 2016: generate_quadratic_bezier_quads doesn't generate quads.  It generates a patch_count x patch_count array of vertices.
+// TODO: 2016: generate_quadratic_bezier_quads doesn't generate quads.  It generates a curve_vertex_count x curve_vertex_count array of vertices.
 // TODO: 2016: Pass in a Patch object, with verts, textures (id and coords), and patch_count.
 static void draw_patch(const Camera& camera, const std::vector<Vector3f>& vertices, unsigned int patch_count, unsigned int texture_id)
 {
-    // GL_MODELVIEW assumed.
-    glLoadIdentity();
-    glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
-    glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
-
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    glDepthFunc(GL_LESS);
-    glBlendFunc(GL_ONE, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-
     const float scale = 1.0f / patch_count;
     const auto curve_vertex_count = patch_count + 1;
 
@@ -58,6 +48,16 @@ static void draw_patch(const Camera& camera, const std::vector<Vector3f>& vertic
         }
     }
 
+    // GL_MODELVIEW assumed.
+    glLoadIdentity();
+    glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
+    glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
+
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glDepthFunc(GL_LESS);
+    glBlendFunc(GL_ONE, GL_ZERO);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+
     glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
     glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
 
@@ -71,6 +71,22 @@ static void draw_patch(const Camera& camera, const std::vector<Vector3f>& vertic
 // compare the draw_billboard function with draw_patch, and see if there are any material differences left.
 static void draw_billboard(const Camera& camera, const Vector3f& position, float size, unsigned int texture_id)
 {
+    // Vertices are specified counterclockwise from the upper-left corner.
+    // TODO: 2016: Specify vertices in a flat array, like patch.
+    // TODO: 2016: Eliminate half_size and just premultiply size by 0.5f.
+    const float half_size = size / 2.0f;
+    const Vector3f vertices[] = {{ -half_size,  half_size, 0.0f },
+                                 { -half_size, -half_size, 0.0f },
+                                 {  half_size, -half_size, 0.0f },
+                                 {  half_size,  half_size, 0.0f }};
+
+    const Vector2f texture_coords[] = {{ 0.0f, 0.0f },
+                                       { 0.0f, 1.0f },
+                                       { 1.0f, 1.0f },
+                                       { 1.0f, 0.0f }};
+
+    const uint8_t index_array[] = { 0, 1, 3, 3, 1, 2 };
+
     // Transform to location.
     // GL_MODELVIEW assumed.
     glLoadIdentity();
@@ -87,24 +103,10 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
     glBlendFunc(GL_ONE, GL_ONE);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
-    // Vertices are specified counterclockwise from the upper-left corner.
-    // TODO: 2016: Specify vertices in a flat array, like patch.
-    // TODO: 2016: Eliminate half_size and just premultiply size by 0.5f.
-    const float half_size = size / 2.0f;
-    const Vector3f vertices[] = {{ -half_size,  half_size, 0.0f },
-                                 { -half_size, -half_size, 0.0f },
-                                 {  half_size, -half_size, 0.0f },
-                                 {  half_size,  half_size, 0.0f }};
     glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
-
-    const Vector2f texture_coords[] = {{ 0.0f, 0.0f },
-                                       { 0.0f, 1.0f },
-                                       { 1.0f, 1.0f },
-                                       { 1.0f, 0.0f }};
     glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
 
-    const uint8_t allIndices[] = { 0, 1, 3, 3, 1, 2 };
-    glDrawElements(GL_TRIANGLES, ARRAYSIZE(allIndices), GL_UNSIGNED_BYTE, allIndices);
+    glDrawElements(GL_TRIANGLES, ARRAYSIZE(index_array), GL_UNSIGNED_BYTE, index_array);
 }
 
 // TODO: 2014: Drawing should be done against a vertex/index array.
@@ -232,7 +234,7 @@ void draw_map(
         // TODO: 2016: Convert all index arrays to 16-bit.
         assert(map.world_mesh.size() < 256 / 4);
 
-        const uint8_t allIndices[] =
+        const uint8_t index_array[] =
         {
             static_cast<uint8_t>(ii * 4),
             static_cast<uint8_t>(ii * 4 + 1),
@@ -248,7 +250,7 @@ void draw_map(
         glBindTexture(GL_TEXTURE_2D, iter->texture);
 
         // TODO: 2016: Make this GL_TRIANGLES.  This might require changes to the persisted formats?
-        glDrawElements(GL_QUADS, ARRAYSIZE(allIndices), GL_UNSIGNED_BYTE, allIndices);
+        glDrawElements(GL_QUADS, ARRAYSIZE(index_array), GL_UNSIGNED_BYTE, index_array);
 
         if(iter->lightmap == 0)
         {
@@ -260,7 +262,7 @@ void draw_map(
         glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D, iter->lightmap);
 
-        glDrawElements(GL_QUADS, ARRAYSIZE(allIndices), GL_UNSIGNED_BYTE, allIndices);
+        glDrawElements(GL_QUADS, ARRAYSIZE(index_array), GL_UNSIGNED_BYTE, index_array);
     }
 
     draw_patch(camera, vertices, patch_count, map.patch_texture_id);
