@@ -10,6 +10,92 @@
 namespace Demo
 {
 
+static void bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id)
+{
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    // TODO: GL_REPEAT seems like a good idea, but something about GL_LINEAR is causing
+    // v=0 to actually wrap the texture at least vertically one line.  Likely this is
+    // a bug in the renderer itself, as it happens in more than one OpenGL implementation.
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    if(bitmap.filtered)
+    {
+        // Bilinear filtering.
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+    else
+    {
+        // Don't filter the texture.
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    }
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 3,
+                 bitmap.xsize,
+                 bitmap.ysize,
+                 0,
+                 GL_RGB,
+                 GL_UNSIGNED_BYTE,
+                 &bitmap.bitmap[0]);
+}
+
+void initialize_gl_constants()
+{
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    const double LEFTCLIP = -0.5;
+    const double RIGHTCLIP = 0.5;
+    const double BOTTOMCLIP = -0.5;
+    const double TOPCLIP = 0.5;
+    const double NEARCLIP = 0.5;
+    const double FARCLIP = 700.0;
+
+    // TODO: 2014: Use these bounds once the world geometry collision has knowledge of the clip planes.
+    //const double LEFTCLIP = -1.0;
+    //const double RIGHTCLIP = 1.0;
+    //const double BOTTOMCLIP = -1.0;
+    //const double TOPCLIP = 1.0;
+    //const double NEARCLIP = 1.0;
+    //const double FARCLIP = 512.0;
+    glFrustum(LEFTCLIP, RIGHTCLIP, BOTTOMCLIP, TOPCLIP, NEARCLIP, FARCLIP);
+
+    glMatrixMode(GL_MODELVIEW);
+
+    // Enable backface culling and hidden surface removal.
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
+    glCullFace(GL_BACK);
+
+    glEnable(GL_BLEND);
+
+    // Enable vertex arrays.
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
+void initialize_gl_world_data(
+    const std::vector<ImageProcessing::Bitmap>& texture_list)
+{
+    // Load all texture data.
+    assert(texture_list.size() <= UINT_MAX);
+    const auto size = static_cast<unsigned int>(texture_list.size());
+    for(unsigned int ix = 0; ix < size; ++ix)
+    {
+        bind_bitmap_to_gl_texture(texture_list[ix], ix);
+    }
+}
+
 // Vertices is a two dimensional array of patch vertices.  generate_quadratic_bezier_quads() creates the expected output.
 // TODO: 2016: generate_quadratic_bezier_quads doesn't generate quads.  It generates a curve_vertex_count x curve_vertex_count array of vertices.
 // TODO: 2016: Pass in a Patch object, with verts, textures (id and coords), and patch_count.
@@ -117,93 +203,6 @@ static void draw_emitter(const Emitter& emitter, const Camera& camera, unsigned 
         // TODO: 2016: size should be a member of Emitter.
         draw_billboard(camera, particle.position, 0.5f, texture_id);
     });
-}
-
-// TODO: 2016: Move non-draw functions to the top of this module.
-static void bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id)
-{
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    // TODO: GL_REPEAT seems like a good idea, but something about GL_LINEAR is causing
-    // v=0 to actually wrap the texture at least vertically one line.  Likely this is
-    // a bug in the renderer itself, as it happens in more than one OpenGL implementation.
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    if(bitmap.filtered)
-    {
-        // Bilinear filtering.
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    }
-    else
-    {
-        // Don't filter the texture.
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    }
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-    glTexImage2D(GL_TEXTURE_2D,
-                 0,
-                 3,
-                 bitmap.xsize,
-                 bitmap.ysize,
-                 0,
-                 GL_RGB,
-                 GL_UNSIGNED_BYTE,
-                 &bitmap.bitmap[0]);
-}
-
-void initialize_gl_constants()
-{
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    const double LEFTCLIP = -0.5;
-    const double RIGHTCLIP = 0.5;
-    const double BOTTOMCLIP = -0.5;
-    const double TOPCLIP = 0.5;
-    const double NEARCLIP = 0.5;
-    const double FARCLIP = 700.0;
-
-    // TODO: 2014: Use these bounds once the world geometry collision has knowledge of the clip planes.
-    //const double LEFTCLIP = -1.0;
-    //const double RIGHTCLIP = 1.0;
-    //const double BOTTOMCLIP = -1.0;
-    //const double TOPCLIP = 1.0;
-    //const double NEARCLIP = 1.0;
-    //const double FARCLIP = 512.0;
-    glFrustum(LEFTCLIP, RIGHTCLIP, BOTTOMCLIP, TOPCLIP, NEARCLIP, FARCLIP);
-
-    glMatrixMode(GL_MODELVIEW);
-
-    // Enable backface culling and hidden surface removal.
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CCW);
-    glCullFace(GL_BACK);
-
-    glEnable(GL_BLEND);
-
-    // Enable vertex arrays.
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-}
-
-void initialize_gl_world_data(
-    const std::vector<ImageProcessing::Bitmap>& texture_list)
-{
-    // Load all texture data.
-    assert(texture_list.size() <= UINT_MAX);
-    const auto size = static_cast<unsigned int>(texture_list.size());
-    for(unsigned int ix = 0; ix < size; ++ix)
-    {
-        bind_bitmap_to_gl_texture(texture_list[ix], ix);
-    }
 }
 
 // TODO: modularize into separate functions
