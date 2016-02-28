@@ -159,12 +159,10 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
 {
     // Vertices are specified counterclockwise from the upper-left corner.
     // TODO: 2016: Specify vertices in a flat array, like patch.
-    // TODO: 2016: Eliminate half_size and just premultiply size by 0.5f.
-    const float half_size = size / 2.0f;
-    const Vector3f vertices[] = {{ -half_size,  half_size, 0.0f },
-                                 { -half_size, -half_size, 0.0f },
-                                 {  half_size, -half_size, 0.0f },
-                                 {  half_size,  half_size, 0.0f }};
+    const Vector3f vertices[] = {{ -size,  size, 0.0f },
+                                 { -size, -size, 0.0f },
+                                 {  size, -size, 0.0f },
+                                 {  size,  size, 0.0f }};
 
     const Vector2f texture_coords[] = {{ 0.0f, 0.0f },
                                        { 0.0f, 1.0f },
@@ -201,7 +199,7 @@ static void draw_emitter(const Emitter& emitter, const Camera& camera, unsigned 
     std::for_each(emitter.cbegin(), emitter.cend(), [&, texture_id](const Particle& particle)
     {
         // TODO: 2016: size should be a member of Emitter.
-        draw_billboard(camera, particle.position, 0.5f, texture_id);
+        draw_billboard(camera, particle.position, 0.25f, texture_id);
     });
 }
 
