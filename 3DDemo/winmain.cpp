@@ -29,6 +29,7 @@ int WINAPI _tWinMain(_In_ HINSTANCE instance,   // Handle to the program instanc
     }
     catch(const std::exception& ex)
     {
+        // TODO: 2016: Consider a way where the message can be copied to the clipboard.
         MessageBox(nullptr, PortableRuntime::utf16_from_utf8(ex.what()).c_str(), L"Error", MB_OK | MB_ICONERROR);
 
         // Set the ERRORLEVEL to 1, indicating an error.
