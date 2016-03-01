@@ -157,19 +157,18 @@ static void draw_patch(const Camera& camera, const Patch& patch, unsigned int pa
 // compare the draw_billboard function with draw_patch, and see if there are any material differences left.
 static void draw_billboard(const Camera& camera, const Vector3f& position, float size, unsigned int texture_id)
 {
-    // Vertices are specified counterclockwise from the upper-left corner.
-    // TODO: 2016: Specify vertices in a flat array, like patch.
+    // Vertices are specified in left-to-right order from upper-left corner.
     const Vector3f vertices[] = {{ -size,  size, 0.0f },
+                                 {  size,  size, 0.0f },
                                  { -size, -size, 0.0f },
-                                 {  size, -size, 0.0f },
-                                 {  size,  size, 0.0f }};
+                                 {  size, -size, 0.0f }};
 
     const Vector2f texture_coords[] = {{ 0.0f, 0.0f },
+                                       { 1.0f, 0.0f },
                                        { 0.0f, 1.0f },
-                                       { 1.0f, 1.0f },
-                                       { 1.0f, 0.0f }};
+                                       { 1.0f, 1.0f }};
 
-    const uint8_t index_array[] = { 0, 1, 3, 3, 1, 2 };
+    const uint8_t index_array[] = { 0, 2, 1, 1, 2, 3 };
 
     // Transform to location.
     // GL_MODELVIEW assumed.
