@@ -21,6 +21,8 @@ struct Polygon
 struct Patch
 {
     std::vector<Vector3f> vertices;
+    unsigned int patch_count;
+    unsigned int texture_id;
 };
 
 struct Map

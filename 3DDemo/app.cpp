@@ -99,11 +99,15 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
         patch_count = std::min(std::max(2u, patch_count), MAX_GENERATED_POINTS - 1);
         Patch patch1, patch2;
         patch1.vertices = generate_quadratic_bezier_quads(patches[0], patch_count);
+        patch1.patch_count = patch_count;
+        patch1.texture_id = map.patch_texture_id;
         patch2.vertices = generate_quadratic_bezier_quads(patches[1], patch_count);
+        patch2.patch_count = patch_count;
+        patch2.texture_id = map.patch_texture_id;
 
         emitter.update(elapsed_milliseconds);
 
-        draw_map(map, camera, patch1, patch2, patch_count, emitter);
+        draw_map(map, camera, patch1, patch2, emitter);
 
         const HDC device_context = wglGetCurrentDC();
         SwapBuffers(device_context);

@@ -16,7 +16,7 @@ static void bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap, uns
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    // TODO: GL_REPEAT seems like a good idea, but something about GL_LINEAR is causing
+    // TODO: 2016: GL_REPEAT seems like a good idea, but something about GL_LINEAR is causing
     // v=0 to actually wrap the texture at least vertically one line.  Likely this is
     // a bug in the renderer itself, as it happens in more than one OpenGL implementation.
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -34,6 +34,8 @@ static void bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap, uns
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
+
+    // TODO: 2016: GL_TEXTURE_ENV is not a loading property - it's a drawing property.  Move this.
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
@@ -99,23 +101,23 @@ void initialize_gl_world_data(
 // Vertices is a two dimensional array of patch vertices.  generate_quadratic_bezier_quads() creates the expected output.
 // TODO: 2016: generate_quadratic_bezier_quads doesn't generate quads.  It generates a curve_vertex_count x curve_vertex_count array of vertices.
 // TODO: 2016: Pass in a Patch object, with verts, textures (id and coords), and patch_count.
-static void draw_patch(const Camera& camera, const Patch& patch, unsigned int patch_count, unsigned int texture_id)
+static void draw_patch(const Patch& patch, const Camera& camera)
 {
-    const float scale = 1.0f / patch_count;
-    const auto curve_vertex_count = patch_count + 1;
+    const float scale = 1.0f / patch.patch_count;
+    const auto curve_vertex_count = patch.patch_count + 1;
 
     // TODO: 2016: index_array and texture_coords (and vertices) can be cached, as long as patch_count doesn't change between frames.
     // TODO: 2016: Calculate this stuff at the same time the vertices are calculated.
     // TODO: 2016: When reusing arrays, can precalculate the reserve to be the largest expected size, so reallocation never happens.
     std::vector<uint16_t> index_array;
-    index_array.reserve(patch_count * patch_count * 6);     // Six push_backs per loop iteration.
+    index_array.reserve(patch.patch_count * patch.patch_count * 6);     // Six push_backs per loop iteration.
 
     std::vector<Vector2f> texture_coords;
     texture_coords.reserve(curve_vertex_count * curve_vertex_count);
 
-    for(unsigned int vv = 0; vv < patch_count; ++vv)
+    for(unsigned int vv = 0; vv < patch.patch_count; ++vv)
     {
-        for(unsigned int uu = 0; uu < patch_count; ++uu)
+        for(unsigned int uu = 0; uu < patch.patch_count; ++uu)
         {
             index_array.push_back(static_cast<uint16_t>((uu + 0) + (vv + 0) * curve_vertex_count));
             index_array.push_back(static_cast<uint16_t>((uu + 0) + (vv + 1) * curve_vertex_count));
@@ -142,7 +144,7 @@ static void draw_patch(const Camera& camera, const Patch& patch, unsigned int pa
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glDepthFunc(GL_LESS);
     glBlendFunc(GL_ONE, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glBindTexture(GL_TEXTURE_2D, patch.texture_id);
 
     glVertexPointer(3, GL_FLOAT, 0, &patch.vertices[0]);
     glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
@@ -168,6 +170,9 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
                                        { 0.0f, 1.0f },
                                        { 1.0f, 1.0f }};
 
+    // TODO: 2016: With billboards and patches in the same format, there
+    // may be a helper function that can generate the index_array for either.
+    // TODO: 2016: Should be a uint16_t.
     const uint8_t index_array[] = { 0, 2, 1, 1, 2, 3 };
 
     // Transform to location.
@@ -183,6 +188,7 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
     // TODO: 2016: Understand why glColor4f only passes red.
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
     glDepthFunc(GL_LESS);
+    // TODO: 2016: This will be glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA), once textures are 32-bit. :(
     glBlendFunc(GL_ONE, GL_ONE);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
@@ -208,7 +214,6 @@ void draw_map(
     const struct Camera& camera,
     const Patch& patch1,
     const Patch& patch2,
-    unsigned int patch_count,
     const class Emitter& emitter)
 {
     glClearDepth(1.0);
@@ -261,8 +266,8 @@ void draw_map(
         glDrawElements(GL_QUADS, ARRAYSIZE(index_array), GL_UNSIGNED_BYTE, index_array);
     }
 
-    draw_patch(camera, patch1, patch_count, map.patch_texture_id);
-    draw_patch(camera, patch2, patch_count, map.patch_texture_id);
+    draw_patch(patch1, camera);
+    draw_patch(patch2, camera);
 
     draw_emitter(emitter, camera, 6);
 

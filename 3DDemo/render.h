@@ -15,7 +15,7 @@ struct Camera;
 
 void initialize_gl_constants();
 void initialize_gl_world_data(const std::vector<ImageProcessing::Bitmap>& texture_list);
-void draw_map(const Map& map, const Camera& camera, const Patch& patch1, const Patch& patch2, unsigned int patch_count, const Emitter& emitter);
+void draw_map(const Map& map, const Camera& camera, const Patch& patch1, const Patch& patch2, const Emitter& emitter);
 
 }
 
