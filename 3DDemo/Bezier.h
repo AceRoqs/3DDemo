@@ -10,7 +10,7 @@ struct Bezier_patch
     unsigned int control_point_indices[quadratic_bezier_control_point_count * quadratic_bezier_control_point_count];
 };
 
-std::vector<struct Vector3f> generate_quadratic_bezier_quads(const Bezier_patch& patch, unsigned int patch_count);
+std::vector<struct Vector3f> generate_quadratic_bezier_vertex_patch(const Bezier_patch& patch, unsigned int patch_count);
 
 }
 

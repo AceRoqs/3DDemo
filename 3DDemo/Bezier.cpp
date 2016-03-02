@@ -53,7 +53,7 @@ static Vector3f calculate_quadratic_bezier_vertex(const Bezier_patch& patch, flo
 }
 
 // TODO: 2014: It would make much more sense to do this in a compute shader to generate the data where they are used.
-std::vector<Vector3f> generate_quadratic_bezier_quads(const Bezier_patch& patch, unsigned int patch_count)
+std::vector<Vector3f> generate_quadratic_bezier_vertex_patch(const Bezier_patch& patch, unsigned int patch_count)
 {
     const auto curve_vertex_count = patch_count + 1;
 

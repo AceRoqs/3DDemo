@@ -98,8 +98,6 @@ void initialize_gl_world_data(
     }
 }
 
-// Vertices is a two dimensional array of patch vertices.  generate_quadratic_bezier_quads() creates the expected output.
-// TODO: 2016: generate_quadratic_bezier_quads doesn't generate quads.  It generates a curve_vertex_count x curve_vertex_count array of vertices.
 // TODO: 2016: Pass in a Patch object, with verts, textures (id and coords), and patch_count.
 static void draw_patch(const Patch& patch, const Camera& camera)
 {

@@ -98,10 +98,10 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
         unsigned int patch_count = (unsigned int)(MAX_GENERATED_POINTS * 4 / (point_distance(camera.m_position, make_vector(2.0f, 0.0f, 10.0f)))) - 1;
         patch_count = std::min(std::max(2u, patch_count), MAX_GENERATED_POINTS - 1);
         Patch patch1, patch2;
-        patch1.vertices = generate_quadratic_bezier_quads(patches[0], patch_count);
+        patch1.vertices = generate_quadratic_bezier_vertex_patch(patches[0], patch_count);
         patch1.patch_count = patch_count;
         patch1.texture_id = map.patch_texture_id;
-        patch2.vertices = generate_quadratic_bezier_quads(patches[1], patch_count);
+        patch2.vertices = generate_quadratic_bezier_vertex_patch(patches[1], patch_count);
         patch2.patch_count = patch_count;
         patch2.texture_id = map.patch_texture_id;
 
