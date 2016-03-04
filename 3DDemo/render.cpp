@@ -98,47 +98,8 @@ void initialize_gl_world_data(
     }
 }
 
-// TODO: 2016: Pass in a Patch object, with verts, textures (id and coords), and patch_count.
 static void draw_patch(const Patch& patch, const Camera& camera)
 {
-    const float scale = 1.0f / patch.patch_count;
-    const auto curve_vertex_count = patch.patch_count + 1;
-
-    // TODO: 2016: index_array and texture_coords (and vertices) can be cached, as long as patch_count doesn't change between frames.
-    // TODO: 2016: Calculate this stuff at the same time the vertices are calculated.
-    // TODO: 2016: When reusing arrays, can precalculate the reserve to be the largest expected size, so reallocation never happens.
-    std::vector<uint16_t> index_array;
-    assert(index_array.size() < UINT16_MAX);
-    const auto offset = static_cast<uint16_t>(index_array.size());
-
-    // Arithmetic wrap is safe as this is just an optimization.
-    index_array.reserve(offset + patch.patch_count * patch.patch_count * 6);     // Six push_backs per loop iteration.
-
-    for(unsigned int vv = 0; vv < patch.patch_count; ++vv)
-    {
-        for(unsigned int uu = 0; uu < patch.patch_count; ++uu)
-        {
-            index_array.push_back(offset + static_cast<uint16_t>((uu + 0) + (vv + 0) * curve_vertex_count));
-            index_array.push_back(offset + static_cast<uint16_t>((uu + 0) + (vv + 1) * curve_vertex_count));
-            index_array.push_back(offset + static_cast<uint16_t>((uu + 1) + (vv + 0) * curve_vertex_count));
-            index_array.push_back(offset + static_cast<uint16_t>((uu + 1) + (vv + 0) * curve_vertex_count));
-            index_array.push_back(offset + static_cast<uint16_t>((uu + 0) + (vv + 1) * curve_vertex_count));
-            index_array.push_back(offset + static_cast<uint16_t>((uu + 1) + (vv + 1) * curve_vertex_count));
-        }
-    }
-
-    std::vector<Vector2f> texture_coords;
-    // Arithmetic wrap is safe as this is just an optimization.
-    texture_coords.reserve(texture_coords.size() + curve_vertex_count * curve_vertex_count);
-
-    for(unsigned int vv = 0; vv < curve_vertex_count; ++vv)
-    {
-        for(unsigned int uu = 0; uu < curve_vertex_count; ++uu)
-        {
-            texture_coords.push_back({uu * scale, vv * scale});
-        }
-    }
-
     // GL_MODELVIEW assumed.
     glLoadIdentity();
     glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
@@ -150,10 +111,13 @@ static void draw_patch(const Patch& patch, const Camera& camera)
     glBindTexture(GL_TEXTURE_2D, patch.texture_id);
 
     glVertexPointer(3, GL_FLOAT, 0, &patch.vertices[0]);
-    glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
+    glTexCoordPointer(2, GL_FLOAT, 0, &patch.texture_coords[0]);
 
-    assert(index_array.size() < INT_MAX);   // GLsizei == int
-    glDrawElements(GL_TRIANGLES, patch.patch_count * patch.patch_count * 6, GL_UNSIGNED_SHORT, &index_array[offset]);
+    assert(patch.index_array.size() < INT_MAX);   // GLsizei == int
+    // TODO: 2016: Patch should pass an offset?  Offset will always be zero, since patch is the thing that hold the arrays.
+    //             Either patch holds the arrays, and no offset, or it holds a reference to arrays, and have an offset.
+    //glDrawElements(GL_TRIANGLES, patch.patch_count * patch.patch_count * 6, GL_UNSIGNED_SHORT, &patch.index_array[offset]);
+    glDrawElements(GL_TRIANGLES, patch.patch_count * patch.patch_count * 6, GL_UNSIGNED_SHORT, &patch.index_array[0]);
 }
 
 // TODO: 2016: This isn't a true billboard, in the sense that it's only billboarded against the vertical axis.

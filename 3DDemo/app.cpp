@@ -69,6 +69,47 @@ static const Bezier_patch patches[] =
     { { bezier_control_points }, 2,  9, 10,  5, 11, 12,  8, 13, 14 },
 };
 
+static void append_patch_index_array(unsigned int patch_count, std::vector<uint16_t>& index_array)
+{
+    const auto curve_vertex_count = patch_count + 1;
+
+    assert(index_array.size() < UINT16_MAX);
+    const auto offset = static_cast<uint16_t>(index_array.size());
+
+    // Arithmetic wrap is safe as this is just an optimization.
+    index_array.reserve(offset + patch_count * patch_count * 6);     // Six push_backs per loop iteration.
+
+    for(unsigned int vv = 0; vv < patch_count; ++vv)
+    {
+        for(unsigned int uu = 0; uu < patch_count; ++uu)
+        {
+            index_array.push_back(offset + static_cast<uint16_t>((uu + 0) + (vv + 0) * curve_vertex_count));
+            index_array.push_back(offset + static_cast<uint16_t>((uu + 0) + (vv + 1) * curve_vertex_count));
+            index_array.push_back(offset + static_cast<uint16_t>((uu + 1) + (vv + 0) * curve_vertex_count));
+            index_array.push_back(offset + static_cast<uint16_t>((uu + 1) + (vv + 0) * curve_vertex_count));
+            index_array.push_back(offset + static_cast<uint16_t>((uu + 0) + (vv + 1) * curve_vertex_count));
+            index_array.push_back(offset + static_cast<uint16_t>((uu + 1) + (vv + 1) * curve_vertex_count));
+        }
+    }
+}
+
+static void append_patch_texture_coords_array(unsigned int patch_count, std::vector<Vector2f>& texture_coords)
+{
+    const float scale = 1.0f / patch_count;
+    const auto curve_vertex_count = patch_count + 1;
+
+    // Arithmetic wrap is safe as this is just an optimization.
+    texture_coords.reserve(texture_coords.size() + curve_vertex_count * curve_vertex_count);
+
+    for(unsigned int vv = 0; vv < curve_vertex_count; ++vv)
+    {
+        for(unsigned int uu = 0; uu < curve_vertex_count; ++uu)
+        {
+            texture_coords.push_back({uu * scale, vv * scale});
+        }
+    }
+}
+
 static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, const WindowsCommon::Input_device& keyboard)
 {
     Camera camera(make_vector(0.0f, 0.0f, 1.0f), 0.0f);
@@ -97,11 +138,20 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
         const unsigned int MAX_GENERATED_POINTS = 10;
         unsigned int patch_count = (unsigned int)(MAX_GENERATED_POINTS * 4 / (point_distance(camera.m_position, make_vector(2.0f, 0.0f, 10.0f)))) - 1;
         patch_count = std::min(std::max(2u, patch_count), MAX_GENERATED_POINTS - 1);
-        Patch patch1, patch2;
+
+        // TODO: 2016: index_array and texture_coords (and vertices) can be cached, as long as patch_count doesn't change between frames.
+        // TODO: 2016: When reusing arrays, can precalculate the reserve to be the largest expected size, so reallocation never happens.
+        Patch patch1;
         patch1.vertices = generate_quadratic_bezier_vertex_patch(patches[0], patch_count);
+        append_patch_index_array(patch_count, patch1.index_array);
+        append_patch_texture_coords_array(patch_count, patch1.texture_coords);
         patch1.patch_count = patch_count;
         patch1.texture_id = map.patch_texture_id;
+
+        Patch patch2;
         patch2.vertices = generate_quadratic_bezier_vertex_patch(patches[1], patch_count);
+        append_patch_index_array(patch_count, patch2.index_array);
+        append_patch_texture_coords_array(patch_count, patch2.texture_coords);
         patch2.patch_count = patch_count;
         patch2.texture_id = map.patch_texture_id;
 
