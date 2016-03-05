@@ -139,8 +139,7 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
 
     // TODO: 2016: With billboards and patches in the same format, there
     // may be a helper function that can generate the index_array for either.
-    // TODO: 2016: Should be a uint16_t.
-    const uint8_t index_array[] = { 0, 2, 1, 1, 2, 3 };
+    const uint16_t index_array[] = { 0, 2, 1, 1, 2, 3 };
 
     // Transform to location.
     // GL_MODELVIEW assumed.
@@ -162,7 +161,7 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
     glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
     glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
 
-    glDrawElements(GL_TRIANGLES, ARRAYSIZE(index_array), GL_UNSIGNED_BYTE, index_array);
+    glDrawElements(GL_TRIANGLES, ARRAYSIZE(index_array), GL_UNSIGNED_SHORT, index_array);
 }
 
 // TODO: 2014: Drawing should be done against a vertex/index array.
@@ -199,15 +198,14 @@ void draw_map(
     // problems on a second light pass once the world is drawn
     for(unsigned int ii = 0; ii < map.world_mesh.size(); ++ii)
     {
-        // TODO: 2016: Convert all index arrays to 16-bit.
-        assert(map.world_mesh.size() < 256 / 4);
+        assert(map.world_mesh.size() < 65536 / 4);
 
-        const uint8_t index_array[] =
+        const uint16_t index_array[] =
         {
-            static_cast<uint8_t>(ii * 4),
-            static_cast<uint8_t>(ii * 4 + 1),
-            static_cast<uint8_t>(ii * 4 + 2),
-            static_cast<uint8_t>(ii * 4 + 3)
+            static_cast<uint16_t>(ii * 4),
+            static_cast<uint16_t>(ii * 4 + 1),
+            static_cast<uint16_t>(ii * 4 + 2),
+            static_cast<uint16_t>(ii * 4 + 3)
         };
 
         const Polygon* iter = &map.world_mesh[ii];
@@ -218,7 +216,7 @@ void draw_map(
         glBindTexture(GL_TEXTURE_2D, iter->texture);
 
         // TODO: 2016: Make this GL_TRIANGLES.  This might require changes to the persisted formats?
-        glDrawElements(GL_QUADS, ARRAYSIZE(index_array), GL_UNSIGNED_BYTE, index_array);
+        glDrawElements(GL_QUADS, ARRAYSIZE(index_array), GL_UNSIGNED_SHORT, index_array);
 
         if(iter->lightmap == 0)
         {
@@ -230,7 +228,7 @@ void draw_map(
         glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D, iter->lightmap);
 
-        glDrawElements(GL_QUADS, ARRAYSIZE(index_array), GL_UNSIGNED_BYTE, index_array);
+        glDrawElements(GL_QUADS, ARRAYSIZE(index_array), GL_UNSIGNED_SHORT, index_array);
     }
 
     draw_patch(patch1, camera);
