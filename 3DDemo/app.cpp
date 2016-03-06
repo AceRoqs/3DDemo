@@ -142,18 +142,20 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
         // TODO: 2016: index_array and texture_coords (and vertices) can be cached, as long as patch_count doesn't change between frames.
         // TODO: 2016: When reusing arrays, can precalculate the reserve to be the largest expected size, so reallocation never happens.
         Patch patch1;
-        patch1.vertices = generate_quadratic_bezier_vertex_patch(patches[0], patch_count);
+        append_quadratic_bezier_vertex_patch(patches[0], patch_count, patch1.vertices);
         append_patch_index_array(patch_count, patch1.index_array);
         append_patch_texture_coords_array(patch_count, patch1.texture_coords);
         patch1.patch_count = patch_count;
         patch1.texture_id = map.patch_texture_id;
+        patch1.index_array_offset = 0;
 
         Patch patch2;
-        patch2.vertices = generate_quadratic_bezier_vertex_patch(patches[1], patch_count);
+        append_quadratic_bezier_vertex_patch(patches[1], patch_count, patch2.vertices);
         append_patch_index_array(patch_count, patch2.index_array);
         append_patch_texture_coords_array(patch_count, patch2.texture_coords);
         patch2.patch_count = patch_count;
         patch2.texture_id = map.patch_texture_id;
+        patch2.index_array_offset = 0;
 
         emitter.update(elapsed_milliseconds);
 

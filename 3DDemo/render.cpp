@@ -116,8 +116,7 @@ static void draw_patch(const Patch& patch, const Camera& camera)
     assert(patch.index_array.size() < INT_MAX);   // GLsizei == int
     // TODO: 2016: Patch should pass an offset?  Offset will always be zero, since patch is the thing that hold the arrays.
     //             Either patch holds the arrays, and no offset, or it holds a reference to arrays, and have an offset.
-    //glDrawElements(GL_TRIANGLES, patch.patch_count * patch.patch_count * 6, GL_UNSIGNED_SHORT, &patch.index_array[offset]);
-    glDrawElements(GL_TRIANGLES, patch.patch_count * patch.patch_count * 6, GL_UNSIGNED_SHORT, &patch.index_array[0]);
+    glDrawElements(GL_TRIANGLES, patch.patch_count * patch.patch_count * 6, GL_UNSIGNED_SHORT, &patch.index_array[patch.index_array_offset]);
 }
 
 // TODO: 2016: This isn't a true billboard, in the sense that it's only billboarded against the vertical axis.

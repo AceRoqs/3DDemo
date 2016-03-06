@@ -53,13 +53,11 @@ static Vector3f calculate_quadratic_bezier_vertex(const Bezier_patch& patch, flo
 }
 
 // TODO: 2014: It would make much more sense to do this in a compute shader to generate the data where they are used.
-// TODO: 2016: Consider having this take a vector to append to.
-std::vector<Vector3f> generate_quadratic_bezier_vertex_patch(const Bezier_patch& patch, unsigned int patch_count)
+void append_quadratic_bezier_vertex_patch(const Bezier_patch& patch, unsigned int patch_count, std::vector<Vector3f>& vertices)
 {
     const auto curve_vertex_count = patch_count + 1;
 
-    std::vector<Vector3f> vertices;
-    vertices.reserve(curve_vertex_count * curve_vertex_count);
+    vertices.reserve(vertices.size() + curve_vertex_count * curve_vertex_count);
 
     // Generate all of the points.
     for(unsigned int v = 0; v < curve_vertex_count; ++v)
@@ -75,8 +73,6 @@ std::vector<Vector3f> generate_quadratic_bezier_vertex_patch(const Bezier_patch&
             vertices.push_back(calculate_quadratic_bezier_vertex(patch, t_u, t_v));
         }
     }
-
-    return vertices;
 }
 
 }
