@@ -93,6 +93,30 @@ static void append_patch_index_array(unsigned int patch_count, std::vector<uint1
     }
 }
 
+static void generate_patch_index_array(unsigned int patch_count, uint16_t* begin, uint16_t* end, size_t offset)
+{
+    const auto curve_vertex_count = patch_count + 1;
+
+    assert(end > begin);
+    assert((end - begin) >= (patch_count * patch_count * 6));
+    assert(offset + patch_count + patch_count * curve_vertex_count <= UINT16_MAX);
+    (void)end;
+
+    size_t index = 0;
+    for(unsigned int vv = 0; vv < patch_count; ++vv)
+    {
+        for(unsigned int uu = 0; uu < patch_count; ++uu)
+        {
+            begin[index++] = static_cast<uint16_t>(offset + (uu + 0) + (vv + 0) * curve_vertex_count);
+            begin[index++] = static_cast<uint16_t>(offset + (uu + 0) + (vv + 1) * curve_vertex_count);
+            begin[index++] = static_cast<uint16_t>(offset + (uu + 1) + (vv + 0) * curve_vertex_count);
+            begin[index++] = static_cast<uint16_t>(offset + (uu + 1) + (vv + 0) * curve_vertex_count);
+            begin[index++] = static_cast<uint16_t>(offset + (uu + 0) + (vv + 1) * curve_vertex_count);
+            begin[index++] = static_cast<uint16_t>(offset + (uu + 1) + (vv + 1) * curve_vertex_count);
+        }
+    }
+}
+
 static void append_patch_texture_coords_array(unsigned int patch_count, std::vector<Vector2f>& texture_coords)
 {
     const float scale = 1.0f / patch_count;
@@ -106,6 +130,27 @@ static void append_patch_texture_coords_array(unsigned int patch_count, std::vec
         for(unsigned int uu = 0; uu < curve_vertex_count; ++uu)
         {
             texture_coords.push_back({uu * scale, vv * scale});
+        }
+    }
+}
+
+// TODO: 2016: This is probably better served as taking a start pointer and end pointer, and foregoing the vector/min/max.
+static void generate_patch_texture_coords_array(unsigned int patch_count, std::vector<Vector2f>& texture_coords, uint16_t min, uint16_t max)
+{
+    const auto curve_vertex_count = patch_count + 1;
+    assert(texture_coords.size() <= UINT16_MAX);
+    assert((max - min + 1u) >= (curve_vertex_count * curve_vertex_count));
+    assert(max < texture_coords.size());
+    (void)max;
+
+    const float scale = 1.0f / patch_count;
+
+    size_t offset = min;
+    for(unsigned int vv = 0; vv < curve_vertex_count; ++vv)
+    {
+        for(unsigned int uu = 0; uu < curve_vertex_count; ++uu)
+        {
+            texture_coords[vv * curve_vertex_count + uu + offset++] = {uu * scale, vv * scale};
         }
     }
 }
