@@ -93,6 +93,23 @@ static void append_patch_index_array(unsigned int patch_count, std::vector<uint1
     }
 }
 
+static void append_patch_texture_coords_array(unsigned int patch_count, std::vector<Vector2f>& texture_coords)
+{
+    const float scale = 1.0f / patch_count;
+    const auto curve_vertex_count = patch_count + 1;
+
+    // Arithmetic wrap is safe as this is just an optimization.
+    texture_coords.reserve(texture_coords.size() + curve_vertex_count * curve_vertex_count);
+
+    for(unsigned int vv = 0; vv < curve_vertex_count; ++vv)
+    {
+        for(unsigned int uu = 0; uu < curve_vertex_count; ++uu)
+        {
+            texture_coords.push_back({uu * scale, vv * scale});
+        }
+    }
+}
+
 static void generate_patch_index_array(unsigned int patch_count, size_t bias, _Out_writes_to_(length, patch_count * patch_count * 6) uint16_t* begin, size_t length)
 {
     const auto curve_vertex_count = patch_count + 1;
@@ -112,23 +129,6 @@ static void generate_patch_index_array(unsigned int patch_count, size_t bias, _O
             begin[index++] = static_cast<uint16_t>(bias + (uu + 1) + (vv + 0) * curve_vertex_count);
             begin[index++] = static_cast<uint16_t>(bias + (uu + 0) + (vv + 1) * curve_vertex_count);
             begin[index++] = static_cast<uint16_t>(bias + (uu + 1) + (vv + 1) * curve_vertex_count);
-        }
-    }
-}
-
-static void append_patch_texture_coords_array(unsigned int patch_count, std::vector<Vector2f>& texture_coords)
-{
-    const float scale = 1.0f / patch_count;
-    const auto curve_vertex_count = patch_count + 1;
-
-    // Arithmetic wrap is safe as this is just an optimization.
-    texture_coords.reserve(texture_coords.size() + curve_vertex_count * curve_vertex_count);
-
-    for(unsigned int vv = 0; vv < curve_vertex_count; ++vv)
-    {
-        for(unsigned int uu = 0; uu < curve_vertex_count; ++uu)
-        {
-            texture_coords.push_back({uu * scale, vv * scale});
         }
     }
 }
