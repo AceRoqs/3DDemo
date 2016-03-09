@@ -155,6 +155,18 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
     Camera camera(make_vector(0.0f, 0.0f, 1.0f), 0.0f);
     Emitter emitter(make_vector(-3.0f, 0.0f, -10.5f), 50, particle_descriptor);
 
+    const unsigned int MAX_PATCH_COUNT_PER_DIMENSION = 9;
+    const unsigned int MAX_GENERATED_VERTICES_PER_DIMENSION = MAX_PATCH_COUNT_PER_DIMENSION + 1;
+    const unsigned int MAX_GENERATED_VERTICES = MAX_GENERATED_VERTICES_PER_DIMENSION * MAX_GENERATED_VERTICES_PER_DIMENSION;
+    const unsigned int MAX_GENERATED_INDICES_PER_DIMENSION = MAX_PATCH_COUNT_PER_DIMENSION;
+    const unsigned int MAX_GENERATED_INDICES = MAX_GENERATED_INDICES_PER_DIMENSION * MAX_GENERATED_INDICES_PER_DIMENSION * 6;
+
+    // TODO: 2016: This will move to the map structure.
+    std::vector<uint16_t> indices;
+    indices.resize(MAX_GENERATED_INDICES * 2);
+    std::vector<Vector2f> texture_coords;
+    texture_coords.resize(MAX_GENERATED_VERTICES * 2);
+
     MSG message;
     for(;;)
     {
@@ -175,16 +187,17 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
         camera = apply_actions(actions, camera);
 
         // Set level-of-detail.
-        const unsigned int MAX_GENERATED_POINTS = 10;
-        unsigned int patch_count = (unsigned int)(MAX_GENERATED_POINTS * 4 / (point_distance(camera.m_position, make_vector(2.0f, 0.0f, 10.0f)))) - 1;
-        patch_count = std::min(std::max(2u, patch_count), MAX_GENERATED_POINTS - 1);
+        unsigned int patch_count = (unsigned int)(MAX_GENERATED_VERTICES_PER_DIMENSION * 4 / (point_distance(camera.m_position, make_vector(2.0f, 0.0f, 10.0f)))) - 1;
+        patch_count = std::min(std::max(2u, patch_count), MAX_PATCH_COUNT_PER_DIMENSION);
 
         // TODO: 2016: index_array and texture_coords (and vertices) can be cached, as long as patch_count doesn't change between frames.
         // TODO: 2016: When reusing arrays, can precalculate the reserve to be the largest expected size, so reallocation never happens.
         Patch patch1;
         append_quadratic_bezier_vertex_patch(patches[0], patch_count, patch1.vertices);
         append_patch_index_array(patch_count, patch1.index_array);
+        generate_patch_index_array(patch_count, 0, &indices[0], MAX_GENERATED_INDICES);
         append_patch_texture_coords_array(patch_count, patch1.texture_coords);
+        generate_patch_texture_coords_array(patch_count, &texture_coords[0], MAX_GENERATED_VERTICES);
         patch1.patch_count = patch_count;
         patch1.texture_id = map.patch_texture_id;
         patch1.index_array_offset = 0;
@@ -192,7 +205,9 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
         Patch patch2;
         append_quadratic_bezier_vertex_patch(patches[1], patch_count, patch2.vertices);
         append_patch_index_array(patch_count, patch2.index_array);
+        generate_patch_index_array(patch_count, MAX_GENERATED_INDICES, &indices[MAX_GENERATED_INDICES], MAX_GENERATED_INDICES);
         append_patch_texture_coords_array(patch_count, patch2.texture_coords);
+        generate_patch_texture_coords_array(patch_count, &texture_coords[MAX_GENERATED_VERTICES], MAX_GENERATED_VERTICES);
         patch2.patch_count = patch_count;
         patch2.texture_id = map.patch_texture_id;
         patch2.index_array_offset = 0;
