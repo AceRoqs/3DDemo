@@ -50,8 +50,9 @@ struct Map
 
 struct Dynamic_meshes
 {
-    std::vector<uint16_t> indices;
+    std::vector<Vector3f> vertices;
     std::vector<Vector2f> texture_coords;
+    std::vector<uint16_t> indices;
 };
 
 std::istream& operator>>(std::istream& is, Demo::Polygon& polygon);

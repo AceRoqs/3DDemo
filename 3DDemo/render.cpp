@@ -176,10 +176,11 @@ static void draw_emitter(const Emitter& emitter, const Camera& camera, unsigned 
 // TODO: modularize into separate functions
 void draw_map(
     const Map& map,
-    const struct Camera& camera,
+    const Dynamic_meshes& dynamic_meshes, 
+    const Camera& camera,
     const Patch& patch1,
     const Patch& patch2,
-    const class Emitter& emitter)
+    const Emitter& emitter)
 {
     glClearDepth(1.0);
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -230,6 +231,7 @@ void draw_map(
         glDrawElements(GL_QUADS, ARRAYSIZE(index_array), GL_UNSIGNED_SHORT, index_array);
     }
 
+    (void)dynamic_meshes;
     draw_patch(patch1, camera);
     draw_patch(patch2, camera);
 

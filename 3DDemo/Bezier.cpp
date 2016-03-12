@@ -75,5 +75,35 @@ void append_quadratic_bezier_vertex_patch(const Bezier_patch& patch, unsigned in
     }
 }
 
+// TODO: 2014: It would make much more sense to do this in a compute shader to generate the data where they are used.
+void generate_patch_quadratic_bezier_vertex_array(
+    const Bezier_patch& patch,
+    unsigned int patch_count,
+    _Out_writes_to_(length, (patch_count + 1) * (patch_count + 1)) Vector3f* vertices,
+    size_t length)
+{
+    const auto curve_vertex_count = patch_count + 1;
+
+    assert(curve_vertex_count * curve_vertex_count <= length);
+    (void)length;
+
+    // Generate all of the points.
+    size_t ix = 0;
+    for(unsigned int v = 0; v < curve_vertex_count; ++v)
+    {
+        // Range [0..1].
+        const float t_v = v / static_cast<float>(patch_count);
+
+        for(unsigned int u = 0; u < curve_vertex_count; ++u)
+        {
+            // Range [0..1].
+            const float t_u = u / static_cast<float>(patch_count);
+
+            vertices[ix] = calculate_quadratic_bezier_vertex(patch, t_u, t_v);
+            ix++;
+        }
+    }
+}
+
 }
 

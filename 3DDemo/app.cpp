@@ -163,8 +163,9 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
 
     // Allocate the maximum size so reallocation never happens.
     Dynamic_meshes dynamic_meshes;
-    dynamic_meshes.indices.resize(MAX_GENERATED_INDICES * 2);
+    dynamic_meshes.vertices.resize(MAX_GENERATED_VERTICES * 2);
     dynamic_meshes.texture_coords.resize(MAX_GENERATED_VERTICES * 2);
+    dynamic_meshes.indices.resize(MAX_GENERATED_INDICES * 2);
 
     unsigned int patch_count = MAX_PATCH_COUNT_PER_DIMENSION + 1;
     MSG message;
@@ -194,11 +195,11 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
         {
             patch_count = new_patch_count;
 
-            // TODO: 2016: Vertices must also be cached.
             for(auto ii = 0u; ii < 2; ++ii)
             {
-                generate_patch_index_array(patch_count, MAX_GENERATED_INDICES * ii, &dynamic_meshes.indices[MAX_GENERATED_INDICES * ii], MAX_GENERATED_INDICES);
+                generate_patch_quadratic_bezier_vertex_array(patches[ii], patch_count, &dynamic_meshes.vertices[MAX_GENERATED_VERTICES * ii], MAX_GENERATED_VERTICES);
                 generate_patch_texture_coords_array(patch_count, &dynamic_meshes.texture_coords[MAX_GENERATED_VERTICES * ii], MAX_GENERATED_VERTICES);
+                generate_patch_index_array(patch_count, MAX_GENERATED_INDICES * ii, &dynamic_meshes.indices[MAX_GENERATED_INDICES * ii], MAX_GENERATED_INDICES);
             }
         }
 
@@ -215,7 +216,7 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
 
         emitter.update(elapsed_milliseconds);
 
-        draw_map(map, camera, patch[0], patch[1], emitter);
+        draw_map(map, dynamic_meshes, camera, patch[0], patch[1], emitter);
 
         const HDC device_context = wglGetCurrentDC();
         SwapBuffers(device_context);
