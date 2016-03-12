@@ -48,6 +48,12 @@ struct Map
     //class Emitter emitter;
 };
 
+struct Dynamic_meshes
+{
+    std::vector<uint16_t> indices;
+    std::vector<Vector2f> texture_coords;
+};
+
 std::istream& operator>>(std::istream& is, Demo::Polygon& polygon);
 
 bool is_point_in_world(const struct Vector3f& point);

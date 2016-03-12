@@ -161,13 +161,10 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
     const unsigned int MAX_GENERATED_INDICES_PER_DIMENSION = MAX_PATCH_COUNT_PER_DIMENSION;
     const unsigned int MAX_GENERATED_INDICES = MAX_GENERATED_INDICES_PER_DIMENSION * MAX_GENERATED_INDICES_PER_DIMENSION * 6;
 
-    // TODO: 2016: This will move to the map structure.
-    std::vector<uint16_t> indices;
-    std::vector<Vector2f> texture_coords;
-
     // Allocate the maximum size so reallocation never happens.
-    indices.resize(MAX_GENERATED_INDICES * 2);
-    texture_coords.resize(MAX_GENERATED_VERTICES * 2);
+    Dynamic_meshes dynamic_meshes;
+    dynamic_meshes.indices.resize(MAX_GENERATED_INDICES * 2);
+    dynamic_meshes.texture_coords.resize(MAX_GENERATED_VERTICES * 2);
 
     unsigned int patch_count = MAX_PATCH_COUNT_PER_DIMENSION + 1;
     MSG message;
@@ -200,8 +197,8 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
             // TODO: 2016: Vertices must also be cached.
             for(auto ii = 0u; ii < 2; ++ii)
             {
-                generate_patch_index_array(patch_count, MAX_GENERATED_INDICES * ii, &indices[MAX_GENERATED_INDICES * ii], MAX_GENERATED_INDICES);
-                generate_patch_texture_coords_array(patch_count, &texture_coords[MAX_GENERATED_VERTICES * ii], MAX_GENERATED_VERTICES);
+                generate_patch_index_array(patch_count, MAX_GENERATED_INDICES * ii, &dynamic_meshes.indices[MAX_GENERATED_INDICES * ii], MAX_GENERATED_INDICES);
+                generate_patch_texture_coords_array(patch_count, &dynamic_meshes.texture_coords[MAX_GENERATED_VERTICES * ii], MAX_GENERATED_VERTICES);
             }
         }
 
