@@ -98,6 +98,33 @@ void initialize_gl_world_data(
     }
 }
 
+static void draw_dynamic_meshes(const Dynamic_meshes& dynamic_meshes, const Camera& camera)
+{
+    // GL_MODELVIEW assumed.
+    glLoadIdentity();
+    glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
+    glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
+
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glDepthFunc(GL_LESS);
+    glBlendFunc(GL_ONE, GL_ZERO);
+
+    glVertexPointer(3, GL_FLOAT, 0, &dynamic_meshes.vertices[0]);
+    glTexCoordPointer(2, GL_FLOAT, 0, &dynamic_meshes.texture_coords[0]);
+
+    for(auto ix = 0; ix < dynamic_meshes.patches.size(); ++ix)
+    {
+        glBindTexture(GL_TEXTURE_2D, dynamic_meshes.patches[ix].texture_id);
+
+        assert(dynamic_meshes.indices.size() < INT_MAX);    // GLsizei == int
+        glDrawElements(GL_TRIANGLES,
+                       dynamic_meshes.patches[ix].patch_count * dynamic_meshes.patches[ix].patch_count * 6,
+                       GL_UNSIGNED_SHORT,
+                       &dynamic_meshes.indices[dynamic_meshes.patches[ix].index_array_offset]);
+    }
+}
+
+#if 0
 static void draw_patch(const Patch& patch, const Camera& camera)
 {
     // GL_MODELVIEW assumed.
@@ -118,6 +145,7 @@ static void draw_patch(const Patch& patch, const Camera& camera)
     //             Either patch holds the arrays, and no offset, or it holds a reference to arrays, and have an offset.
     glDrawElements(GL_TRIANGLES, patch.patch_count * patch.patch_count * 6, GL_UNSIGNED_SHORT, &patch.index_array[patch.index_array_offset]);
 }
+#endif
 
 // TODO: 2016: This isn't a true billboard, in the sense that it's only billboarded against the vertical axis.
 // TODO: 2016: Pass in a Billboard object, with center_position, vertices, texture (ID and coords).
@@ -178,8 +206,6 @@ void draw_map(
     const Map& map,
     const Dynamic_meshes& dynamic_meshes, 
     const Camera& camera,
-    const Patch& patch1,
-    const Patch& patch2,
     const Emitter& emitter)
 {
     glClearDepth(1.0);
@@ -231,9 +257,12 @@ void draw_map(
         glDrawElements(GL_QUADS, ARRAYSIZE(index_array), GL_UNSIGNED_SHORT, index_array);
     }
 
-    (void)dynamic_meshes;
-    draw_patch(patch1, camera);
-    draw_patch(patch2, camera);
+    //(void)dynamic_meshes;
+    draw_dynamic_meshes(dynamic_meshes, camera);
+    //(void)patch1;
+    //(void)patch2;
+    //draw_patch(patch1, camera);
+    //draw_patch(patch2, camera);
 
     draw_emitter(emitter, camera, 6);
 
