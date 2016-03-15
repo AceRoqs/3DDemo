@@ -44,6 +44,7 @@ static const Particle_descriptor particle_descriptor =
     150.0f,     // life.
 };
 
+// TODO: 2016: Bezier patch data should go into world loading time.
 static const Vector3f bezier_control_points[] =
 {
     { -2.0f, 0.0f, -10.0f },    // 0
@@ -55,18 +56,25 @@ static const Vector3f bezier_control_points[] =
     { -2.0f,-2.0f, -10.0f },    // 6
     { -2.0f,-2.0f, -11.0f },    // 7
     { -3.0f,-2.0f, -11.0f },    // 8
-    { -4.0f, 0.0f, -11.0f },    // 9
-    { -4.0f, 0.0f, -10.0f },    // 10
-    { -4.0f,-1.0f, -11.0f },    // 11
-    { -4.0f,-1.0f, -10.0f },    // 12
-    { -4.0f,-2.0f, -11.0f },    // 13
-    { -4.0f,-2.0f, -10.0f },    // 14
+};
+
+static const Vector3f bezier_control_points2[] =
+{
+    { -3.0f, 0.0f, -11.0f },    // 0
+    { -4.0f, 0.0f, -11.0f },    // 1
+    { -4.0f, 0.0f, -10.0f },    // 2
+    { -3.0f,-1.0f, -11.0f },    // 3
+    { -4.0f,-1.0f, -11.0f },    // 4
+    { -4.0f,-1.0f, -10.0f },    // 5
+    { -3.0f,-2.0f, -11.0f },    // 6
+    { -4.0f,-2.0f, -11.0f },    // 7
+    { -4.0f,-2.0f, -10.0f },    // 8
 };
 
 static const Bezier_patch patches[] =
 {
-    { { bezier_control_points }, 0,  1,  2,  3,  4,  5,  6,  7,  8 },
-    { { bezier_control_points }, 2,  9, 10,  5, 11, 12,  8, 13, 14 },
+    { { bezier_control_points } },
+    { { bezier_control_points2 } },
 };
 
 static void append_patch_index_array(unsigned int patch_count, std::vector<uint16_t>& index_array)
@@ -170,6 +178,7 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
     dynamic_meshes.patches.resize(2);
 
     const auto dynamic_mesh_count = dynamic_meshes.patches.size();
+
     // Initialize patch data.
     // TODO: 2016: This should move to world load time.
     for(auto ii = 0u; ii < dynamic_mesh_count; ++ii)

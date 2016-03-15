@@ -44,8 +44,7 @@ static Vector3f calculate_quadratic_bezier_vertex(const Bezier_patch& patch, flo
             const float basis = bezier_quadratic_basis(i, t_u) * basis_v;
 
             // Q(u,v) = sum[i=0..2]sum[j=0..2] Bi(u)Bj(v)Pij
-            const size_t control_point_index = patch.control_point_indices[j * quadratic_bezier_control_point_count + i];
-            vertex += patch.control_point_vertices[control_point_index] * basis;
+            vertex += patch.control_point_vertices[j * quadratic_bezier_control_point_count + i] * basis;
         }
     }
 
