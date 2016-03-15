@@ -162,13 +162,23 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
     const unsigned int MAX_GENERATED_INDICES = MAX_GENERATED_INDICES_PER_DIMENSION * MAX_GENERATED_INDICES_PER_DIMENSION * 6;
 
     // Allocate the maximum size so reallocation never happens.
+    // TODO: 2016: Should this move to world load time?
     Dynamic_meshes dynamic_meshes;
     dynamic_meshes.vertices.resize(MAX_GENERATED_VERTICES * 2);
     dynamic_meshes.texture_coords.resize(MAX_GENERATED_VERTICES * 2);
     dynamic_meshes.indices.resize(MAX_GENERATED_INDICES * 2);
     dynamic_meshes.patches.resize(2);
 
-    unsigned int patch_count = MAX_PATCH_COUNT_PER_DIMENSION + 1;
+    const auto dynamic_mesh_count = dynamic_meshes.patches.size();
+    // Initialize patch data.
+    // TODO: 2016: This should move to world load time.
+    for(auto ii = 0u; ii < dynamic_mesh_count; ++ii)
+    {
+        dynamic_meshes.patches[ii].patch_count = MAX_PATCH_COUNT_PER_DIMENSION + 1;
+        dynamic_meshes.patches[ii].texture_id = map.patch_texture_id;
+        dynamic_meshes.patches[ii].index_array_offset = ii * MAX_GENERATED_INDICES;
+    }
+
     MSG message;
     for(;;)
     {
@@ -188,40 +198,20 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
         const std::vector<std::pair<float, Action>> actions = actions_from_keyboard_state(elapsed_milliseconds, keyboard_state);
         camera = apply_actions(actions, camera);
 
-        // Set level-of-detail.
-        unsigned int new_patch_count = (unsigned int)(MAX_GENERATED_VERTICES_PER_DIMENSION * 4 / (point_distance(camera.m_position, make_vector(2.0f, 0.0f, 10.0f)))) - 1;
-        new_patch_count = std::min(std::max(2u, new_patch_count), MAX_PATCH_COUNT_PER_DIMENSION);
-
-        if(new_patch_count != patch_count)
+        for(auto ii = 0u; ii < dynamic_mesh_count; ++ii)
         {
-            patch_count = new_patch_count;
+            // Set level-of-detail.
+            // TODO: 2016: Calculate level of detail individually for each patch.
+            unsigned int patch_count = (unsigned int)(MAX_GENERATED_VERTICES_PER_DIMENSION * 4 / (point_distance(camera.m_position, make_vector(2.0f, 0.0f, 10.0f)))) - 1;
+            patch_count = std::min(std::max(2u, patch_count), MAX_PATCH_COUNT_PER_DIMENSION);
 
-            for(auto ii = 0u; ii < 2; ++ii)
+            if(dynamic_meshes.patches[ii].patch_count != patch_count)
             {
+                dynamic_meshes.patches[ii].patch_count = patch_count;
                 generate_patch_quadratic_bezier_vertex_array(patches[ii], patch_count, &dynamic_meshes.vertices[MAX_GENERATED_VERTICES * ii], MAX_GENERATED_VERTICES);
                 generate_patch_texture_coords_array(patch_count, &dynamic_meshes.texture_coords[MAX_GENERATED_VERTICES * ii], MAX_GENERATED_VERTICES);
                 generate_patch_index_array(patch_count, MAX_GENERATED_VERTICES * ii, &dynamic_meshes.indices[MAX_GENERATED_INDICES * ii], MAX_GENERATED_INDICES);
             }
-        }
-
-#if 0
-        Patch patch[2];
-        for(auto ii = 0u; ii < 2; ++ii)
-        {
-            append_quadratic_bezier_vertex_patch(patches[ii], patch_count, patch[ii].vertices);
-            append_patch_index_array(patch_count, patch[ii].index_array);
-            append_patch_texture_coords_array(patch_count, patch[ii].texture_coords);
-            patch[ii].patch_count = patch_count;
-            patch[ii].texture_id = map.patch_texture_id;
-            patch[ii].index_array_offset = 0;
-        }
-#endif
-
-        for(auto ii = 0u; ii < 2; ++ii)
-        {
-            dynamic_meshes.patches[ii].patch_count = patch_count;
-            dynamic_meshes.patches[ii].texture_id = map.patch_texture_id;
-            dynamic_meshes.patches[ii].index_array_offset = ii * MAX_GENERATED_INDICES;
         }
 
         emitter.update(elapsed_milliseconds);
