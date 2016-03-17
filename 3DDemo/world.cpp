@@ -57,39 +57,6 @@ static const Vector2f world_texture_coords[] =
     { 2.5, 1.0 },
 };
 
-// TODO: 2016: Bezier patch data should come from file.
-static const Vector3f bezier_control_points[] =
-{
-    { -2.0f, 0.0f, -10.0f },    // 0
-    { -2.0f, 0.0f, -11.0f },    // 1
-    { -3.0f, 0.0f, -11.0f },    // 2
-    { -2.0f,-1.0f, -10.0f },    // 3
-    { -2.0f,-1.0f, -11.0f },    // 4
-    { -3.0f,-1.0f, -11.0f },    // 5
-    { -2.0f,-2.0f, -10.0f },    // 6
-    { -2.0f,-2.0f, -11.0f },    // 7
-    { -3.0f,-2.0f, -11.0f },    // 8
-};
-
-static const Vector3f bezier_control_points2[] =
-{
-    { -3.0f, 0.0f, -11.0f },    // 0
-    { -4.0f, 0.0f, -11.0f },    // 1
-    { -4.0f, 0.0f, -10.0f },    // 2
-    { -3.0f,-1.0f, -11.0f },    // 3
-    { -4.0f,-1.0f, -11.0f },    // 4
-    { -4.0f,-1.0f, -10.0f },    // 5
-    { -3.0f,-2.0f, -11.0f },    // 6
-    { -4.0f,-2.0f, -11.0f },    // 7
-    { -4.0f,-2.0f, -10.0f },    // 8
-};
-
-static const Bezier_patch patches[] =
-{
-    { { bezier_control_points } },
-    { { bezier_control_points2 } },
-};
-
 Polygon::Polygon() :
     texture(0),
     lightmap(0)
@@ -193,9 +160,27 @@ static Map load_world_data(
         }
     }
 
-    map.patches.reserve(2);
-    map.patches.push_back(patches[0]);
-    map.patches.push_back(patches[1]);
+    unsigned int patch_count;
+    is >> patch_count;
+    map.patches.reserve(patch_count);
+
+    std::vector<Vector3f> bezier_control_points;
+    bezier_control_points.reserve(quadratic_bezier_control_point_count * quadratic_bezier_control_point_count);
+    for(ii = 0; ii < patch_count; ++ii)
+    {
+        bezier_control_points.resize(0);
+        for(int jj = 0; jj < quadratic_bezier_control_point_count * quadratic_bezier_control_point_count; ++jj)
+        {
+            Vector3f control_point;
+            is >> control_point.x();
+            is >> control_point.y();
+            is >> control_point.z();
+            bezier_control_points.push_back(control_point);
+        }
+
+        // TODO: 2016: Eliminate Bezier_patch type, and replace with vector.  This means map.patches can use better move semantics.
+        map.patches.push_back({bezier_control_points});
+    }
 
     return map;
 }
