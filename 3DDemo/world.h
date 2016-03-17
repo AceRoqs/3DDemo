@@ -31,6 +31,7 @@ struct Patch
 struct Map
 {
     std::vector<struct Demo::Polygon> world_mesh;
+    std::vector<struct Bezier_patch> patches;
 
     // TODO: This is a set of vertices for all of the polygons in the world_mesh.  The world shouldn't
     // be made of individual polygons in 2016, so this is maybe correct to put all world points in one vector

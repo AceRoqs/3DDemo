@@ -1,5 +1,6 @@
 #include "PreCompile.h"
 #include "world.h"
+#include "Bezier.h"
 #include "BitmapReader.h"
 #include "LinearAlgebra.h"
 #include <PortableRuntime/CheckException.h>
@@ -54,6 +55,39 @@ static const Vector2f world_texture_coords[] =
     { 5.0, 1.0 },
     { 2.5, 0.0 },
     { 2.5, 1.0 },
+};
+
+// TODO: 2016: Bezier patch data should come from file.
+static const Vector3f bezier_control_points[] =
+{
+    { -2.0f, 0.0f, -10.0f },    // 0
+    { -2.0f, 0.0f, -11.0f },    // 1
+    { -3.0f, 0.0f, -11.0f },    // 2
+    { -2.0f,-1.0f, -10.0f },    // 3
+    { -2.0f,-1.0f, -11.0f },    // 4
+    { -3.0f,-1.0f, -11.0f },    // 5
+    { -2.0f,-2.0f, -10.0f },    // 6
+    { -2.0f,-2.0f, -11.0f },    // 7
+    { -3.0f,-2.0f, -11.0f },    // 8
+};
+
+static const Vector3f bezier_control_points2[] =
+{
+    { -3.0f, 0.0f, -11.0f },    // 0
+    { -4.0f, 0.0f, -11.0f },    // 1
+    { -4.0f, 0.0f, -10.0f },    // 2
+    { -3.0f,-1.0f, -11.0f },    // 3
+    { -4.0f,-1.0f, -11.0f },    // 4
+    { -4.0f,-1.0f, -10.0f },    // 5
+    { -3.0f,-2.0f, -11.0f },    // 6
+    { -4.0f,-2.0f, -11.0f },    // 7
+    { -4.0f,-2.0f, -10.0f },    // 8
+};
+
+static const Bezier_patch patches[] =
+{
+    { { bezier_control_points } },
+    { { bezier_control_points2 } },
 };
 
 Polygon::Polygon() :
@@ -158,6 +192,10 @@ static Map load_world_data(
             map.texture_coords.push_back(world_texture_coords[ix]);
         }
     }
+
+    map.patches.reserve(2);
+    map.patches.push_back(patches[0]);
+    map.patches.push_back(patches[1]);
 
     return map;
 }

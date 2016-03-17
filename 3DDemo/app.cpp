@@ -44,39 +44,6 @@ static const Particle_descriptor particle_descriptor =
     150.0f,     // life.
 };
 
-// TODO: 2016: Bezier patch data should go into world loading time.
-static const Vector3f bezier_control_points[] =
-{
-    { -2.0f, 0.0f, -10.0f },    // 0
-    { -2.0f, 0.0f, -11.0f },    // 1
-    { -3.0f, 0.0f, -11.0f },    // 2
-    { -2.0f,-1.0f, -10.0f },    // 3
-    { -2.0f,-1.0f, -11.0f },    // 4
-    { -3.0f,-1.0f, -11.0f },    // 5
-    { -2.0f,-2.0f, -10.0f },    // 6
-    { -2.0f,-2.0f, -11.0f },    // 7
-    { -3.0f,-2.0f, -11.0f },    // 8
-};
-
-static const Vector3f bezier_control_points2[] =
-{
-    { -3.0f, 0.0f, -11.0f },    // 0
-    { -4.0f, 0.0f, -11.0f },    // 1
-    { -4.0f, 0.0f, -10.0f },    // 2
-    { -3.0f,-1.0f, -11.0f },    // 3
-    { -4.0f,-1.0f, -11.0f },    // 4
-    { -4.0f,-1.0f, -10.0f },    // 5
-    { -3.0f,-2.0f, -11.0f },    // 6
-    { -4.0f,-2.0f, -11.0f },    // 7
-    { -4.0f,-2.0f, -10.0f },    // 8
-};
-
-static const Bezier_patch patches[] =
-{
-    { { bezier_control_points } },
-    { { bezier_control_points2 } },
-};
-
 static void append_patch_index_array(unsigned int patch_count, std::vector<uint16_t>& index_array)
 {
     const auto curve_vertex_count = patch_count + 1;
@@ -170,17 +137,15 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
     const unsigned int MAX_GENERATED_INDICES = MAX_GENERATED_INDICES_PER_DIMENSION * MAX_GENERATED_INDICES_PER_DIMENSION * 6;
 
     // Allocate the maximum size so reallocation never happens.
-    // TODO: 2016: Should this move to world load time?
+    const auto dynamic_mesh_count = map.patches.size();
     Dynamic_meshes dynamic_meshes;
-    dynamic_meshes.vertices.resize(MAX_GENERATED_VERTICES * 2);
-    dynamic_meshes.texture_coords.resize(MAX_GENERATED_VERTICES * 2);
-    dynamic_meshes.indices.resize(MAX_GENERATED_INDICES * 2);
-    dynamic_meshes.patches.resize(2);
-
-    const auto dynamic_mesh_count = dynamic_meshes.patches.size();
+    dynamic_meshes.vertices.resize(MAX_GENERATED_VERTICES * dynamic_mesh_count);
+    dynamic_meshes.texture_coords.resize(MAX_GENERATED_VERTICES * dynamic_mesh_count);
+    dynamic_meshes.indices.resize(MAX_GENERATED_INDICES * dynamic_mesh_count);
+    dynamic_meshes.patches.resize(dynamic_mesh_count);
 
     // Initialize patch data.
-    // TODO: 2016: This should move to world load time.
+    // TODO: 2016: Texture should move to map.patches data.
     for(auto ii = 0u; ii < dynamic_mesh_count; ++ii)
     {
         dynamic_meshes.patches[ii].patch_count = MAX_PATCH_COUNT_PER_DIMENSION + 1;
@@ -217,7 +182,7 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
             if(dynamic_meshes.patches[ii].patch_count != patch_count)
             {
                 dynamic_meshes.patches[ii].patch_count = patch_count;
-                generate_patch_quadratic_bezier_vertex_array(patches[ii], patch_count, &dynamic_meshes.vertices[MAX_GENERATED_VERTICES * ii], MAX_GENERATED_VERTICES);
+                generate_patch_quadratic_bezier_vertex_array(map.patches[ii], patch_count, &dynamic_meshes.vertices[MAX_GENERATED_VERTICES * ii], MAX_GENERATED_VERTICES);
                 generate_patch_texture_coords_array(patch_count, &dynamic_meshes.texture_coords[MAX_GENERATED_VERTICES * ii], MAX_GENERATED_VERTICES);
                 generate_patch_index_array(patch_count, MAX_GENERATED_VERTICES * ii, &dynamic_meshes.indices[MAX_GENERATED_INDICES * ii], MAX_GENERATED_INDICES);
             }
