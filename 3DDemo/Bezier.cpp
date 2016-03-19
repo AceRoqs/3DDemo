@@ -30,7 +30,7 @@ static float bezier_quadratic_basis(unsigned int index, float t)
     return basis;
 }
 
-static Vector3f calculate_quadratic_bezier_vertex(const Bezier_patch& patch, float t_u, float t_v)
+static Vector3f calculate_quadratic_bezier_vertex(const std::vector<struct Vector3f>& control_points, float t_u, float t_v)
 {
     Vector3f vertex = make_vector(0.0f, 0.0f, 0.0f);
 
@@ -44,7 +44,7 @@ static Vector3f calculate_quadratic_bezier_vertex(const Bezier_patch& patch, flo
             const float basis = bezier_quadratic_basis(i, t_u) * basis_v;
 
             // Q(u,v) = sum[i=0..2]sum[j=0..2] Bi(u)Bj(v)Pij
-            vertex += patch.control_point_vertices[j * quadratic_bezier_control_point_count + i] * basis;
+            vertex += control_points[j * quadratic_bezier_control_point_count + i] * basis;
         }
     }
 
@@ -52,7 +52,7 @@ static Vector3f calculate_quadratic_bezier_vertex(const Bezier_patch& patch, flo
 }
 
 // TODO: 2014: It would make much more sense to do this in a compute shader to generate the data where they are used.
-void append_quadratic_bezier_vertex_patch(const Bezier_patch& patch, unsigned int patch_count, std::vector<Vector3f>& vertices)
+void append_quadratic_bezier_vertex_patch(const Control_point_patch& control_points, unsigned int patch_count, std::vector<Vector3f>& vertices)
 {
     const auto curve_vertex_count = patch_count + 1;
 
@@ -69,18 +69,19 @@ void append_quadratic_bezier_vertex_patch(const Bezier_patch& patch, unsigned in
             // Range [0..1].
             const float t_u = u / static_cast<float>(patch_count);
 
-            vertices.push_back(calculate_quadratic_bezier_vertex(patch, t_u, t_v));
+            vertices.push_back(calculate_quadratic_bezier_vertex(control_points, t_u, t_v));
         }
     }
 }
 
 // TODO: 2014: It would make much more sense to do this in a compute shader to generate the data where they are used.
 void generate_patch_quadratic_bezier_vertex_array(
-    const Bezier_patch& patch,
+    const Control_point_patch& control_points,
     unsigned int patch_count,
     _Out_writes_to_(length, (patch_count + 1) * (patch_count + 1)) Vector3f* vertices,
     size_t length)
 {
+    assert(control_points.size() == (quadratic_bezier_control_point_count * quadratic_bezier_control_point_count));
     const auto curve_vertex_count = patch_count + 1;
 
     assert(curve_vertex_count * curve_vertex_count <= length);
@@ -98,7 +99,7 @@ void generate_patch_quadratic_bezier_vertex_array(
             // Range [0..1].
             const float t_u = u / static_cast<float>(patch_count);
 
-            vertices[ix] = calculate_quadratic_bezier_vertex(patch, t_u, t_v);
+            vertices[ix] = calculate_quadratic_bezier_vertex(control_points, t_u, t_v);
             ix++;
         }
     }

@@ -164,22 +164,23 @@ static Map load_world_data(
     is >> patch_count;
     map.patches.reserve(patch_count);
 
-    std::vector<Vector3f> bezier_control_points;
+    Control_point_patch bezier_control_points;
     bezier_control_points.reserve(quadratic_bezier_control_point_count * quadratic_bezier_control_point_count);
     for(ii = 0; ii < patch_count; ++ii)
     {
-        bezier_control_points.resize(0);
+        // The move at the end of the loop guarantees this.
+        assert(bezier_control_points.size() == 0);
+
         for(int jj = 0; jj < quadratic_bezier_control_point_count * quadratic_bezier_control_point_count; ++jj)
         {
             Vector3f control_point;
             is >> control_point.x();
             is >> control_point.y();
             is >> control_point.z();
-            bezier_control_points.push_back(control_point);
+            bezier_control_points.emplace_back(control_point);
         }
 
-        // TODO: 2016: Eliminate Bezier_patch type, and replace with vector.  This means map.patches can use better move semantics.
-        map.patches.push_back({bezier_control_points});
+        map.patches.emplace_back(std::move(bezier_control_points));
     }
 
     return map;
