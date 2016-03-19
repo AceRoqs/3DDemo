@@ -137,20 +137,18 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
     const unsigned int MAX_GENERATED_INDICES = MAX_GENERATED_INDICES_PER_DIMENSION * MAX_GENERATED_INDICES_PER_DIMENSION * 6;
 
     // Allocate the maximum size so reallocation never happens.
-    const auto dynamic_mesh_count = map.patches.size();
+    const auto dynamic_mesh_count = map.implicit_surfaces.size();
     Dynamic_meshes dynamic_meshes;
     dynamic_meshes.vertices.resize(MAX_GENERATED_VERTICES * dynamic_mesh_count);
     dynamic_meshes.texture_coords.resize(MAX_GENERATED_VERTICES * dynamic_mesh_count);
     dynamic_meshes.indices.resize(MAX_GENERATED_INDICES * dynamic_mesh_count);
-    dynamic_meshes.patches.resize(dynamic_mesh_count);
+    dynamic_meshes.implicit_surfaces.resize(dynamic_mesh_count);
 
-    // Initialize patch data.
-    // TODO: 2016: Texture should move to map.patches data.
+    // Initialize implicit surface data.
     for(auto ii = 0u; ii < dynamic_mesh_count; ++ii)
     {
-        dynamic_meshes.patches[ii].patch_count = MAX_PATCH_COUNT_PER_DIMENSION + 1;
-        dynamic_meshes.patches[ii].texture_id = map.patch_texture_id;
-        dynamic_meshes.patches[ii].index_array_offset = ii * MAX_GENERATED_INDICES;
+        dynamic_meshes.implicit_surfaces[ii].patch_count = MAX_PATCH_COUNT_PER_DIMENSION + 1;
+        dynamic_meshes.implicit_surfaces[ii].index_array_offset = ii * MAX_GENERATED_INDICES;
     }
 
     MSG message;
@@ -175,14 +173,14 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
         for(auto ii = 0u; ii < dynamic_mesh_count; ++ii)
         {
             // Set level-of-detail.
-            // TODO: 2016: Calculate level of detail individually for each patch.
+            // TODO: 2016: Calculate level of detail individually for each surface.
             unsigned int patch_count = (unsigned int)(MAX_GENERATED_VERTICES_PER_DIMENSION * 4 / (point_distance(camera.m_position, make_vector(2.0f, 0.0f, 10.0f)))) - 1;
             patch_count = std::min(std::max(2u, patch_count), MAX_PATCH_COUNT_PER_DIMENSION);
 
-            if(dynamic_meshes.patches[ii].patch_count != patch_count)
+            if(dynamic_meshes.implicit_surfaces[ii].patch_count != patch_count)
             {
-                dynamic_meshes.patches[ii].patch_count = patch_count;
-                generate_patch_quadratic_bezier_vertex_array(map.patches[ii], patch_count, &dynamic_meshes.vertices[MAX_GENERATED_VERTICES * ii], MAX_GENERATED_VERTICES);
+                dynamic_meshes.implicit_surfaces[ii].patch_count = patch_count;
+                generate_patch_quadratic_bezier_vertex_array(map.implicit_surfaces[ii].control_points, patch_count, &dynamic_meshes.vertices[MAX_GENERATED_VERTICES * ii], MAX_GENERATED_VERTICES);
                 generate_patch_texture_coords_array(patch_count, &dynamic_meshes.texture_coords[MAX_GENERATED_VERTICES * ii], MAX_GENERATED_VERTICES);
                 generate_patch_index_array(patch_count, MAX_GENERATED_VERTICES * ii, &dynamic_meshes.indices[MAX_GENERATED_INDICES * ii], MAX_GENERATED_INDICES);
             }

@@ -19,20 +19,22 @@ struct Polygon
     Polygon();
 };
 
-struct Patch
+struct Implicit_surface
 {
-    //std::vector<Vector3f> vertices;
-    //std::vector<Vector2f> texture_coords;
-    //std::vector<uint16_t> index_array;
-    unsigned int patch_count;
+    Control_point_patch control_points;
     unsigned int texture_id;
+};
+
+struct Implicit_surface_instance
+{
+    unsigned int patch_count;
     size_t index_array_offset;
 };
 
 struct Map
 {
     std::vector<struct Demo::Polygon> world_mesh;
-    std::vector<Control_point_patch> patches;
+    std::vector<Implicit_surface> implicit_surfaces;
 
     // TODO: This is a set of vertices for all of the polygons in the world_mesh.  The world shouldn't
     // be made of individual polygons in 2016, so this is maybe correct to put all world points in one vector
@@ -46,13 +48,15 @@ struct Map
     //std::vector<struct Vector3f> vertices;
     //std::vector<struct Vector3f> vertices2;
     //unsigned int patch_count;
-    unsigned int patch_texture_id;
+    //unsigned int patch_texture_id;
     //class Emitter emitter;
 };
 
+// TODO: 2016: Dynamic_meshes might not be a great name for this, since it's all implicit surfaces right now.
 struct Dynamic_meshes
 {
-    std::vector<Patch> patches;
+    // TODO: 2016: There appears to be an implicit data structure here, since the implicit_surfaces need to match the implicit_surfaces in the Map structure.
+    std::vector<Implicit_surface_instance> implicit_surfaces;
 
     std::vector<Vector3f> vertices;
     std::vector<Vector2f> texture_coords;

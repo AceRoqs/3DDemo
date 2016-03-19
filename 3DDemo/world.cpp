@@ -132,14 +132,13 @@ static Map load_world_data(
         texture_list->push_back(bitmap_from_file(file_name));
     }
 
-    unsigned int patch_texture_id;
-    is >> patch_texture_id;
+    unsigned int implicit_surface_texture_id;
+    is >> implicit_surface_texture_id;
 
     unsigned int cPolys;
     is >> cPolys;
 
     Map map;
-    map.patch_texture_id = patch_texture_id;
 
     for(ii = 0; ii < cPolys; ++ii)
     {
@@ -160,13 +159,13 @@ static Map load_world_data(
         }
     }
 
-    unsigned int patch_count;
-    is >> patch_count;
-    map.patches.reserve(patch_count);
+    unsigned int implicit_surface_count;
+    is >> implicit_surface_count;
+    map.implicit_surfaces.reserve(implicit_surface_count);
 
     Control_point_patch bezier_control_points;
     bezier_control_points.reserve(quadratic_bezier_control_point_count * quadratic_bezier_control_point_count);
-    for(ii = 0; ii < patch_count; ++ii)
+    for(ii = 0; ii < implicit_surface_count; ++ii)
     {
         // The move at the end of the loop guarantees this.
         assert(bezier_control_points.size() == 0);
@@ -180,7 +179,7 @@ static Map load_world_data(
             bezier_control_points.emplace_back(control_point);
         }
 
-        map.patches.emplace_back(std::move(bezier_control_points));
+        map.implicit_surfaces.push_back({ std::move(bezier_control_points), implicit_surface_texture_id });
     }
 
     return map;

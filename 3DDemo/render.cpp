@@ -98,8 +98,10 @@ void initialize_gl_world_data(
     }
 }
 
-static void draw_dynamic_meshes(const Dynamic_meshes& dynamic_meshes, const Camera& camera)
+static void draw_dynamic_meshes(const std::vector<Implicit_surface>& implicit_surfaces, const Dynamic_meshes& dynamic_meshes, const Camera& camera)
 {
+    assert(implicit_surfaces.size() == dynamic_meshes.implicit_surfaces.size());
+
     // GL_MODELVIEW assumed.
     glLoadIdentity();
     glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
@@ -112,15 +114,15 @@ static void draw_dynamic_meshes(const Dynamic_meshes& dynamic_meshes, const Came
     glVertexPointer(3, GL_FLOAT, 0, &dynamic_meshes.vertices[0]);
     glTexCoordPointer(2, GL_FLOAT, 0, &dynamic_meshes.texture_coords[0]);
 
-    for(auto ix = 0; ix < dynamic_meshes.patches.size(); ++ix)
+    for(auto ix = 0; ix < implicit_surfaces.size(); ++ix)
     {
-        glBindTexture(GL_TEXTURE_2D, dynamic_meshes.patches[ix].texture_id);
+        glBindTexture(GL_TEXTURE_2D, implicit_surfaces[ix].texture_id);
 
         assert(dynamic_meshes.indices.size() < INT_MAX);    // GLsizei == int
         glDrawElements(GL_TRIANGLES,
-                       dynamic_meshes.patches[ix].patch_count * dynamic_meshes.patches[ix].patch_count * 6,
+                       dynamic_meshes.implicit_surfaces[ix].patch_count * dynamic_meshes.implicit_surfaces[ix].patch_count * 6,
                        GL_UNSIGNED_SHORT,
-                       &dynamic_meshes.indices[dynamic_meshes.patches[ix].index_array_offset]);
+                       &dynamic_meshes.indices[dynamic_meshes.implicit_surfaces[ix].index_array_offset]);
     }
 }
 
@@ -258,7 +260,7 @@ void draw_map(
     }
 
     //(void)dynamic_meshes;
-    draw_dynamic_meshes(dynamic_meshes, camera);
+    draw_dynamic_meshes(map.implicit_surfaces, dynamic_meshes, camera);
     //(void)patch1;
     //(void)patch2;
     //draw_patch(patch1, camera);
