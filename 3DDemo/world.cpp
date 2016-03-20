@@ -132,9 +132,6 @@ static Map load_world_data(
         texture_list->push_back(bitmap_from_file(file_name));
     }
 
-    unsigned int implicit_surface_texture_id;
-    is >> implicit_surface_texture_id;
-
     unsigned int cPolys;
     is >> cPolys;
 
@@ -167,6 +164,9 @@ static Map load_world_data(
     bezier_control_points.reserve(quadratic_bezier_control_point_count * quadratic_bezier_control_point_count);
     for(ii = 0; ii < implicit_surface_count; ++ii)
     {
+        unsigned int implicit_surface_texture_id;
+        is >> implicit_surface_texture_id;
+
         // The move at the end of the loop guarantees this.
         assert(bezier_control_points.size() == 0);
 
