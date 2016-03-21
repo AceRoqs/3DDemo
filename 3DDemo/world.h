@@ -1,13 +1,11 @@
 #pragma once
 
 #include "Bezier.h"
+#include "LinearAlgebra.h"
 #include <ImageProcessing/Bitmap.h>
 
 namespace Demo
 {
-
-struct Vector3f;
-struct Vector2f;
 
 struct Polygon
 {
@@ -23,6 +21,7 @@ struct Implicit_surface
 {
     Control_point_patch control_points;
     unsigned int texture_id;
+    Vector3f origin;
 };
 
 struct Implicit_surface_instance

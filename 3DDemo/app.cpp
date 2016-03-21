@@ -173,8 +173,7 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
         for(auto ii = 0u; ii < dynamic_mesh_count; ++ii)
         {
             // Set level-of-detail.
-            // TODO: 2016: Calculate level of detail individually for each surface.
-            unsigned int patch_count = (unsigned int)(MAX_GENERATED_VERTICES_PER_DIMENSION * 4 / (point_distance(camera.m_position, make_vector(2.0f, 0.0f, 10.0f)))) - 1;
+            unsigned int patch_count = (unsigned int)(MAX_GENERATED_VERTICES_PER_DIMENSION * 4 / (point_distance(camera.m_position, map.implicit_surfaces[ii].origin))) - 1;
             patch_count = std::min(std::max(2u, patch_count), MAX_PATCH_COUNT_PER_DIMENSION);
 
             if(dynamic_meshes.implicit_surfaces[ii].patch_count != patch_count)
