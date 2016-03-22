@@ -100,5 +100,14 @@ Vector3f& operator+=(Vector3f& v1, const Vector3f& v2)
     return v1;
 }
 
+std::istream& operator>>(std::istream& input_stream, Vector3f& point)
+{
+    input_stream >> point.element[0];
+    input_stream >> point.element[1];
+    input_stream >> point.element[2];
+
+    return input_stream;
+}
+
 }
 

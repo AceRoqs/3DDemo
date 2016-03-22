@@ -167,21 +167,16 @@ static Map load_world_data(
         unsigned int implicit_surface_texture_id;
         is >> implicit_surface_texture_id;
 
-        // TODO: 2016: Add operator>> for Vector3f.
         Vector3f implicit_surface_origin;
-        is >> implicit_surface_origin.element[0];
-        is >> implicit_surface_origin.element[1];
-        is >> implicit_surface_origin.element[2];
+        is >> implicit_surface_origin;
 
         // The move at the end of the loop guarantees this.
         assert(bezier_control_points.size() == 0);
 
-        for(int jj = 0; jj < quadratic_bezier_control_point_count * quadratic_bezier_control_point_count; ++jj)
+        for(unsigned int jj = 0; jj < quadratic_bezier_control_point_count * quadratic_bezier_control_point_count; ++jj)
         {
             Vector3f control_point;
-            is >> control_point.x();
-            is >> control_point.y();
-            is >> control_point.z();
+            is >> control_point;
             bezier_control_points.emplace_back(control_point);
         }
 
