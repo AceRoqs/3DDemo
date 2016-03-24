@@ -63,15 +63,15 @@ std::vector<Vector3f> generate_quadratic_bezier_vertex_array(
     vertex_array.reserve(curve_vertex_count * curve_vertex_count);
 
     // Generate all of the points.
-    for(unsigned int v = 0; v < curve_vertex_count; ++v)
+    for(unsigned int vv = 0; vv < curve_vertex_count; ++vv)
     {
         // Range [0..1].
-        const float t_v = v / static_cast<float>(patch_count);
+        const float t_v = vv / static_cast<float>(patch_count);
 
-        for(unsigned int u = 0; u < curve_vertex_count; ++u)
+        for(unsigned int uu = 0; uu < curve_vertex_count; ++uu)
         {
             // Range [0..1].
-            const float t_u = u / static_cast<float>(patch_count);
+            const float t_u = uu / static_cast<float>(patch_count);
 
             vertex_array.emplace_back(calculate_quadratic_bezier_vertex(control_points, t_u, t_v));
         }
