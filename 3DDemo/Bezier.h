@@ -12,9 +12,10 @@ void generate_patch_quadratic_bezier_vertex_array(
     unsigned int patch_count,
     _Out_writes_to_(length, (patch_count + 1) * (patch_count + 1)) Vector3f* vertices,
     size_t length);
-std::vector<Vector3f> generate_patch_quadratic_bezier_vertex_array(
-    const Control_point_patch& control_points,
-    unsigned int patch_count);
+
+std::vector<struct Vector3f> generate_patch_quadratic_bezier_vertex_array(const Control_point_patch& control_points, unsigned int patch_count);
+std::vector<uint16_t> generate_patch_index_array(unsigned int patch_count, size_t bias);
+std::vector<struct Vector2f> generate_patch_texture_coords_array(unsigned int patch_count);
 
 }
 
