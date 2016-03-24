@@ -148,11 +148,11 @@ static Map load_world_data(
             // TODO: 2014: Bounds check constant arrays.
             auto ix = poly.vertex_indices[jj];
             CHECK_EXCEPTION(ix < ARRAYSIZE(world_vertices), u8"world_vertices too small for index");
-            map.vertices.push_back(world_vertices[ix]);
+            map.vertex_array.push_back(world_vertices[ix]);
 
             ix = poly.texture_coordinates[jj];
             CHECK_EXCEPTION(ix < ARRAYSIZE(world_texture_coords), u8"world_texture_coords too small for index");
-            map.texture_coords.push_back(world_texture_coords[ix]);
+            map.texture_coords_array.push_back(world_texture_coords[ix]);
         }
     }
 

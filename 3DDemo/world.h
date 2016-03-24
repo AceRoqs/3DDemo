@@ -41,8 +41,8 @@ struct Map
     // renderer, but eventually the world_mesh idea needs to go away and replaced with something like
     // an octree of objects (including meshes).  Possibly for AZDO, there will still just be one big buffer,
     // but let's get all of the objects rendering with glDrawElements uniformly first.
-    std::vector<Vector3f> vertices;
-    std::vector<Vector2f> texture_coords;
+    std::vector<Vector3f> vertex_array;
+    std::vector<Vector2f> texture_coords_array;
 
     //std::vector<struct Vector3f> vertices;
     //std::vector<struct Vector3f> vertices2;
@@ -57,9 +57,9 @@ struct Dynamic_meshes
     // TODO: 2016: There appears to be an implicit data structure here, since the implicit_surfaces need to match the implicit_surfaces in the Map structure.
     std::vector<Implicit_surface_instance> implicit_surfaces;
 
-    std::vector<Vector3f> vertices;
-    std::vector<Vector2f> texture_coords;
-    std::vector<uint16_t> indices;
+    std::vector<Vector3f> vertex_array;
+    std::vector<Vector2f> texture_coords_array;
+    std::vector<uint16_t> index_array;
 };
 
 std::istream& operator>>(std::istream& is, Demo::Polygon& polygon);

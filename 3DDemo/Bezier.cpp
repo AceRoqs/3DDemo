@@ -52,61 +52,7 @@ static Vector3f calculate_quadratic_bezier_vertex(const std::vector<struct Vecto
 }
 
 // TODO: 2014: It would make much more sense to do this in a compute shader to generate the data where they are used.
-void append_quadratic_bezier_vertex_patch(const Control_point_patch& control_points, unsigned int patch_count, std::vector<Vector3f>& vertices)
-{
-    const auto curve_vertex_count = patch_count + 1;
-
-    vertices.reserve(vertices.size() + curve_vertex_count * curve_vertex_count);
-
-    // Generate all of the points.
-    for(unsigned int v = 0; v < curve_vertex_count; ++v)
-    {
-        // Range [0..1].
-        const float t_v = v / static_cast<float>(patch_count);
-
-        for(unsigned int u = 0; u < curve_vertex_count; ++u)
-        {
-            // Range [0..1].
-            const float t_u = u / static_cast<float>(patch_count);
-
-            vertices.push_back(calculate_quadratic_bezier_vertex(control_points, t_u, t_v));
-        }
-    }
-}
-
-// TODO: 2014: It would make much more sense to do this in a compute shader to generate the data where they are used.
-void generate_patch_quadratic_bezier_vertex_array(
-    const Control_point_patch& control_points,
-    unsigned int patch_count,
-    _Out_writes_to_(length, (patch_count + 1) * (patch_count + 1)) Vector3f* vertices,
-    size_t length)
-{
-    assert(control_points.size() == (quadratic_bezier_control_point_count * quadratic_bezier_control_point_count));
-    const auto curve_vertex_count = patch_count + 1;
-
-    assert(curve_vertex_count * curve_vertex_count <= length);
-    (void)length;
-
-    // Generate all of the points.
-    size_t ix = 0;
-    for(unsigned int v = 0; v < curve_vertex_count; ++v)
-    {
-        // Range [0..1].
-        const float t_v = v / static_cast<float>(patch_count);
-
-        for(unsigned int u = 0; u < curve_vertex_count; ++u)
-        {
-            // Range [0..1].
-            const float t_u = u / static_cast<float>(patch_count);
-
-            vertices[ix] = calculate_quadratic_bezier_vertex(control_points, t_u, t_v);
-            ix++;
-        }
-    }
-}
-
-// TODO: 2014: It would make much more sense to do this in a compute shader to generate the data where they are used.
-std::vector<Vector3f> generate_patch_quadratic_bezier_vertex_array(
+std::vector<Vector3f> generate_quadratic_bezier_vertex_array(
     const Control_point_patch& control_points,
     unsigned int patch_count)
 {
@@ -134,7 +80,7 @@ std::vector<Vector3f> generate_patch_quadratic_bezier_vertex_array(
     return vertex_array;
 }
 
-std::vector<uint16_t> generate_patch_index_array(unsigned int patch_count, size_t bias)
+std::vector<uint16_t> generate_implicit_surface_index_array(unsigned int patch_count, size_t bias)
 {
     const auto curve_vertex_count = patch_count + 1;
 
@@ -160,7 +106,7 @@ std::vector<uint16_t> generate_patch_index_array(unsigned int patch_count, size_
     return index_array;
 }
 
-std::vector<Vector2f> generate_patch_texture_coords_array(unsigned int patch_count)
+std::vector<Vector2f> generate_implicit_surface_texture_coords_array(unsigned int patch_count)
 {
     const auto curve_vertex_count = patch_count + 1;
 

@@ -58,9 +58,9 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
     // Allocate the maximum size so reallocation never happens.
     const auto dynamic_mesh_count = map.implicit_surfaces.size();
     Dynamic_meshes dynamic_meshes;
-    dynamic_meshes.vertices.resize(MAX_GENERATED_VERTICES * dynamic_mesh_count);
-    dynamic_meshes.texture_coords.resize(MAX_GENERATED_VERTICES * dynamic_mesh_count);
-    dynamic_meshes.indices.resize(MAX_GENERATED_INDICES * dynamic_mesh_count);
+    dynamic_meshes.vertex_array.resize(MAX_GENERATED_VERTICES * dynamic_mesh_count);
+    dynamic_meshes.texture_coords_array.resize(MAX_GENERATED_VERTICES * dynamic_mesh_count);
+    dynamic_meshes.index_array.resize(MAX_GENERATED_INDICES * dynamic_mesh_count);
     dynamic_meshes.implicit_surfaces.resize(dynamic_mesh_count);
 
     // Initialize implicit surface data.
@@ -99,14 +99,14 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
             {
                 dynamic_meshes.implicit_surfaces[ii].patch_count = patch_count;
 
-                const auto vertex_array = generate_patch_quadratic_bezier_vertex_array(map.implicit_surfaces[ii].control_points, patch_count);
-                std::copy(std::cbegin(vertex_array), std::cend(vertex_array), std::begin(dynamic_meshes.vertices) + MAX_GENERATED_VERTICES * ii);
+                const auto vertex_array = generate_quadratic_bezier_vertex_array(map.implicit_surfaces[ii].control_points, patch_count);
+                std::copy(std::cbegin(vertex_array), std::cend(vertex_array), std::begin(dynamic_meshes.vertex_array) + MAX_GENERATED_VERTICES * ii);
 
-                const auto texture_coords_array = generate_patch_texture_coords_array(patch_count);
-                std::copy(std::cbegin(texture_coords_array), std::cend(texture_coords_array), std::begin(dynamic_meshes.texture_coords) + MAX_GENERATED_VERTICES * ii);
+                const auto texture_coords_array = generate_implicit_surface_texture_coords_array(patch_count);
+                std::copy(std::cbegin(texture_coords_array), std::cend(texture_coords_array), std::begin(dynamic_meshes.texture_coords_array) + MAX_GENERATED_VERTICES * ii);
 
-                const auto index_array = generate_patch_index_array(patch_count, MAX_GENERATED_VERTICES * ii);
-                std::copy(std::cbegin(index_array), std::cend(index_array), std::begin(dynamic_meshes.indices) + MAX_GENERATED_INDICES * ii);
+                const auto index_array = generate_implicit_surface_index_array(patch_count, MAX_GENERATED_VERTICES * ii);
+                std::copy(std::cbegin(index_array), std::cend(index_array), std::begin(dynamic_meshes.index_array) + MAX_GENERATED_INDICES * ii);
             }
         }
 

@@ -111,18 +111,18 @@ static void draw_dynamic_meshes(const std::vector<Implicit_surface>& implicit_su
     glDepthFunc(GL_LESS);
     glBlendFunc(GL_ONE, GL_ZERO);
 
-    glVertexPointer(3, GL_FLOAT, 0, &dynamic_meshes.vertices[0]);
-    glTexCoordPointer(2, GL_FLOAT, 0, &dynamic_meshes.texture_coords[0]);
+    glVertexPointer(3, GL_FLOAT, 0, &dynamic_meshes.vertex_array[0]);
+    glTexCoordPointer(2, GL_FLOAT, 0, &dynamic_meshes.texture_coords_array[0]);
 
     for(auto ix = 0; ix < implicit_surfaces.size(); ++ix)
     {
         glBindTexture(GL_TEXTURE_2D, implicit_surfaces[ix].texture_id);
 
-        assert(dynamic_meshes.indices.size() < INT_MAX);    // GLsizei == int
+        assert(dynamic_meshes.index_array.size() < INT_MAX);    // GLsizei == int
         glDrawElements(GL_TRIANGLES,
                        dynamic_meshes.implicit_surfaces[ix].patch_count * dynamic_meshes.implicit_surfaces[ix].patch_count * 6,
                        GL_UNSIGNED_SHORT,
-                       &dynamic_meshes.indices[dynamic_meshes.implicit_surfaces[ix].index_array_offset]);
+                       &dynamic_meshes.index_array[dynamic_meshes.implicit_surfaces[ix].index_array_offset]);
     }
 }
 
@@ -218,8 +218,8 @@ void draw_map(
     glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
     glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
 
-    glVertexPointer(3, GL_FLOAT, 0, &map.vertices[0]);
-    glTexCoordPointer(2, GL_FLOAT, 0, &map.texture_coords[0]);
+    glVertexPointer(3, GL_FLOAT, 0, &map.vertex_array[0]);
+    glTexCoordPointer(2, GL_FLOAT, 0, &map.texture_coords_array[0]);
 
     // single loop multi pass textured lighting
     // this is done is one pass because of visibility
