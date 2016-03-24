@@ -85,44 +85,49 @@ static void append_patch_texture_coords_array(unsigned int patch_count, std::vec
     }
 }
 
-static void generate_patch_index_array(unsigned int patch_count, size_t bias, _Out_writes_to_(length, patch_count * patch_count * 6) uint16_t* begin, size_t length)
+static std::vector<uint16_t> generate_patch_index_array(unsigned int patch_count, size_t bias)
 {
     const auto curve_vertex_count = patch_count + 1;
 
-    assert(length >= (patch_count * patch_count * 6));
+    // Verify that all indices generated will not wrap the max number of vertices.
     assert(bias + patch_count + patch_count * curve_vertex_count <= UINT16_MAX);
-    (void)length;
 
-    size_t index = 0;
+    std::vector<uint16_t> index_array;
+    index_array.reserve(patch_count * patch_count);
+
     for(unsigned int vv = 0; vv < patch_count; ++vv)
     {
         for(unsigned int uu = 0; uu < patch_count; ++uu)
         {
-            begin[index++] = static_cast<uint16_t>(bias + (uu + 0) + (vv + 0) * curve_vertex_count);
-            begin[index++] = static_cast<uint16_t>(bias + (uu + 0) + (vv + 1) * curve_vertex_count);
-            begin[index++] = static_cast<uint16_t>(bias + (uu + 1) + (vv + 0) * curve_vertex_count);
-            begin[index++] = static_cast<uint16_t>(bias + (uu + 1) + (vv + 0) * curve_vertex_count);
-            begin[index++] = static_cast<uint16_t>(bias + (uu + 0) + (vv + 1) * curve_vertex_count);
-            begin[index++] = static_cast<uint16_t>(bias + (uu + 1) + (vv + 1) * curve_vertex_count);
+            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 0) + (vv + 0) * curve_vertex_count));
+            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 0) + (vv + 1) * curve_vertex_count));
+            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 1) + (vv + 0) * curve_vertex_count));
+            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 1) + (vv + 0) * curve_vertex_count));
+            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 0) + (vv + 1) * curve_vertex_count));
+            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 1) + (vv + 1) * curve_vertex_count));
         }
     }
+
+    return index_array;
 }
 
-static void generate_patch_texture_coords_array(unsigned int patch_count, _Out_writes_to_(length, (patch_count + 1) * (patch_count + 1)) Vector2f* begin, size_t length)
+static std::vector<Vector2f> generate_patch_texture_coords_array(unsigned int patch_count)
 {
     const auto curve_vertex_count = patch_count + 1;
 
-    assert(length >= (curve_vertex_count * curve_vertex_count));
-    (void)length;
+    std::vector<Vector2f> texture_coords_array;
+    texture_coords_array.reserve(curve_vertex_count * curve_vertex_count);
 
     const float scale = 1.0f / patch_count;
     for(unsigned int vv = 0; vv < curve_vertex_count; ++vv)
     {
         for(unsigned int uu = 0; uu < curve_vertex_count; ++uu)
         {
-            begin[uu + vv * curve_vertex_count] = {uu * scale, vv * scale};
+            texture_coords_array.push_back({uu * scale, vv * scale});
         }
     }
+
+    return texture_coords_array;
 }
 
 static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, const WindowsCommon::Input_device& keyboard)
@@ -179,9 +184,15 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
             if(dynamic_meshes.implicit_surfaces[ii].patch_count != patch_count)
             {
                 dynamic_meshes.implicit_surfaces[ii].patch_count = patch_count;
-                generate_patch_quadratic_bezier_vertex_array(map.implicit_surfaces[ii].control_points, patch_count, &dynamic_meshes.vertices[MAX_GENERATED_VERTICES * ii], MAX_GENERATED_VERTICES);
-                generate_patch_texture_coords_array(patch_count, &dynamic_meshes.texture_coords[MAX_GENERATED_VERTICES * ii], MAX_GENERATED_VERTICES);
-                generate_patch_index_array(patch_count, MAX_GENERATED_VERTICES * ii, &dynamic_meshes.indices[MAX_GENERATED_INDICES * ii], MAX_GENERATED_INDICES);
+
+                const auto vertex_array = generate_patch_quadratic_bezier_vertex_array(map.implicit_surfaces[ii].control_points, patch_count);
+                std::copy(std::cbegin(vertex_array), std::cend(vertex_array), std::begin(dynamic_meshes.vertices) + MAX_GENERATED_VERTICES * ii);
+
+                const auto texture_coords_array = generate_patch_texture_coords_array(patch_count);
+                std::copy(std::cbegin(texture_coords_array), std::cend(texture_coords_array), std::begin(dynamic_meshes.texture_coords) + MAX_GENERATED_VERTICES * ii);
+
+                const auto index_array = generate_patch_index_array(patch_count, MAX_GENERATED_VERTICES * ii);
+                std::copy(std::cbegin(index_array), std::cend(index_array), std::begin(dynamic_meshes.indices) + MAX_GENERATED_INDICES * ii);
             }
         }
 

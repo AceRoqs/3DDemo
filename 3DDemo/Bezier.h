@@ -12,6 +12,9 @@ void generate_patch_quadratic_bezier_vertex_array(
     unsigned int patch_count,
     _Out_writes_to_(length, (patch_count + 1) * (patch_count + 1)) Vector3f* vertices,
     size_t length);
+std::vector<Vector3f> generate_patch_quadratic_bezier_vertex_array(
+    const Control_point_patch& control_points,
+    unsigned int patch_count);
 
 }
 
