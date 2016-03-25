@@ -69,26 +69,22 @@ std::istream& operator>>(std::istream& is, Demo::Polygon& polygon)
     std::vector<unsigned int>().swap(polygon.vertex_indices);
     std::vector<unsigned int>().swap(polygon.texture_coordinates);
 
-    unsigned int num_points;
-    is >> num_points;
-    if(num_points > 0)
+    const unsigned int num_points = 4;
+    polygon.vertex_indices.reserve(num_points);
+    polygon.texture_coordinates.reserve(num_points);
+
+    for(unsigned int ix = 0; ix < num_points; ++ix)
     {
-        polygon.vertex_indices.reserve(num_points);
-        polygon.texture_coordinates.reserve(num_points);
+        unsigned int vertex_indices;
+        is >> vertex_indices;
+        polygon.vertex_indices.push_back(vertex_indices);
+    }
 
-        for(unsigned int ix = 0; ix < num_points; ++ix)
-        {
-            unsigned int vertex_indices;
-            is >> vertex_indices;
-            polygon.vertex_indices.push_back(vertex_indices);
-        }
-
-        for(unsigned int ix = 0; ix < num_points; ++ix)
-        {
-            unsigned int texture_coordinate;
-            is >> texture_coordinate;
-            polygon.texture_coordinates.push_back(texture_coordinate);
-        }
+    for(unsigned int ix = 0; ix < num_points; ++ix)
+    {
+        unsigned int texture_coordinate;
+        is >> texture_coordinate;
+        polygon.texture_coordinates.push_back(texture_coordinate);
     }
 
     is >> polygon.texture >> polygon.lightmap;
