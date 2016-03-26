@@ -57,34 +57,6 @@ static const Vector2f world_texture_coords[] =
     { 2.5, 1.0 },
 };
 
-std::istream& operator>>(std::istream& is, Demo::Polygon& polygon)
-{
-    // Clear and realloc vectors.
-    std::vector<unsigned int>().swap(polygon.vertex_indices);
-    std::vector<unsigned int>().swap(polygon.texture_coordinates);
-
-    const unsigned int num_points = 4;
-    polygon.vertex_indices.reserve(num_points);
-    polygon.texture_coordinates.reserve(num_points);
-
-    for(unsigned int ix = 0; ix < num_points; ++ix)
-    {
-        unsigned int vertex_indices;
-        is >> vertex_indices;
-        polygon.vertex_indices.push_back(vertex_indices);
-    }
-
-    for(unsigned int ix = 0; ix < num_points; ++ix)
-    {
-        unsigned int texture_coordinate;
-        is >> texture_coordinate;
-        polygon.texture_coordinates.push_back(texture_coordinate);
-    }
-
-    is >> polygon.texture >> polygon.lightmap;
-    return is;
-}
-
 // Returns true if the point is inside the bounds of all polygons in the world.
 bool is_point_in_world(const Vector3f& point)
 {
@@ -129,21 +101,42 @@ static Map load_world_data(
 
     for(ii = 0; ii < cPolys; ++ii)
     {
-        Demo::Polygon poly;
-        is >> poly;
-        map.world_mesh.push_back(poly);
+        std::vector<unsigned int> vertex_indices;       // Indices into vertex list (used for load only).
+        std::vector<unsigned int> texture_coordinates;  // Indices into texture coordinate list (used for load only).
+
+        const unsigned int num_points = 4;
+        vertex_indices.reserve(num_points);
+        texture_coordinates.reserve(num_points);
+
+        for(unsigned int ix = 0; ix < num_points; ++ix)
+        {
+            unsigned int vertex_index;
+            is >> vertex_index;
+            vertex_indices.push_back(vertex_index);
+        }
+
+        for(unsigned int ix = 0; ix < num_points; ++ix)
+        {
+            unsigned int texture_coordinate;
+            is >> texture_coordinate;
+            texture_coordinates.push_back(texture_coordinate);
+        }
 
         for(auto jj = 0; jj < 4; ++jj)
         {
             // TODO: 2014: Bounds check constant arrays.
-            auto ix = poly.vertex_indices[jj];
+            auto ix = vertex_indices[jj];
             CHECK_EXCEPTION(ix < ARRAYSIZE(world_vertices), u8"world_vertices too small for index");
             map.vertex_array.push_back(world_vertices[ix]);
 
-            ix = poly.texture_coordinates[jj];
+            ix = texture_coordinates[jj];
             CHECK_EXCEPTION(ix < ARRAYSIZE(world_texture_coords), u8"world_texture_coords too small for index");
             map.texture_coords_array.push_back(world_texture_coords[ix]);
         }
+
+        Demo::Polygon poly;
+        is >> poly.texture >> poly.lightmap;
+        map.world_mesh.push_back(poly);
     }
 
     unsigned int implicit_surface_count;
