@@ -57,12 +57,6 @@ static const Vector2f world_texture_coords[] =
     { 2.5, 1.0 },
 };
 
-Polygon::Polygon() :
-    texture(0),
-    lightmap(0)
-{
-}
-
 std::istream& operator>>(std::istream& is, Demo::Polygon& polygon)
 {
     // Clear and realloc vectors.

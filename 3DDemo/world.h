@@ -11,10 +11,8 @@ struct Polygon
 {
     std::vector<unsigned int> vertex_indices;       // Indices into vertex list (used for load only).
     std::vector<unsigned int> texture_coordinates;  // Indices into texture coordinate list (used for load only).
-    unsigned int texture;                           // Texture ID.
-    unsigned int lightmap;                          // Index into lightmap list.
-
-    Polygon();
+    unsigned int texture = 0;                       // Texture ID.
+    unsigned int lightmap = 0;                      // Index into lightmap list.
 };
 
 struct Implicit_surface
