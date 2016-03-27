@@ -5,12 +5,8 @@
 namespace Demo
 {
 
-struct Polygon;
-struct Vector3f;
-struct Vector2f;
 struct Map;
 struct Dynamic_meshes;
-struct Patch;
 class Emitter;
 struct Camera;
 
