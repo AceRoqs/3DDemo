@@ -137,10 +137,15 @@ static Map load_world_data(
         Demo::Polygon poly;
         for(unsigned int ix = 0; ix < num_points; ++ix)
         {
+            // TODO: 2016: ii*num_points+ix assumes each polygon has num_points vertices.
+            poly.index_array.push_back(static_cast<uint16_t>(ii * num_points + ix));
+        }
+
         is >> poly.texture >> poly.lightmap;
         map.world_mesh.push_back(poly);
     }
 
+    // TODO: 2016: Get firm on types put in index buffers (int16_t vs uint16_t), and what the range is and why.
     assert(map.world_mesh.size() < 65536 / 4);
 
     unsigned int implicit_surface_count;
