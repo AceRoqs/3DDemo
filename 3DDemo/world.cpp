@@ -122,7 +122,7 @@ static Map load_world_data(
             texture_coordinates.push_back(texture_coordinate);
         }
 
-        for(auto jj = 0; jj < 4; ++jj)
+        for(auto jj = 0; jj < num_points; ++jj)
         {
             // TODO: 2014: Bounds check constant arrays.
             auto ix = vertex_indices[jj];
@@ -135,9 +135,13 @@ static Map load_world_data(
         }
 
         Demo::Polygon poly;
+        for(unsigned int ix = 0; ix < num_points; ++ix)
+        {
         is >> poly.texture >> poly.lightmap;
         map.world_mesh.push_back(poly);
     }
+
+    assert(map.world_mesh.size() < 65536 / 4);
 
     unsigned int implicit_surface_count;
     is >> implicit_surface_count;

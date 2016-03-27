@@ -226,16 +226,6 @@ void draw_map(
     // problems on a second light pass once the world is drawn
     for(unsigned int ii = 0; ii < map.world_mesh.size(); ++ii)
     {
-        assert(map.world_mesh.size() < 65536 / 4);
-
-        const uint16_t index_array[] =
-        {
-            static_cast<uint16_t>(ii * 4),
-            static_cast<uint16_t>(ii * 4 + 1),
-            static_cast<uint16_t>(ii * 4 + 2),
-            static_cast<uint16_t>(ii * 4 + 3)
-        };
-
         const Polygon* iter = &map.world_mesh[ii];
 
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -244,7 +234,8 @@ void draw_map(
         glBindTexture(GL_TEXTURE_2D, iter->texture);
 
         // TODO: 2016: Make this GL_TRIANGLES.  This might require changes to the persisted formats?
-        glDrawElements(GL_QUADS, ARRAYSIZE(index_array), GL_UNSIGNED_SHORT, index_array);
+        assert(iter->index_array.size() <= INT_MAX);
+        glDrawElements(GL_QUADS, static_cast<int>(iter->index_array.size()), GL_UNSIGNED_SHORT, &iter->index_array[0]);
 
         if(iter->lightmap == 0)
         {
@@ -256,7 +247,7 @@ void draw_map(
         glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D, iter->lightmap);
 
-        glDrawElements(GL_QUADS, ARRAYSIZE(index_array), GL_UNSIGNED_SHORT, index_array);
+        glDrawElements(GL_QUADS, static_cast<int>(iter->index_array.size()), GL_UNSIGNED_SHORT, &iter->index_array[0]);
     }
 
     //(void)dynamic_meshes;

@@ -9,6 +9,8 @@ namespace Demo
 
 struct Polygon
 {
+    std::vector<uint16_t> index_array;
+
     unsigned int texture = 0;                       // Texture ID.
     unsigned int lightmap = 0;                      // Index into lightmap list.
 };
