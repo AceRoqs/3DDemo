@@ -98,40 +98,27 @@ static Map load_world_data(
     is >> cPolys;
 
     Map map;
+    map.world_mesh.reserve(cPolys);
+
+    // TODO: 2016: Get firm on types put in index buffers (int16_t vs uint16_t), and what the range is and why.
+    const unsigned int num_points = 4;
+    assert(cPolys < 65536 / num_points);
 
     for(ii = 0; ii < cPolys; ++ii)
     {
-        std::vector<unsigned int> vertex_indices;       // Indices into vertex list (used for load only).
-        std::vector<unsigned int> texture_coordinates;  // Indices into texture coordinate list (used for load only).
-
-        const unsigned int num_points = 4;
-        vertex_indices.reserve(num_points);
-        texture_coordinates.reserve(num_points);
-
         for(unsigned int ix = 0; ix < num_points; ++ix)
         {
+            // TODO: 2014: Bounds check constant arrays.  2016: This code all assumes the file data to be trusted.
             unsigned int vertex_index;
             is >> vertex_index;
-            vertex_indices.push_back(vertex_index);
+            map.vertex_array.push_back(world_vertices[vertex_index]);
         }
 
         for(unsigned int ix = 0; ix < num_points; ++ix)
         {
             unsigned int texture_coordinate;
             is >> texture_coordinate;
-            texture_coordinates.push_back(texture_coordinate);
-        }
-
-        for(auto jj = 0; jj < num_points; ++jj)
-        {
-            // TODO: 2014: Bounds check constant arrays.
-            auto ix = vertex_indices[jj];
-            CHECK_EXCEPTION(ix < ARRAYSIZE(world_vertices), u8"world_vertices too small for index");
-            map.vertex_array.push_back(world_vertices[ix]);
-
-            ix = texture_coordinates[jj];
-            CHECK_EXCEPTION(ix < ARRAYSIZE(world_texture_coords), u8"world_texture_coords too small for index");
-            map.texture_coords_array.push_back(world_texture_coords[ix]);
+            map.texture_coords_array.push_back(world_texture_coords[texture_coordinate]);
         }
 
         Demo::Polygon poly;
@@ -144,9 +131,6 @@ static Map load_world_data(
         is >> poly.texture >> poly.lightmap;
         map.world_mesh.push_back(poly);
     }
-
-    // TODO: 2016: Get firm on types put in index buffers (int16_t vs uint16_t), and what the range is and why.
-    assert(map.world_mesh.size() < 65536 / 4);
 
     unsigned int implicit_surface_count;
     is >> implicit_surface_count;
