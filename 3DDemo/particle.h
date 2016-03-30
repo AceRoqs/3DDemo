@@ -38,6 +38,7 @@ class Emitter
     Vector3f m_position;
 
 public:
+    Emitter();
     Emitter(const Vector3f& emitter_position, unsigned int particle_count, const Particle_descriptor& descriptor);
     void update(float elapsed_milliseconds);
 

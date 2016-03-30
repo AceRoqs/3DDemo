@@ -2,6 +2,7 @@
 
 #include "Bezier.h"
 #include "LinearAlgebra.h"
+#include "particle.h"
 #include <ImageProcessing/Bitmap.h>
 
 namespace Demo
@@ -32,6 +33,7 @@ struct Map
 {
     std::vector<struct Demo::Polygon> world_mesh;
     std::vector<Implicit_surface> implicit_surfaces;
+    std::vector<Emitter> emitters;
 
     // TODO: This is a set of vertices for all of the polygons in the world_mesh.  The world shouldn't
     // be made of individual polygons in 2016, so this is maybe correct to put all world points in one vector
