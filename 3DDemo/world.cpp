@@ -57,6 +57,27 @@ static const Vector2f world_texture_coords[] =
     { 2.5, 1.0 },
 };
 
+constexpr Particle_descriptor particle_descriptor =
+{
+    // Position.
+    0.5f,       // x scale.
+    -0.25f,     // x bias.
+    0.0f,       // y scale.
+    0.0f,       // y bias.
+    0.0f,       // z scale.
+    0.0f,       // z bias.
+
+    // Velocity.
+    -0.004f,    // x scale.
+    0.0016f,    // x bias.
+    0.008f,     // y scale.
+    0.0f,       // y bias.
+    -0.004f,    // z scale.
+    0.0016f,    // z bias.
+
+    150.0f,     // life.
+};
+
 // Returns true if the point is inside the bounds of all polygons in the world.
 bool is_point_in_world(const Vector3f& point)
 {
@@ -158,6 +179,10 @@ static Map load_world_data(
 
         map.implicit_surfaces.push_back({ std::move(bezier_control_points), implicit_surface_texture_id, implicit_surface_origin });
     }
+
+    // TODO: 2016: Read emitter data from file.
+    Emitter emitter(make_vector(-3.0f, 0.0f, -10.5f), 50, particle_descriptor);
+    map.emitters.push_back(emitter);
 
     return map;
 }

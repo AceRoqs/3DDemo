@@ -23,31 +23,11 @@ namespace Demo
 
 static bool s_fWindowed = true;
 
-static const Particle_descriptor particle_descriptor =
-{
-    // Position.
-    0.5f,       // x scale.
-    -0.25f,     // x bias.
-    0.0f,       // y scale.
-    0.0f,       // y bias.
-    0.0f,       // z scale.
-    0.0f,       // z bias.
-
-    // Velocity.
-    -0.004f,    // x scale.
-    0.0016f,    // x bias.
-    0.008f,     // y scale.
-    0.0f,       // y bias.
-    -0.004f,    // z scale.
-    0.0016f,    // z bias.
-
-    150.0f,     // life.
-};
-
-static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, const WindowsCommon::Input_device& keyboard)
+// TODO: 2016: map was const until emitters became mutable.  See if all mutable state can be pushed to a
+// secondary struct, so map can become const again.
+static UINT_PTR game_message_loop(Map& map, WindowsCommon::Clock& clock, const WindowsCommon::Input_device& keyboard)
 {
     Camera camera(make_vector(0.0f, 0.0f, 1.0f), 0.0f);
-    Emitter emitter(make_vector(-3.0f, 0.0f, -10.5f), 50, particle_descriptor);
 
     const unsigned int MAX_PATCH_COUNT_PER_DIMENSION = 9;
     const unsigned int MAX_GENERATED_VERTICES_PER_DIMENSION = MAX_PATCH_COUNT_PER_DIMENSION + 1;
@@ -110,9 +90,10 @@ static UINT_PTR game_message_loop(const Map& map, WindowsCommon::Clock& clock, c
             }
         }
 
-        emitter.update(elapsed_milliseconds);
+        // TODO: 2016: Update all emitters, and don't pass emitters explicitly to draw_map.
+        map.emitters[0].update(elapsed_milliseconds);
 
-        draw_map(map, dynamic_meshes, camera, emitter);
+        draw_map(map, dynamic_meshes, camera, map.emitters[0]);
 
         const HDC device_context = wglGetCurrentDC();
         SwapBuffers(device_context);
