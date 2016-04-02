@@ -90,10 +90,12 @@ static UINT_PTR game_message_loop(Map& map, WindowsCommon::Clock& clock, const W
             }
         }
 
-        // TODO: 2016: Update all emitters, and don't pass emitters explicitly to draw_map.
-        map.emitters[0].update(elapsed_milliseconds);
+        std::for_each(std::begin(map.emitters), std::end(map.emitters), [elapsed_milliseconds](Emitter& emitter)
+        {
+            emitter.update(elapsed_milliseconds);
+        });
 
-        draw_map(map, dynamic_meshes, camera, map.emitters[0]);
+        draw_map(map, dynamic_meshes, camera);
 
         const HDC device_context = wglGetCurrentDC();
         SwapBuffers(device_context);
