@@ -194,12 +194,12 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
 }
 
 // TODO: 2014: Drawing should be done against a vertex/index array.
-static void draw_emitter(const Emitter& emitter, const Camera& camera, unsigned int texture_id)
+static void draw_emitter(const Emitter& emitter, const Camera& camera)
 {
-    std::for_each(emitter.cbegin(), emitter.cend(), [&, texture_id](const Particle& particle)
+    std::for_each(emitter.cbegin(), emitter.cend(), [&](const Particle& particle)
     {
         // TODO: 2016: size should be a member of Emitter.
-        draw_billboard(camera, particle.position, 0.25f, texture_id);
+        draw_billboard(camera, particle.position, 0.25f, emitter.texture_id());
     });
 }
 
@@ -258,7 +258,7 @@ void draw_map(
 
     std::for_each(std::cbegin(map.emitters), std::cend(map.emitters), [&camera](const Emitter& emitter)
     {
-        draw_emitter(emitter, camera, 6);
+        draw_emitter(emitter, camera);
     });
 
     assert(glGetError() == GL_NO_ERROR);

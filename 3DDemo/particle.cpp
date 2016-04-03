@@ -54,10 +54,11 @@ Emitter::Emitter() :
 {
 }
 
-Emitter::Emitter(const Vector3f& position, unsigned int particle_count, const Particle_descriptor& descriptor) :
+Emitter::Emitter(const Vector3f& position, unsigned int particle_count, const Particle_descriptor& descriptor, unsigned int texture_id) :
     m_descriptor(descriptor),
     m_particles(particle_count),
-    m_position(position)
+    m_position(position),
+    m_texture_id(texture_id)
 {
 
     std::for_each(std::begin(m_particles), std::end(m_particles), [](Particle& particle)
@@ -76,6 +77,11 @@ void Emitter::update(float elapsed_milliseconds)
 
     // TODO: 2014: Consider a SSE version.
     std::transform(std::begin(m_particles), std::end(m_particles), std::begin(m_particles), update);
+}
+
+unsigned int Emitter::texture_id() const
+{
+    return m_texture_id;
 }
 
 std::vector<Particle>::const_iterator Emitter::cbegin() const

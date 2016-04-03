@@ -181,7 +181,7 @@ static Map load_world_data(
     }
 
     // TODO: 2016: Read emitter data from file.
-    Emitter emitter(make_vector(-3.0f, 0.0f, -10.5f), 50, particle_descriptor);
+    Emitter emitter(make_vector(-3.0f, 0.0f, -10.5f), 50, particle_descriptor, 6);
     map.emitters.push_back(emitter);
 
     return map;
