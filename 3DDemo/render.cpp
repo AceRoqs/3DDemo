@@ -206,9 +206,8 @@ static void draw_emitter(const Emitter& emitter, const Camera& camera, unsigned 
 // TODO: modularize into separate functions
 void draw_map(
     const Map& map,
-    const Dynamic_meshes& dynamic_meshes, 
-    const Camera& camera,
-    const Emitter& emitter)
+    const Dynamic_meshes& dynamic_meshes,
+    const Camera& camera)
 {
     glClearDepth(1.0);
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -257,7 +256,10 @@ void draw_map(
     //draw_patch(patch1, camera);
     //draw_patch(patch2, camera);
 
-    draw_emitter(emitter, camera, 6);
+    std::for_each(std::cbegin(map.emitters), std::cend(map.emitters), [&camera](const Emitter& emitter)
+    {
+        draw_emitter(emitter, camera, 6);
+    });
 
     assert(glGetError() == GL_NO_ERROR);
 }
