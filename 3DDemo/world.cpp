@@ -127,6 +127,9 @@ static Map load_world_data(
 
     for(ii = 0; ii < cPolys; ++ii)
     {
+        // TODO: 2016: Vertices are specified counterclockwise from upper left.
+        // TODO: 2016: Would be better row oriented like everything else, as long as indices are being generated.
+        // TODO: 2016: If vertex arrays are shared across polygons, then indexes should just be an index into world_vertices.
         for(unsigned int ix = 0; ix < num_points; ++ix)
         {
             // TODO: 2014: Bounds check constant arrays.  2016: This code all assumes the file data to be trusted.
@@ -142,12 +145,14 @@ static Map load_world_data(
             map.texture_coords_array.push_back(world_texture_coords[texture_coordinate]);
         }
 
+        // Index buffer for two triangles.
         Demo::Polygon poly;
-        for(unsigned int ix = 0; ix < num_points; ++ix)
-        {
-            // TODO: 2016: ii*num_points+ix assumes each polygon has num_points vertices.
-            poly.index_array.push_back(static_cast<uint16_t>(ii * num_points + ix));
-        }
+        poly.index_array.push_back(static_cast<uint16_t>(ii * num_points + 0));
+        poly.index_array.push_back(static_cast<uint16_t>(ii * num_points + 1));
+        poly.index_array.push_back(static_cast<uint16_t>(ii * num_points + 3));
+        poly.index_array.push_back(static_cast<uint16_t>(ii * num_points + 3));
+        poly.index_array.push_back(static_cast<uint16_t>(ii * num_points + 1));
+        poly.index_array.push_back(static_cast<uint16_t>(ii * num_points + 2));
 
         is >> poly.texture >> poly.lightmap;
         map.world_mesh.push_back(poly);

@@ -232,9 +232,8 @@ void draw_map(
         glBlendFunc(GL_ONE, GL_ZERO);
         glBindTexture(GL_TEXTURE_2D, iter->texture);
 
-        // TODO: 2016: Make this GL_TRIANGLES.  This might require changes to the persisted formats?
         assert(iter->index_array.size() <= INT_MAX);
-        glDrawElements(GL_QUADS, static_cast<int>(iter->index_array.size()), GL_UNSIGNED_SHORT, &iter->index_array[0]);
+        glDrawElements(GL_TRIANGLES, static_cast<int>(iter->index_array.size()), GL_UNSIGNED_SHORT, &iter->index_array[0]);
 
         if(iter->lightmap == 0)
         {
@@ -246,7 +245,7 @@ void draw_map(
         glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D, iter->lightmap);
 
-        glDrawElements(GL_QUADS, static_cast<int>(iter->index_array.size()), GL_UNSIGNED_SHORT, &iter->index_array[0]);
+        glDrawElements(GL_TRIANGLES, static_cast<int>(iter->index_array.size()), GL_UNSIGNED_SHORT, &iter->index_array[0]);
     }
 
     //(void)dynamic_meshes;
