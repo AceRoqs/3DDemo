@@ -48,12 +48,6 @@ static Particle update_particle(
     return particle;
 }
 
-Emitter::Emitter() :
-    m_descriptor({}),
-    m_position({0.f, 0.f, 0.f})
-{
-}
-
 Emitter::Emitter(const Vector3f& position, unsigned int particle_count, const Particle_descriptor& descriptor, unsigned int texture_id) :
     m_descriptor(descriptor),
     m_particles(particle_count),

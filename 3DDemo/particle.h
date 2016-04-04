@@ -39,7 +39,6 @@ class Emitter
     unsigned int m_texture_id = 0;
 
 public:
-    Emitter();
     Emitter(const Vector3f& emitter_position, unsigned int particle_count, const Particle_descriptor& descriptor, unsigned int texture_id);
 
     void update(float elapsed_milliseconds);

@@ -180,9 +180,22 @@ static Map load_world_data(
         map.implicit_surfaces.push_back({ std::move(bezier_control_points), implicit_surface_texture_id, implicit_surface_origin });
     }
 
-    // TODO: 2016: Read emitter data from file.
-    Emitter emitter(make_vector(-3.0f, 0.0f, -10.5f), 50, particle_descriptor, 6);
-    map.emitters.push_back(emitter);
+    unsigned int emitter_count;
+    is >> emitter_count;
+    for(ii = 0; ii < emitter_count; ++ii)
+    {
+        Vector3f origin;
+        is >> origin;
+
+        unsigned int particle_count;
+        is >> particle_count;
+
+        unsigned int texture_id;
+        is >> texture_id;
+
+        Emitter emitter(origin, particle_count, particle_descriptor, texture_id);
+        map.emitters.push_back(emitter);
+    }
 
     return map;
 }
