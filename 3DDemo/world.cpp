@@ -43,20 +43,6 @@ static const Vector3f world_vertices[] =
     {  -2, 4, -10 },        //                      24
 };
 
-static const Vector2f world_texture_coords[] =
-{
-    { 0.0, 0.0 },
-    { 0.0, 1.0 },
-    { 1.0, 0.0 },
-    { 1.0, 1.0 },
-    { 8.0, 0.0 },
-    { 8.0, 1.0 },
-    { 5.0, 0.0 },
-    { 5.0, 1.0 },
-    { 2.5, 0.0 },
-    { 2.5, 1.0 },
-};
-
 constexpr Particle_descriptor particle_descriptor =
 {
     // Position.
@@ -136,12 +122,12 @@ static Map load_world_data(
             map.vertex_array.push_back(world_vertices[vertex_index]);
         }
 
-        for(unsigned int ix = 0; ix < num_points; ++ix)
-        {
-            unsigned int texture_coordinate;
-            is >> texture_coordinate;
-            map.texture_coords_array.push_back(world_texture_coords[texture_coordinate]);
-        }
+        float scale_x, scale_y;
+        is >> scale_x >> scale_y;
+        map.texture_coords_array.push_back({ 0.0f, 0.0f });
+        map.texture_coords_array.push_back({ scale_x, 0.0f });
+        map.texture_coords_array.push_back({ 0.0f, scale_y });
+        map.texture_coords_array.push_back({ scale_x, scale_y });
 
         // Index buffer for two triangles.
         Demo::Polygon poly;
