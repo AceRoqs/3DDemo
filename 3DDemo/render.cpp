@@ -161,13 +161,15 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
                                  { -size, -size, 0.0f },
                                  {  size, -size, 0.0f }};
 
+    // TODO: 2016: Like below, this texture_coords format could be generated, scaled, etc.
     const Vector2f texture_coords[] = {{ 0.0f, 0.0f },
                                        { 1.0f, 0.0f },
                                        { 0.0f, 1.0f },
                                        { 1.0f, 1.0f }};
 
-    // TODO: 2016: With billboards and patches in the same format, there
+    // TODO: 2016: With billboards, patches, and world geometry in the same format, there
     // may be a helper function that can generate the index_array for either.
+    // And its name IS JOHN CENA^H^H^H^H^H^H^H^H^Hgenerate_implicit_surface_index_array.
     const uint16_t index_array[] = { 0, 2, 1, 1, 2, 3 };
 
     // Transform to location.

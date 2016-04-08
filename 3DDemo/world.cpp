@@ -8,41 +8,6 @@
 namespace Demo
 {
 
-static const Vector3f world_vertices[] =
-{
-    { -2, -2, -10 },        // left lower front      0
-    { -2,  2, -10 },        // left upper front      1
-    {  2, -2, -10 },        // right lower front     2
-    {  2,  2, -10 },        // right upper front     3
-    {  2, -2,   0 },        // right lower back      4
-    { -2, -2,   0 },        // left lower back       5
-    { -2,  2,   0 },        // left upper back       6
-    {  2,  2,   0 },        // right upper back      7
-    // sky
-    { -500, 50, -500 },     // left upper front      8
-    { -500, 50,  500 },     // left upper back       9
-    {  500, 50,  500 },     // right upper back     10
-    {  500, 50, -500 },     // right upper front    11
-
-    // outside wall
-    { -10, -2, -20 },       // left lower front     12
-    { -10,  2, -20 },       // left upper front     13
-    {  10, -2, -20 },       // right lower front    14
-    {  10,  2, -20 },       // right upper front    15
-    // far floor
-    {  10, -2, -20 },       //                      16
-    {  10, -2, -10 },       //                      17
-    { -10, -2, -10 },       //                      18
-    // left far wall
-    { -10, 2, -10 },        //                      19
-
-    {  10, 2, -10 },        //                      20
-    {  10, 4, -10 },        //                      21
-    { -10, 4, -10 },        //                      22
-    {   2, 4, -10 },        //                      23
-    {  -2, 4, -10 },        //                      24
-};
-
 constexpr Particle_descriptor particle_descriptor =
 {
     // Position.
@@ -116,10 +81,9 @@ static Map load_world_data(
         // TODO: 2016: If vertex arrays are shared across polygons, then indexes should just be an index into world_vertices.
         for(unsigned int ix = 0; ix < num_points; ++ix)
         {
-            // TODO: 2014: Bounds check constant arrays.  2016: This code all assumes the file data to be trusted.
-            unsigned int vertex_index;
-            is >> vertex_index;
-            map.vertex_array.push_back(world_vertices[vertex_index]);
+            Vector3f vertex;
+            is >> vertex;
+            map.vertex_array.push_back(vertex);
         }
 
         float scale_x, scale_y;
