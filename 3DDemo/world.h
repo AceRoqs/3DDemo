@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Bezier.h"
+#include "GenerateMesh.h"
 #include "LinearAlgebra.h"
 #include "particle.h"
 #include <ImageProcessing/Bitmap.h>

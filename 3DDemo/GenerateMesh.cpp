@@ -1,5 +1,5 @@
 #include "PreCompile.h"
-#include "Bezier.h"
+#include "GenerateMesh.h"
 #include "LinearAlgebra.h"
 
 namespace Demo

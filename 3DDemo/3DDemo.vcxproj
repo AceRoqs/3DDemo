@@ -49,7 +49,7 @@
     <ResourceCompile Include="3DDemo.rc" />
     <ClCompile Include="Action.cpp" />
     <ClCompile Include="app.cpp" />
-    <ClCompile Include="Bezier.cpp" />
+    <ClCompile Include="GenerateMesh.cpp" />
     <ClCompile Include="BitmapReader.cpp" />
     <ClCompile Include="DirectInputMap.cpp" />
     <ClCompile Include="LinearAlgebra.cpp" />
@@ -62,7 +62,7 @@
     <ClCompile Include="world.cpp" />
     <ClInclude Include="Action.h" />
     <ClInclude Include="app.h" />
-    <ClInclude Include="Bezier.h" />
+    <ClInclude Include="GenerateMesh.h" />
     <ClInclude Include="BitmapReader.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DirectInputMap.h" />

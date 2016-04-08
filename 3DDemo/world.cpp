@@ -1,6 +1,6 @@
 #include "PreCompile.h"
 #include "world.h"
-#include "Bezier.h"
+#include "GenerateMesh.h"
 #include "BitmapReader.h"
 #include "LinearAlgebra.h"
 #include <PortableRuntime/CheckException.h>

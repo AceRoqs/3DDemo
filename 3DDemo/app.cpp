@@ -5,7 +5,7 @@
 #include "particle.h"
 #include "Camera.h"
 #include "Action.h"
-#include "Bezier.h"
+#include "GenerateMesh.h"
 #include "DirectInputMap.h"
 #include "LinearAlgebra.h"
 #include <ImageProcessing/Bitmap.h>
