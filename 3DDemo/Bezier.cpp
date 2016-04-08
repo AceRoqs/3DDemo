@@ -57,18 +57,18 @@ std::vector<Vector3f> generate_quadratic_bezier_vertex_array(
     unsigned int patch_count)
 {
     assert(control_points.size() == (quadratic_bezier_control_point_count * quadratic_bezier_control_point_count));
-    const auto curve_vertex_count = patch_count + 1;
+    const auto surface_vertex_count = patch_count + 1;
 
     std::vector<Vector3f> vertex_array;
-    vertex_array.reserve(curve_vertex_count * curve_vertex_count);
+    vertex_array.reserve(surface_vertex_count * surface_vertex_count);
 
     // Generate all of the points.
-    for(unsigned int vv = 0; vv < curve_vertex_count; ++vv)
+    for(unsigned int vv = 0; vv < surface_vertex_count; ++vv)
     {
         // Range [0..1].
         const float t_v = vv / static_cast<float>(patch_count);
 
-        for(unsigned int uu = 0; uu < curve_vertex_count; ++uu)
+        for(unsigned int uu = 0; uu < surface_vertex_count; ++uu)
         {
             // Range [0..1].
             const float t_u = uu / static_cast<float>(patch_count);
@@ -82,10 +82,10 @@ std::vector<Vector3f> generate_quadratic_bezier_vertex_array(
 
 std::vector<uint16_t> generate_implicit_surface_index_array(unsigned int patch_count, size_t bias)
 {
-    const auto curve_vertex_count = patch_count + 1;
+    const auto surface_vertex_count = patch_count + 1;
 
     // Verify that all indices generated will not wrap the max number of vertices.
-    assert(bias + patch_count + patch_count * curve_vertex_count <= UINT16_MAX);
+    assert(bias + patch_count + patch_count * surface_vertex_count <= UINT16_MAX);
 
     std::vector<uint16_t> index_array;
     index_array.reserve(patch_count * patch_count);
@@ -94,12 +94,12 @@ std::vector<uint16_t> generate_implicit_surface_index_array(unsigned int patch_c
     {
         for(unsigned int uu = 0; uu < patch_count; ++uu)
         {
-            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 0) + (vv + 0) * curve_vertex_count));
-            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 0) + (vv + 1) * curve_vertex_count));
-            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 1) + (vv + 0) * curve_vertex_count));
-            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 1) + (vv + 0) * curve_vertex_count));
-            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 0) + (vv + 1) * curve_vertex_count));
-            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 1) + (vv + 1) * curve_vertex_count));
+            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 0) + (vv + 0) * surface_vertex_count));
+            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 0) + (vv + 1) * surface_vertex_count));
+            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 1) + (vv + 0) * surface_vertex_count));
+            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 1) + (vv + 0) * surface_vertex_count));
+            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 0) + (vv + 1) * surface_vertex_count));
+            index_array.emplace_back(static_cast<uint16_t>(bias + (uu + 1) + (vv + 1) * surface_vertex_count));
         }
     }
 
@@ -108,15 +108,15 @@ std::vector<uint16_t> generate_implicit_surface_index_array(unsigned int patch_c
 
 std::vector<Vector2f> generate_implicit_surface_texture_coords_array(unsigned int patch_count)
 {
-    const auto curve_vertex_count = patch_count + 1;
+    const auto surface_vertex_count = patch_count + 1;
 
     std::vector<Vector2f> texture_coords_array;
-    texture_coords_array.reserve(curve_vertex_count * curve_vertex_count);
+    texture_coords_array.reserve(surface_vertex_count * surface_vertex_count);
 
     const float scale = 1.0f / patch_count;
-    for(unsigned int vv = 0; vv < curve_vertex_count; ++vv)
+    for(unsigned int vv = 0; vv < surface_vertex_count; ++vv)
     {
-        for(unsigned int uu = 0; uu < curve_vertex_count; ++uu)
+        for(unsigned int uu = 0; uu < surface_vertex_count; ++uu)
         {
             texture_coords_array.push_back({uu * scale, vv * scale});
         }
