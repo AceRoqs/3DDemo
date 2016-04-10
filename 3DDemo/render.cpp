@@ -34,13 +34,11 @@ static void bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap, uns
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
 
-    // TODO: 2016: GL_TEXTURE_ENV is not a loading property - it's a drawing property.  Move this.
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
     glTexImage2D(GL_TEXTURE_2D,
                  0,
-                 3,
+                 GL_RGB,
                  bitmap.xsize,
                  bitmap.ysize,
                  0,
@@ -181,10 +179,8 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
     // Billboard the sprite.
     glRotatef(-camera.m_degrees, 0.0f, 1.0f, 0.0f);
 
-    // TODO: 2016: Understand why glColor4f only passes red.
-    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-    glDepthFunc(GL_LESS);
-    // TODO: 2016: This will be glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA), once textures are 32-bit. :(
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_ONE, GL_ONE);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
@@ -197,6 +193,7 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
 // TODO: 2014: Drawing should be done against a vertex/index array.
 static void draw_emitter(const Emitter& emitter, const Camera& camera)
 {
+    // TODO: 2016: Particles need to be sorted by Z to blend correctly.
     std::for_each(emitter.cbegin(), emitter.cend(), [&](const Particle& particle)
     {
         // TODO: 2016: size should be a member of Emitter.
@@ -212,6 +209,9 @@ void draw_map(
 {
     glClearDepth(1.0);
     glClear(GL_DEPTH_BUFFER_BIT);
+
+    // TODO: 2016: Each draw function should implement this  Move this to each draw function.
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
     // GL_MODELVIEW assumed.
     glLoadIdentity();
