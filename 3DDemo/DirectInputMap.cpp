@@ -35,7 +35,7 @@ std::vector<std::pair<float, Action>> actions_from_keyboard_state(float ellapsed
     {
         if(keyboard_state[map.input])
         {
-            actions.push_back(std::make_pair(ellapsed_milliseconds, map.action));
+            actions.emplace_back(std::make_pair(ellapsed_milliseconds, map.action));
         }
     });
 
@@ -59,27 +59,27 @@ std::vector<std::pair<float, Action>> actions_from_joystick_state(float ellapsed
     {
         if((state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP) != 0)
         {
-            actions.push_back(std::make_pair(ellapsed_milliseconds, Move_forward));
+            actions.emplace_back(std::make_pair(ellapsed_milliseconds, Move_forward));
         }
         if((state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN) != 0)
         {
-            actions.push_back(std::make_pair(ellapsed_milliseconds, Move_backward));
+            actions.emplace_back(std::make_pair(ellapsed_milliseconds, Move_backward));
         }
         if((state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) != 0)
         {
-            actions.push_back(std::make_pair(ellapsed_milliseconds, Strafe_right));
+            actions.emplace_back(std::make_pair(ellapsed_milliseconds, Strafe_right));
         }
         if((state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) != 0)
         {
-            actions.push_back(std::make_pair(ellapsed_milliseconds, Strafe_left));
+            actions.emplace_back(std::make_pair(ellapsed_milliseconds, Strafe_left));
         }
         if(state.Gamepad.bLeftTrigger > 50)
         {
-            actions.push_back(std::make_pair(ellapsed_milliseconds, Turn_left));
+            actions.emplace_back(std::make_pair(ellapsed_milliseconds, Turn_left));
         }
         if(state.Gamepad.bRightTrigger > 50)
         {
-            actions.push_back(std::make_pair(ellapsed_milliseconds, Turn_right));
+            actions.emplace_back(std::make_pair(ellapsed_milliseconds, Turn_right));
         }
     }
 

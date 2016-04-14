@@ -63,7 +63,7 @@ static Map load_world_data(
     {
         char file_name[MAX_PATH];
         is >> file_name;
-        texture_list->push_back(bitmap_from_file(file_name));
+        texture_list->emplace_back(bitmap_from_file(file_name));
     }
 
     unsigned int cPolys;
@@ -83,7 +83,7 @@ static Map load_world_data(
         {
             Vector3f vertex;
             is >> vertex;
-            map.vertex_array.push_back(vertex);
+            map.vertex_array.emplace_back(vertex);
         }
 
         float scale_x, scale_y;
@@ -95,15 +95,15 @@ static Map load_world_data(
 
         // Index buffer for two triangles.
         Demo::Polygon poly;
-        poly.index_array.push_back(static_cast<uint16_t>(ii * num_points + 0));
-        poly.index_array.push_back(static_cast<uint16_t>(ii * num_points + 2));
-        poly.index_array.push_back(static_cast<uint16_t>(ii * num_points + 1));
-        poly.index_array.push_back(static_cast<uint16_t>(ii * num_points + 1));
-        poly.index_array.push_back(static_cast<uint16_t>(ii * num_points + 2));
-        poly.index_array.push_back(static_cast<uint16_t>(ii * num_points + 3));
+        poly.index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 0));
+        poly.index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 2));
+        poly.index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 1));
+        poly.index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 1));
+        poly.index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 2));
+        poly.index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 3));
 
         is >> poly.texture >> poly.lightmap;
-        map.world_mesh.push_back(poly);
+        map.world_mesh.emplace_back(poly);
     }
 
     unsigned int implicit_surface_count;
@@ -147,7 +147,7 @@ static Map load_world_data(
         is >> texture_id;
 
         Emitter emitter(origin, particle_count, particle_descriptor, texture_id);
-        map.emitters.push_back(emitter);
+        map.emitters.emplace_back(emitter);
     }
 
     return map;
