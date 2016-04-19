@@ -111,7 +111,9 @@ static void draw_dynamic_meshes(const std::vector<Implicit_surface>& implicit_su
     glVertexPointer(3, GL_FLOAT, 0, &dynamic_meshes.vertex_array[0]);
     glTexCoordPointer(2, GL_FLOAT, 0, &dynamic_meshes.texture_coords_array[0]);
 
-    for(auto ix = 0u; ix < implicit_surfaces.size(); ++ix)
+    assert(implicit_surfaces.size() <= UINT_MAX);
+    const auto implicit_surface_count = static_cast<unsigned int>(implicit_surfaces.size());
+    for(auto ix = 0u; ix < implicit_surface_count; ++ix)
     {
         glBindTexture(GL_TEXTURE_2D, implicit_surfaces[ix].texture_id);
 
