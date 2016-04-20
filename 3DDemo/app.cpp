@@ -113,11 +113,30 @@ public:
     }
 
 protected:
+    int m_reference_x = 0;
+    int m_accumulated_x = 0;
+
     LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) noexcept override
     {
         LRESULT return_value = OpenGL_window::window_proc(window, message, w_param, l_param);
 
-        if(message == WM_DESTROY)
+        if(message == WM_MOUSEMOVE)
+        {
+            auto x_pos = GET_X_LPARAM(l_param);
+
+            // Assume mouse look requires a button for now.
+            // TODO: 2016: Think about how this behaves if the mouse button is down while the cursor is moved into the window.
+            if((w_param & MK_LBUTTON) != 0)
+            {
+                auto diff = x_pos - m_reference_x;
+                m_accumulated_x += diff;
+
+                PortableRuntime::dprintf("Accumulated X: %d\n", m_accumulated_x);
+            }
+
+            m_reference_x = x_pos;
+        }
+        else if(message == WM_DESTROY)
         {
             PostQuitMessage(0);
         }

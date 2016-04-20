@@ -35,6 +35,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
+#include <windowsx.h>
 #include <strsafe.h>
 
 #define DIRECTINPUT_VERSION 0x0800
