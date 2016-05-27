@@ -21,8 +21,6 @@ inline void check_dx9(HRESULT hr)
     }
 }
 
-void throw_dx9err_buffer(HRESULT hr, Microsoft::WRL::ComPtr<ID3DXBuffer>& error_buffer);
-
 } // namespace Direct3D9Common
 
 

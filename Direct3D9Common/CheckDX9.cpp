@@ -35,25 +35,5 @@ DX9_exception::DX9_exception(HRESULT hr, const char* file_name, int line) : HRES
     }
 }
 
-// Reference used so that the DX call can be used inline in the function.
-// ex: throw_dx9err_buffer(D3DXCompileShader(..., &error_buffer, ...), error_buffer).
-// Without the reference, the undefined order of parameter evaluation could cause nullptr to be passed for the second error_buffer parameter.
-void throw_dx9err_buffer(HRESULT hr, Microsoft::WRL::ComPtr<ID3DXBuffer>& error_buffer)
-{
-    if(FAILED(hr) && (nullptr != error_buffer))
-    {
-        // Copy to enforce null termination.
-        char error_string[256];
-        if(SUCCEEDED(StringCbCopyNA(error_string, sizeof(error_string), static_cast<char*>(error_buffer->GetBufferPointer()), error_buffer->GetBufferSize())))
-        {
-            // Output the string before exception is thrown, as DirectX is shut down during exception processing.
-            // TODO: Use Tracing code instead of calling ODS.
-            OutputDebugStringA(error_string);
-        }
-    }
-
-    check_dx9(hr);
-}
-
 } // namespace Direct3D9Common
 
