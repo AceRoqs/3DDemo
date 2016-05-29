@@ -29,7 +29,7 @@ DX9_exception::DX9_exception(HRESULT hr, const char* file_name, int line) : HRES
     }
     catch(const std::bad_alloc& ex)
     {
-        (void)(ex);     // Unreferenced parameter.
+        (void)ex;       // Unreferenced parameter.
 
         PortableRuntime::dprintf("!Failed creation of exception object.\n");
     }

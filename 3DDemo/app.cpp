@@ -174,7 +174,7 @@ void app_run(_In_ HINSTANCE instance, int show_command)
     UpdateWindow(app.m_state.window);
 
     WindowsCommon::debug_validate_message_map();
-    auto return_code = game_message_loop(map, clock, keyboard);
+    const auto return_code = game_message_loop(map, clock, keyboard);
 
 #ifndef NDEBUG
     assert(fpu.current_control() == current_control);
@@ -188,7 +188,7 @@ void app_run(_In_ HINSTANCE instance, int show_command)
 
     // This would be the legal part of the return code.
     //static_cast<int>(return_code);
-    UNREFERENCED_PARAMETER(return_code);
+    (void)return_code;  // Unreferenced variable.
 
     assert((nullptr == app.m_state.window) && "window handle was never released.");
 }

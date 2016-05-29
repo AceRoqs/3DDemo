@@ -15,7 +15,7 @@ int WINAPI _tWinMain(_In_ HINSTANCE instance,   // Handle to the program instanc
                      _In_ PTSTR command_line,   // Command line.
                      _In_ int show_command)     // How the window is to be displayed.
 {
-    UNREFERENCED_PARAMETER(command_line);
+    (void)command_line;     // Unreferenced parameter.
 
     PortableRuntime::set_dprintf(WindowsCommon::debugger_dprintf);
 
