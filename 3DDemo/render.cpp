@@ -44,7 +44,7 @@ static void bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap, uns
                  0,
                  GL_RGB,
                  GL_UNSIGNED_BYTE,
-                 &bitmap.bitmap[0]);
+                 bitmap.bitmap.data());
 }
 
 void initialize_gl_constants()
@@ -108,8 +108,8 @@ static void draw_dynamic_meshes(const std::vector<Implicit_surface>& implicit_su
     glDepthFunc(GL_LESS);
     glBlendFunc(GL_ONE, GL_ZERO);
 
-    glVertexPointer(3, GL_FLOAT, 0, &dynamic_meshes.vertex_array[0]);
-    glTexCoordPointer(2, GL_FLOAT, 0, &dynamic_meshes.texture_coords_array[0]);
+    glVertexPointer(3, GL_FLOAT, 0, dynamic_meshes.vertex_array.data());
+    glTexCoordPointer(2, GL_FLOAT, 0, dynamic_meshes.texture_coords_array.data());
 
     assert(implicit_surfaces.size() <= UINT_MAX);
     const auto implicit_surface_count = static_cast<unsigned int>(implicit_surfaces.size());
@@ -138,8 +138,8 @@ static void draw_patch(const Patch& patch, const Camera& camera)
     glBlendFunc(GL_ONE, GL_ZERO);
     glBindTexture(GL_TEXTURE_2D, patch.texture_id);
 
-    glVertexPointer(3, GL_FLOAT, 0, &patch.vertices[0]);
-    glTexCoordPointer(2, GL_FLOAT, 0, &patch.texture_coords[0]);
+    glVertexPointer(3, GL_FLOAT, 0, patch.vertices.data());
+    glTexCoordPointer(2, GL_FLOAT, 0, patch.texture_coords.data());
 
     assert(patch.index_array.size() < INT_MAX);   // GLsizei == int
     // TODO: 2016: Patch should pass an offset?  Offset will always be zero, since patch is the thing that hold the arrays.
@@ -220,8 +220,8 @@ void draw_map(
     glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
     glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
 
-    glVertexPointer(3, GL_FLOAT, 0, &map.vertex_array[0]);
-    glTexCoordPointer(2, GL_FLOAT, 0, &map.texture_coords_array[0]);
+    glVertexPointer(3, GL_FLOAT, 0, map.vertex_array.data());
+    glTexCoordPointer(2, GL_FLOAT, 0, map.texture_coords_array.data());
 
     // single loop multi pass textured lighting
     // this is done is one pass because of visibility
@@ -236,7 +236,7 @@ void draw_map(
         glBindTexture(GL_TEXTURE_2D, iter->texture);
 
         assert(iter->index_array.size() <= INT_MAX);
-        glDrawElements(GL_TRIANGLES, static_cast<int>(iter->index_array.size()), GL_UNSIGNED_SHORT, &iter->index_array[0]);
+        glDrawElements(GL_TRIANGLES, static_cast<int>(iter->index_array.size()), GL_UNSIGNED_SHORT, iter->index_array.data());
 
         if(iter->lightmap == 0)
         {
@@ -248,7 +248,7 @@ void draw_map(
         glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
         glBindTexture(GL_TEXTURE_2D, iter->lightmap);
 
-        glDrawElements(GL_TRIANGLES, static_cast<int>(iter->index_array.size()), GL_UNSIGNED_SHORT, &iter->index_array[0]);
+        glDrawElements(GL_TRIANGLES, static_cast<int>(iter->index_array.size()), GL_UNSIGNED_SHORT, iter->index_array.data());
     }
 
     //(void)dynamic_meshes;
