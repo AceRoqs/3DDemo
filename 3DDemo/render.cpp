@@ -138,8 +138,8 @@ static void draw_patch(const Patch& patch, const Camera& camera)
     glBlendFunc(GL_ONE, GL_ZERO);
     glBindTexture(GL_TEXTURE_2D, patch.texture_id);
 
-    glVertexPointer(3, GL_FLOAT, 0, patch.vertices.data());
-    glTexCoordPointer(2, GL_FLOAT, 0, patch.texture_coords.data());
+    glVertexPointer(3, GL_FLOAT, 0, patch.vertex_array.data());
+    glTexCoordPointer(2, GL_FLOAT, 0, patch.texture_coords_array.data());
 
     assert(patch.index_array.size() < INT_MAX);   // GLsizei == int
     // TODO: 2016: Patch should pass an offset?  Offset will always be zero, since patch is the thing that hold the arrays.
@@ -155,16 +155,16 @@ static void draw_patch(const Patch& patch, const Camera& camera)
 static void draw_billboard(const Camera& camera, const Vector3f& position, float size, unsigned int texture_id)
 {
     // Vertices are specified in left-to-right order from upper-left corner.
-    const Vector3f vertices[] = {{ -size,  size, 0.0f },
-                                 {  size,  size, 0.0f },
-                                 { -size, -size, 0.0f },
-                                 {  size, -size, 0.0f }};
+    const Vector3f vertex_array[] = {{ -size,  size, 0.0f },
+                                     {  size,  size, 0.0f },
+                                     { -size, -size, 0.0f },
+                                     {  size, -size, 0.0f }};
 
     // TODO: 2016: Like below, this texture_coords format could be generated, scaled, etc.
-    const Vector2f texture_coords[] = {{ 0.0f, 0.0f },
-                                       { 1.0f, 0.0f },
-                                       { 0.0f, 1.0f },
-                                       { 1.0f, 1.0f }};
+    const Vector2f texture_coords_array[] = {{ 0.0f, 0.0f },
+                                             { 1.0f, 0.0f },
+                                             { 0.0f, 1.0f },
+                                             { 1.0f, 1.0f }};
 
     // TODO: 2016: With billboards, patches, and world geometry in the same format, there
     // may be a helper function that can generate the index_array for either.
@@ -186,8 +186,8 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
     glBlendFunc(GL_ONE, GL_ONE);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
-    glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
-    glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords[0]);
+    glVertexPointer(3, GL_FLOAT, 0, &vertex_array[0]);
+    glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords_array[0]);
 
     glDrawElements(GL_TRIANGLES, ARRAYSIZE(index_array), GL_UNSIGNED_SHORT, index_array);
 }
