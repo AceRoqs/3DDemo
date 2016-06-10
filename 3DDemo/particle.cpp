@@ -54,12 +54,6 @@ Emitter::Emitter(const Vector3f& position, unsigned int particle_count, const Pa
     m_position(position),
     m_texture_id(texture_id)
 {
-
-    std::for_each(std::begin(m_particles), std::end(m_particles), [](Particle& particle)
-    {
-        // The rest of the structure is uninitialized.
-        particle.life = 0.0f;
-    });
 }
 
 void Emitter::update(float elapsed_milliseconds)

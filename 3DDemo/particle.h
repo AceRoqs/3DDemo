@@ -26,9 +26,12 @@ struct Particle_descriptor
 
 struct Particle
 {
+    Particle() {}
+    float life {};          // Amount of time remaining in milliseconds.
+
+    // Default value doesn't matter until life is non-zero.
     Vector3f position;
     Vector3f velocity;
-    float life;             // Amount of time remaining in milliseconds.
 };
 
 class Emitter
