@@ -5,7 +5,7 @@
 namespace Demo
 {
 
-static bool is_particle_alive(const Particle& particle)
+static bool is_particle_alive(const Particle& particle) noexcept
 {
     return particle.life > 0.0f;
 }
@@ -67,7 +67,7 @@ void Emitter::update(float elapsed_milliseconds)
     std::transform(std::begin(m_particles), std::end(m_particles), std::begin(m_particles), update);
 }
 
-unsigned int Emitter::texture_id() const
+unsigned int Emitter::texture_id() const noexcept
 {
     return m_texture_id;
 }

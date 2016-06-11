@@ -113,8 +113,8 @@ public:
     }
 
 protected:
-    int m_reference_x = 0;
-    int m_accumulated_x = 0;
+    int m_reference_x {};
+    int m_accumulated_x {};
 
     LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) noexcept override
     {

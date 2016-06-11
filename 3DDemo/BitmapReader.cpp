@@ -28,7 +28,7 @@ ImageProcessing::Bitmap bitmap_from_file(_In_z_ const char* file_name)
     const DWORD size = GetFileSize(file, nullptr);
     const auto read_complete = WindowsCommon::create_event(nullptr, true, false, nullptr);
 
-    OVERLAPPED overlapped = {};
+    OVERLAPPED overlapped {};
     overlapped.hEvent = read_complete;
 
     // TODO: zero inits.

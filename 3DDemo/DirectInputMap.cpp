@@ -53,7 +53,7 @@ std::vector<std::pair<float, Action>> actions_from_joystick_state(float ellapsed
 {
     std::vector<std::pair<float, Action>> actions;
 
-    XINPUT_STATE state = {};
+    XINPUT_STATE state {};
     DWORD dwResult = XInputGetState(0, &state);
     if(dwResult != ERROR_DEVICE_NOT_CONNECTED)
     {
