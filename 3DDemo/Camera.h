@@ -7,11 +7,10 @@ namespace Demo
 
 struct Camera
 {
-    Camera(const Vector3f& position, float degrees) : m_position(position), m_degrees(degrees)
-    {
-    }
-
     Vector3f m_position;
+
+    // TODO: 2016: Document clockwise/counterclockwise, and what axis.
+    // TODO: 2016: Be consistent on degrees/radians throughout.
     float m_degrees;
 };
 

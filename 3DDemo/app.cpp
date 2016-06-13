@@ -27,7 +27,7 @@ static bool s_fWindowed = true;
 // secondary struct, so map can become const again.
 static UINT_PTR game_message_loop(Map& map, WindowsCommon::Clock& clock, const WindowsCommon::Input_device& keyboard)
 {
-    Camera camera(make_vector(0.0f, 0.0f, 1.0f), 0.0f);
+    Camera camera {make_vector(0.0f, 0.0f, 1.0f), 0.0f};
 
     const unsigned int MAX_PATCH_COUNT_PER_DIMENSION = 9;
     const unsigned int MAX_GENERATED_VERTICES_PER_DIMENSION = MAX_PATCH_COUNT_PER_DIMENSION + 1;

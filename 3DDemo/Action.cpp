@@ -64,13 +64,13 @@ Camera apply_actions(const std::vector<std::pair<float, Action>>& actions, const
 
             case Action::Turn_right:
             {
-                new_camera.m_degrees = fmod(new_camera.m_degrees + rotation_degrees, 360.f);
+                new_camera.m_degrees = fmod(new_camera.m_degrees + rotation_degrees, 360.0f);
                 break;
             }
 
             case Action::Turn_left:
             {
-                new_camera.m_degrees = fmod(new_camera.m_degrees - rotation_degrees + 360.f, 360.f);
+                new_camera.m_degrees = fmod(new_camera.m_degrees - rotation_degrees + 360.0f, 360.0f);
                 break;
             }
         }
