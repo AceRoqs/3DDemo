@@ -233,12 +233,12 @@ void draw_map(
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glDepthFunc(GL_LESS);
         glBlendFunc(GL_ONE, GL_ZERO);
-        glBindTexture(GL_TEXTURE_2D, iter->texture);
+        glBindTexture(GL_TEXTURE_2D, iter->texture_id);
 
         assert(iter->index_array.size() <= INT_MAX);
         glDrawElements(GL_TRIANGLES, static_cast<int>(iter->index_array.size()), GL_UNSIGNED_SHORT, iter->index_array.data());
 
-        if(iter->lightmap == 0)
+        if(iter->lightmap_id == 0)
         {
             continue;
         }
@@ -246,7 +246,7 @@ void draw_map(
         glColor4f(0.0f, 0.0f, 0.0f, 0.25f);
         glDepthFunc(GL_EQUAL);
         glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
-        glBindTexture(GL_TEXTURE_2D, iter->lightmap);
+        glBindTexture(GL_TEXTURE_2D, iter->lightmap_id);
 
         glDrawElements(GL_TRIANGLES, static_cast<int>(iter->index_array.size()), GL_UNSIGNED_SHORT, iter->index_array.data());
     }

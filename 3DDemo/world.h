@@ -12,8 +12,8 @@ struct Polygon
 {
     std::vector<uint16_t> index_array;
 
-    unsigned int texture;                           // Texture ID.
-    unsigned int lightmap;                          // Index into lightmap list.
+    unsigned int texture_id;                        // Texture ID.
+    unsigned int lightmap_id;                       // Index into lightmap list.
 };
 
 struct Implicit_surface
