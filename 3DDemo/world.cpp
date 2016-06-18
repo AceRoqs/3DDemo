@@ -88,22 +88,23 @@ static Map load_world_data(
 
         float scale_x, scale_y;
         is >> scale_x >> scale_y;
-        map.texture_coords_array.push_back({ 0.0f, 0.0f });
-        map.texture_coords_array.push_back({ scale_x, 0.0f });
-        map.texture_coords_array.push_back({ 0.0f, scale_y });
-        map.texture_coords_array.push_back({ scale_x, scale_y });
+        map.texture_coords_array.push_back({0.0f,    0.0f});
+        map.texture_coords_array.push_back({scale_x, 0.0f});
+        map.texture_coords_array.push_back({0.0f,    scale_y});
+        map.texture_coords_array.push_back({scale_x, scale_y});
 
         // Index buffer for two triangles.
-        Demo::Polygon poly;
-        poly.index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 0));
-        poly.index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 2));
-        poly.index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 1));
-        poly.index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 1));
-        poly.index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 2));
-        poly.index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 3));
+        std::vector<uint16_t> index_array;
+        index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 0));
+        index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 2));
+        index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 1));
+        index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 1));
+        index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 2));
+        index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 3));
 
-        is >> poly.texture >> poly.lightmap;
-        map.world_mesh.emplace_back(poly);
+        unsigned int texture_id, lightmap_id;
+        is >> texture_id >> lightmap_id;
+        map.world_mesh.push_back({std::move(index_array), texture_id, lightmap_id});
     }
 
     unsigned int implicit_surface_count;
@@ -130,7 +131,7 @@ static Map load_world_data(
             bezier_control_points.emplace_back(control_point);
         }
 
-        map.implicit_surfaces.push_back({ std::move(bezier_control_points), implicit_surface_texture_id, implicit_surface_origin });
+        map.implicit_surfaces.push_back({std::move(bezier_control_points), implicit_surface_texture_id, implicit_surface_origin});
     }
 
     unsigned int emitter_count;
