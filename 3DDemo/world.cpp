@@ -51,69 +51,88 @@ bool is_point_in_world(const Vector3f& point)
     return true;
 }
 
-static Map load_world_data(
-    std::istream& is,
-    std::vector<ImageProcessing::Bitmap>* texture_list)
+static std::vector<Vector3f> read_vertex_array(std::istream& is, unsigned int num_points)
 {
-    unsigned int cTextures;
-    is >> cTextures;
-
-    unsigned int ii;
-    for(ii = 0; ii < cTextures; ++ii)
+    std::vector<Vector3f> vertex_array;
+    for(unsigned int ix = 0; ix < num_points; ++ix)
     {
-        char file_name[MAX_PATH];
-        is >> file_name;
-        texture_list->emplace_back(bitmap_from_file(file_name));
+        Vector3f vertex;
+        is >> vertex;
+        vertex_array.emplace_back(vertex);
     }
 
-    unsigned int cPolys;
-    is >> cPolys;
+    return vertex_array;
+}
 
-    Map map;
-    map.world_mesh.reserve(cPolys);
+static std::vector<Vector2f> read_scaled_quad_texture_coords_array(std::istream& is)
+{
+    float scale_x, scale_y;
+    is >> scale_x >> scale_y;
+
+    return std::vector<Vector2f>{{0.0f,    0.0f},
+                                 {scale_x, 0.0f},
+                                 {0.0f,    scale_y},
+                                 {scale_x, scale_y}};
+}
+
+static std::vector<uint16_t> generate_biased_quad_index_array(unsigned int bias)
+{
+    return {static_cast<uint16_t>(bias + 0),
+            static_cast<uint16_t>(bias + 2),
+            static_cast<uint16_t>(bias + 1),
+            static_cast<uint16_t>(bias + 1),
+            static_cast<uint16_t>(bias + 2),
+            static_cast<uint16_t>(bias + 3)};
+}
+
+static std::tuple<std::vector<Polygon>, std::vector<Vector3f>, std::vector<Vector2f>> read_world_mesh(std::istream& is)
+{
+    unsigned int polygon_count;
+    is >> polygon_count;
 
     // TODO: 2016: Get firm on types put in index buffers (int16_t vs uint16_t), and what the range is and why.
-    const unsigned int num_points = 4;
-    assert(cPolys < 65536 / num_points);
+    constexpr unsigned int quad_point_count = 4;
+    assert(polygon_count < 65536 / quad_point_count);
 
-    for(ii = 0; ii < cPolys; ++ii)
+    std::vector<Polygon> world_mesh;
+    world_mesh.reserve(polygon_count);
+
+    std::vector<Vector3f> vertex_array;
+    vertex_array.reserve(polygon_count * quad_point_count);
+
+    std::vector<Vector2f> texture_coords_array;
+    texture_coords_array.reserve(polygon_count * 4);
+
+    for(unsigned int ii = 0; ii < polygon_count; ++ii)
     {
         // TODO: 2016: If vertex arrays are shared across polygons, then indexes should just be an index into world_vertices.
-        for(unsigned int ix = 0; ix < num_points; ++ix)
-        {
-            Vector3f vertex;
-            is >> vertex;
-            map.vertex_array.emplace_back(vertex);
-        }
-
-        float scale_x, scale_y;
-        is >> scale_x >> scale_y;
-        map.texture_coords_array.push_back({0.0f,    0.0f});
-        map.texture_coords_array.push_back({scale_x, 0.0f});
-        map.texture_coords_array.push_back({0.0f,    scale_y});
-        map.texture_coords_array.push_back({scale_x, scale_y});
-
-        // Index buffer for two triangles.
-        std::vector<uint16_t> index_array;
-        index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 0));
-        index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 2));
-        index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 1));
-        index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 1));
-        index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 2));
-        index_array.emplace_back(static_cast<uint16_t>(ii * num_points + 3));
+        std::vector<Vector3f> vertex_subarray{read_vertex_array(is, quad_point_count)};
+        std::vector<Vector2f> texture_coords_subarray{read_scaled_quad_texture_coords_array(is)};
+        std::vector<uint16_t> index_subarray{generate_biased_quad_index_array(ii * quad_point_count)};
 
         unsigned int texture_id, lightmap_id;
         is >> texture_id >> lightmap_id;
-        map.world_mesh.push_back({std::move(index_array), texture_id, lightmap_id});
+
+        // TODO: 2016: Consider changing read* implementations to take a back_insert_iterator directly.
+        std::move(std::begin(vertex_subarray), std::end(vertex_subarray), std::back_inserter(vertex_array));
+        std::move(std::begin(texture_coords_subarray), std::end(texture_coords_subarray), std::back_inserter(texture_coords_array));
+        world_mesh.push_back({std::move(index_subarray), texture_id, lightmap_id});
     }
 
+    return std::make_tuple(world_mesh, vertex_array, texture_coords_array);
+}
+
+static std::vector<Implicit_surface> read_implicit_surfaces(std::istream& is)
+{
     unsigned int implicit_surface_count;
     is >> implicit_surface_count;
-    map.implicit_surfaces.reserve(implicit_surface_count);
+
+    std::vector<Implicit_surface> implicit_surfaces;
+    implicit_surfaces.reserve(implicit_surface_count);
 
     Control_point_patch bezier_control_points;
     bezier_control_points.reserve(quadratic_bezier_control_point_count * quadratic_bezier_control_point_count);
-    for(ii = 0; ii < implicit_surface_count; ++ii)
+    for(unsigned int ii = 0; ii < implicit_surface_count; ++ii)
     {
         unsigned int implicit_surface_texture_id;
         is >> implicit_surface_texture_id;
@@ -131,12 +150,21 @@ static Map load_world_data(
             bezier_control_points.emplace_back(control_point);
         }
 
-        map.implicit_surfaces.push_back({std::move(bezier_control_points), implicit_surface_texture_id, implicit_surface_origin});
+        implicit_surfaces.push_back({std::move(bezier_control_points), implicit_surface_texture_id, implicit_surface_origin});
     }
 
+    return implicit_surfaces;
+}
+
+static std::vector<Emitter> read_emitters(std::istream& is)
+{
     unsigned int emitter_count;
     is >> emitter_count;
-    for(ii = 0; ii < emitter_count; ++ii)
+
+    std::vector<Emitter> emitters;
+    emitters.reserve(emitter_count);
+
+    for(unsigned int ii = 0; ii < emitter_count; ++ii)
     {
         Vector3f origin;
         is >> origin;
@@ -147,11 +175,41 @@ static Map load_world_data(
         unsigned int texture_id;
         is >> texture_id;
 
-        Emitter emitter(origin, particle_count, particle_descriptor, texture_id);
-        map.emitters.emplace_back(emitter);
+        emitters.push_back({origin, particle_count, particle_descriptor, texture_id});
     }
 
-    return map;
+    return emitters;
+}
+
+static Map load_world_data(
+    std::istream& is,
+    std::vector<ImageProcessing::Bitmap>* texture_list)
+{
+    unsigned int cTextures;
+    is >> cTextures;
+
+    for(unsigned int ii = 0; ii < cTextures; ++ii)
+    {
+        // TODO: 2016: Nice buffer overrun here.  This is trusted data, but it should still read into a string.
+        char file_name[MAX_PATH];
+        is >> file_name;
+        texture_list->emplace_back(bitmap_from_file(file_name));
+    }
+
+    std::vector<Polygon> world_mesh;
+    std::vector<Vector3f> vertex_array;
+    std::vector<Vector2f> texture_coords_array;
+
+    std::tie(world_mesh, vertex_array, texture_coords_array) = read_world_mesh(is);
+
+    std::vector<Implicit_surface> implicit_surfaces = read_implicit_surfaces(is);
+    std::vector<Emitter> emitters = read_emitters(is);
+
+    return {std::move(world_mesh),
+            std::move(implicit_surfaces),
+            std::move(emitters),
+            std::move(vertex_array),
+            std::move(texture_coords_array)};
 }
 
 // TODO: Ensure file_name is UTF-8.
