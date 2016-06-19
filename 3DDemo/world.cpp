@@ -51,28 +51,28 @@ bool is_point_in_world(const Vector3f& point)
     return true;
 }
 
-static std::vector<Vector3f> read_vertex_array(std::istream& is, unsigned int num_points)
+template<typename Output_iterator>
+static void read_vertex_array(std::istream& is, unsigned int vertex_count, Output_iterator iter)
 {
-    std::vector<Vector3f> vertex_array;
-    for(unsigned int ix = 0; ix < num_points; ++ix)
+    for(unsigned int ix = 0; ix < vertex_count; ++ix)
     {
         Vector3f vertex;
         is >> vertex;
-        vertex_array.emplace_back(vertex);
-    }
 
-    return vertex_array;
+        *iter++ = vertex;
+    }
 }
 
-static std::vector<Vector2f> read_scaled_quad_texture_coords_array(std::istream& is)
+template<typename Output_iterator>
+static void read_scaled_quad_texture_coords_array(std::istream& is, Output_iterator iter)
 {
     float scale_x, scale_y;
     is >> scale_x >> scale_y;
 
-    return std::vector<Vector2f>{{0.0f,    0.0f},
-                                 {scale_x, 0.0f},
-                                 {0.0f,    scale_y},
-                                 {scale_x, scale_y}};
+    *iter++ = {0.0f,    0.0f};
+    *iter++ = {scale_x, 0.0f};
+    *iter++ = {0.0f,    scale_y};
+    *iter++ = {scale_x, scale_y};
 }
 
 static std::vector<uint16_t> generate_biased_quad_index_array(unsigned int bias)
@@ -103,19 +103,20 @@ static std::tuple<std::vector<Polygon>, std::vector<Vector3f>, std::vector<Vecto
     std::vector<Vector2f> texture_coords_array;
     texture_coords_array.reserve(polygon_count * 4);
 
+    const auto vertex_array_inserter = std::back_inserter(vertex_array);
+    const auto texture_coords_array_inserter = std::back_inserter(texture_coords_array);
+
     for(unsigned int ii = 0; ii < polygon_count; ++ii)
     {
         // TODO: 2016: If vertex arrays are shared across polygons, then indexes should just be an index into world_vertices.
-        std::vector<Vector3f> vertex_subarray{read_vertex_array(is, quad_point_count)};
-        std::vector<Vector2f> texture_coords_subarray{read_scaled_quad_texture_coords_array(is)};
+        read_vertex_array(is, quad_point_count, vertex_array_inserter);
+        read_scaled_quad_texture_coords_array(is, texture_coords_array_inserter);
+
         std::vector<uint16_t> index_subarray{generate_biased_quad_index_array(ii * quad_point_count)};
 
         unsigned int texture_id, lightmap_id;
         is >> texture_id >> lightmap_id;
 
-        // TODO: 2016: Consider changing read* implementations to take a back_insert_iterator directly.
-        std::move(std::begin(vertex_subarray), std::end(vertex_subarray), std::back_inserter(vertex_array));
-        std::move(std::begin(texture_coords_subarray), std::end(texture_coords_subarray), std::back_inserter(texture_coords_array));
         world_mesh.push_back({std::move(index_subarray), texture_id, lightmap_id});
     }
 
