@@ -29,11 +29,11 @@ static UINT_PTR game_message_loop(Map& map, WindowsCommon::Clock& clock, const W
 {
     Camera camera {make_vector(0.0f, 0.0f, 1.0f), 0.0f};
 
-    const unsigned int MAX_PATCH_COUNT_PER_DIMENSION = 9;
-    const unsigned int MAX_GENERATED_VERTICES_PER_DIMENSION = MAX_PATCH_COUNT_PER_DIMENSION + 1;
-    const unsigned int MAX_GENERATED_VERTICES = MAX_GENERATED_VERTICES_PER_DIMENSION * MAX_GENERATED_VERTICES_PER_DIMENSION;
-    const unsigned int MAX_GENERATED_INDICES_PER_DIMENSION = MAX_PATCH_COUNT_PER_DIMENSION;
-    const unsigned int MAX_GENERATED_INDICES = MAX_GENERATED_INDICES_PER_DIMENSION * MAX_GENERATED_INDICES_PER_DIMENSION * 6;
+    constexpr unsigned int MAX_PATCH_COUNT_PER_DIMENSION = 9;
+    constexpr unsigned int MAX_GENERATED_VERTICES_PER_DIMENSION = MAX_PATCH_COUNT_PER_DIMENSION + 1;
+    constexpr unsigned int MAX_GENERATED_VERTICES = MAX_GENERATED_VERTICES_PER_DIMENSION * MAX_GENERATED_VERTICES_PER_DIMENSION;
+    constexpr unsigned int MAX_GENERATED_INDICES_PER_DIMENSION = MAX_PATCH_COUNT_PER_DIMENSION;
+    constexpr unsigned int MAX_GENERATED_INDICES = MAX_GENERATED_INDICES_PER_DIMENSION * MAX_GENERATED_INDICES_PER_DIMENSION * 6;
 
     // Allocate the maximum size so reallocation never happens.
     const auto dynamic_mesh_count = map.implicit_surfaces.size();
@@ -72,6 +72,7 @@ static UINT_PTR game_message_loop(Map& map, WindowsCommon::Clock& clock, const W
         for(auto ii = 0u; ii < dynamic_mesh_count; ++ii)
         {
             // Set level-of-detail.
+            // TODO: 2016: This is a single LOD for the entire implicit surface, even if the surface could span LOD levels.
             unsigned int patch_count = (unsigned int)(MAX_GENERATED_VERTICES_PER_DIMENSION * 4 / (point_distance(camera.m_position, map.implicit_surfaces[ii].origin))) - 1;
             patch_count = std::min(std::max(2u, patch_count), MAX_PATCH_COUNT_PER_DIMENSION);
 
@@ -79,14 +80,12 @@ static UINT_PTR game_message_loop(Map& map, WindowsCommon::Clock& clock, const W
             {
                 dynamic_meshes.implicit_surfaces[ii].patch_count = patch_count;
 
-                const auto vertex_array = generate_quadratic_bezier_vertex_array(map.implicit_surfaces[ii].control_points, patch_count);
-                std::copy(std::cbegin(vertex_array), std::cend(vertex_array), std::begin(dynamic_meshes.vertex_array) + MAX_GENERATED_VERTICES * ii);
-
-                const auto texture_coords_array = generate_implicit_surface_texture_coords_array(patch_count);
-                std::copy(std::cbegin(texture_coords_array), std::cend(texture_coords_array), std::begin(dynamic_meshes.texture_coords_array) + MAX_GENERATED_VERTICES * ii);
-
-                const auto index_array = generate_implicit_surface_index_array(patch_count, MAX_GENERATED_VERTICES * ii);
-                std::copy(std::cbegin(index_array), std::cend(index_array), std::begin(dynamic_meshes.index_array) + MAX_GENERATED_INDICES * ii);
+                // TODO: 2016: One option is to have one global texture coords array for each LOD level,
+                // and generate that once.  That might be a size/speed tradeoff, and might not even be a
+                // size tradeoff... However, this only works when using a single LOD for the whole surface.
+                generate_quadratic_bezier_vertex_array(map.implicit_surfaces[ii].control_points, patch_count, std::begin(dynamic_meshes.vertex_array) + MAX_GENERATED_VERTICES * ii);
+                generate_implicit_surface_texture_coords_array(patch_count, std::begin(dynamic_meshes.texture_coords_array) + MAX_GENERATED_VERTICES * ii);
+                generate_implicit_surface_index_array(patch_count, MAX_GENERATED_VERTICES * ii, std::begin(dynamic_meshes.index_array) + MAX_GENERATED_INDICES * ii);
             }
         }
 
@@ -106,17 +105,11 @@ static UINT_PTR game_message_loop(Map& map, WindowsCommon::Clock& clock, const W
 
 class App_window : public WindowsCommon::OpenGL_window
 {
-public:
-    App_window(_In_ HINSTANCE instance, bool windowed) :
-        OpenGL_window(u8"3D Demo 1999 (Updated for C++11)", instance, windowed)
-    {
-    }
-
 protected:
-    int m_reference_x {};
-    int m_accumulated_x {};
+    int m_reference_x{};
+    int m_accumulated_x{};
 
-    LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) noexcept override
+    virtual LRESULT window_proc(_In_ HWND window, UINT message, WPARAM w_param, LPARAM l_param) noexcept override
     {
         LRESULT return_value = OpenGL_window::window_proc(window, message, w_param, l_param);
 
@@ -143,6 +136,12 @@ protected:
 
         return return_value;
     }
+
+public:
+    App_window(_In_ HINSTANCE instance, bool windowed) :
+        OpenGL_window(u8"3D Demo 1999 (Updated for C++11)", instance, windowed)
+    {
+    }
 };
 
 void app_run(_In_ HINSTANCE instance, int show_command)
@@ -150,7 +149,7 @@ void app_run(_In_ HINSTANCE instance, int show_command)
 #ifndef NDEBUG
     WindowsCommon::Scoped_FPU_exception_control fpu(_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID);
     fpu.enable(_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID);
-    auto current_control = fpu.current_control();
+    const auto current_control = fpu.current_control();
 #endif
 
     // Start load first, to kick off async reads.
@@ -168,10 +167,10 @@ void app_run(_In_ HINSTANCE instance, int show_command)
     WindowsCommon::lock_thread_to_first_processor();
     WindowsCommon::Clock clock;
 
-    WindowsCommon::Input_device keyboard(instance, app.m_state.window);
+    WindowsCommon::Input_device keyboard(instance, app.state().window);
 
-    ShowWindow(app.m_state.window, show_command);
-    UpdateWindow(app.m_state.window);
+    ShowWindow(app.state().window, show_command);
+    UpdateWindow(app.state().window);
 
     WindowsCommon::debug_validate_message_map();
     const auto return_code = game_message_loop(map, clock, keyboard);
@@ -190,7 +189,7 @@ void app_run(_In_ HINSTANCE instance, int show_command)
     //static_cast<int>(return_code);
     (void)return_code;  // Unreferenced variable.
 
-    assert((nullptr == app.m_state.window) && "window handle was never released.");
+    assert((nullptr == app.state().window) && "window handle was never released.");
 }
 
 }
