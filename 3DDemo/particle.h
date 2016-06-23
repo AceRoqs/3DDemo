@@ -26,22 +26,18 @@ struct Particle_descriptor
 
 struct Particle
 {
-    Particle() noexcept {}
+    float life_remaining_in_milliseconds;
 
-    // Amount of time remaining in milliseconds.
-    float life {};
-
-    // Default value doesn't matter until life is non-zero.
     Vector3f position;
     Vector3f velocity;
 };
 
 class Emitter
 {
-    Particle_descriptor m_descriptor;
-    std::vector<Particle> m_particles;
-    Vector3f m_position;
-    unsigned int m_texture_id;
+    Particle_descriptor m_descriptor{};
+    std::vector<Particle> m_particles{};
+    Vector3f m_position{};
+    unsigned int m_texture_id{};
 
 public:
     Emitter(const Vector3f& emitter_position, unsigned int particle_count, const Particle_descriptor& descriptor, unsigned int texture_id);

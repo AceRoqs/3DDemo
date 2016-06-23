@@ -7,7 +7,7 @@ namespace Demo
 
 static bool is_particle_alive(const Particle& particle) noexcept
 {
-    return particle.life > 0.0f;
+    return particle.life_remaining_in_milliseconds > 0.0f;
 }
 
 static Particle update_particle(
@@ -20,7 +20,7 @@ static Particle update_particle(
 
     // Decrement life first.  If the elapsed_milliseconds is larger than the life, then the
     // calculated velocity and position will be significantly outside the expected bounds.
-    particle.life -= elapsed_milliseconds;
+    particle.life_remaining_in_milliseconds -= elapsed_milliseconds;
     if(is_particle_alive(particle))
     {
         particle.position += particle.velocity * elapsed_milliseconds;
@@ -42,15 +42,29 @@ static Particle update_particle(
         particle.velocity.y() = distribution(generator) * descriptor.velocity_y_scale + descriptor.velocity_y_bias;
         particle.velocity.z() = distribution(generator) * descriptor.velocity_z_scale + descriptor.velocity_z_bias;
 
-        particle.life = distribution(generator) * descriptor.life;
+        particle.life_remaining_in_milliseconds = distribution(generator) * descriptor.life;
     }
 
     return particle;
 }
 
+static std::vector<Particle> generate_dead_particles(unsigned int particle_count)
+{
+    std::vector<Particle> particles;
+    particles.reserve(particle_count);
+
+    for(unsigned int ix = 0; ix < particle_count; ++ix)
+    {
+        // Only initialize life member variable.
+        particles.push_back({0.0f});
+    }
+
+    return particles;
+}
+
 Emitter::Emitter(const Vector3f& position, unsigned int particle_count, const Particle_descriptor& descriptor, unsigned int texture_id) :
     m_descriptor(descriptor),
-    m_particles(particle_count),
+    m_particles(generate_dead_particles(particle_count)),
     m_position(position),
     m_texture_id(texture_id)
 {
