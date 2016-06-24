@@ -52,20 +52,20 @@ void initialize_gl_constants()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    const double LEFTCLIP = -0.5;
-    const double RIGHTCLIP = 0.5;
-    const double BOTTOMCLIP = -0.5;
-    const double TOPCLIP = 0.5;
-    const double NEARCLIP = 0.5;
-    const double FARCLIP = 700.0;
+    constexpr double LEFTCLIP{-0.5};
+    constexpr double RIGHTCLIP{0.5};
+    constexpr double BOTTOMCLIP{-0.5};
+    constexpr double TOPCLIP{0.5};
+    constexpr double NEARCLIP{0.5};
+    constexpr double FARCLIP{700.0};
 
     // TODO: 2014: Use these bounds once the world geometry collision has knowledge of the clip planes.
-    //const double LEFTCLIP = -1.0;
-    //const double RIGHTCLIP = 1.0;
-    //const double BOTTOMCLIP = -1.0;
-    //const double TOPCLIP = 1.0;
-    //const double NEARCLIP = 1.0;
-    //const double FARCLIP = 512.0;
+    //constexpr double LEFTCLIP{-1.0};
+    //constexpr double RIGHTCLIP{1.0};
+    //constexpr double BOTTOMCLIP{-1.0};
+    //constexpr double TOPCLIP{1.0};
+    //constexpr double NEARCLIP{1.0};
+    //constexpr double FARCLIP{512.0};
     glFrustum(LEFTCLIP, RIGHTCLIP, BOTTOMCLIP, TOPCLIP, NEARCLIP, FARCLIP);
 
     glMatrixMode(GL_MODELVIEW);
@@ -155,21 +155,21 @@ static void draw_patch(const Patch& patch, const Camera& camera)
 static void draw_billboard(const Camera& camera, const Vector3f& position, float size, unsigned int texture_id)
 {
     // Vertices are specified in left-to-right order from upper-left corner.
-    const Vector3f vertex_array[] = {{ -size,  size, 0.0f },
-                                     {  size,  size, 0.0f },
-                                     { -size, -size, 0.0f },
-                                     {  size, -size, 0.0f }};
+    const Vector3f vertex_array[]{{ -size,  size, 0.0f },
+                                  {  size,  size, 0.0f },
+                                  { -size, -size, 0.0f },
+                                  {  size, -size, 0.0f }};
 
     // TODO: 2016: Like below, this texture_coords format could be generated, scaled, etc.
-    const Vector2f texture_coords_array[] = {{ 0.0f, 0.0f },
-                                             { 1.0f, 0.0f },
-                                             { 0.0f, 1.0f },
-                                             { 1.0f, 1.0f }};
+    constexpr Vector2f texture_coords_array[]{{ 0.0f, 0.0f },
+                                              { 1.0f, 0.0f },
+                                              { 0.0f, 1.0f },
+                                              { 1.0f, 1.0f }};
 
     // TODO: 2016: With billboards, patches, and world geometry in the same format, there
     // may be a helper function that can generate the index_array for either.
     // And its name IS JOHN CENA^H^H^H^H^H^H^H^H^Hgenerate_implicit_surface_index_array.
-    const uint16_t index_array[] = { 0, 2, 1, 1, 2, 3 };
+    constexpr uint16_t index_array[]{ 0, 2, 1, 1, 2, 3 };
 
     // Transform to location.
     // GL_MODELVIEW assumed.

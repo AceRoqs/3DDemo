@@ -13,10 +13,10 @@ Camera apply_actions(const std::vector<std::pair<float, Action>>& actions, const
     float new_z = new_camera.m_position.z();
 
     // These two values can be configurable for gameplay.
-    const auto walk_distance_per_tick = 0.045f;
-    const auto keyboard_rotational_speed_per_tick = 0.5f;
+    constexpr auto walk_distance_per_tick{0.045f};
+    constexpr auto keyboard_rotational_speed_per_tick{0.5f};
 
-    const auto radians_per_degree = static_cast<float>(M_PI * 2.0f / 360.0f);
+    constexpr auto radians_per_degree{static_cast<float>(M_PI * 2.0f / 360.0f)};
 
     // Accumulate all movement inputs before application.  This will prevent
     // two contractory button presses (e.g. strafe and forward) from bouncing

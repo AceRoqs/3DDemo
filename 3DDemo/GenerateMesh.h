@@ -13,7 +13,7 @@ Vector3f calculate_quadratic_bezier_vertex(const std::vector<Vector3f>& control_
 
 }
 
-const unsigned int quadratic_bezier_control_point_count = 3;
+constexpr unsigned int quadratic_bezier_control_point_count{3};
 typedef std::vector<Vector3f> Control_point_patch;
 
 // TODO: 2014: It would make much more sense to do this in a compute shader to generate the data where they are used.

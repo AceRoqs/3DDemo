@@ -8,11 +8,11 @@ namespace Demo
 // TODO: 2014: Come up with a new name since "action map" is also a DirectInput concept.
 // TODO: 2014: Can't move this to Action.cpp yet, since Action.cpp should eventually be platform
 // agnostic, and not tied to the DirectInput enums below.
-const static struct Action_map
+constexpr static struct Action_map
 {
     int input;
     Action action;
-} action_map[] =
+} action_map[]
 {
     DIK_NUMPAD2, Action::Move_backward,
     DIK_DOWN,    Action::Move_backward,
