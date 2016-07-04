@@ -8,7 +8,7 @@ namespace Direct3D9Common
 class DX9_exception : public WindowsCommon::HRESULT_exception
 {
 public:
-    DX9_exception(HRESULT hr, _In_z_ const char* file_name, int line);
+    DX9_exception(HRESULT hr, _In_z_ const char* file_name, int line) noexcept;
 };
 
 inline void check_dx9(HRESULT hr)

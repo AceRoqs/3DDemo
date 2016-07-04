@@ -7,7 +7,7 @@ namespace Direct3D9Common
 {
 
 _Use_decl_annotations_
-DX9_exception::DX9_exception(HRESULT hr, const char* file_name, int line) : HRESULT_exception(hr, file_name, line)
+DX9_exception::DX9_exception(HRESULT hr, const char* file_name, int line) noexcept : HRESULT_exception(hr, file_name, line)
 {
     try
     {
