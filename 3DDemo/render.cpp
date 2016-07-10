@@ -202,6 +202,21 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
     glDrawElements(GL_TRIANGLES, ARRAYSIZE(index_array), GL_UNSIGNED_SHORT, index_array);
 }
 
+// TODO: 2014: Drawing should be done against a vertex/index array.
+static void draw_emitter(const Emitter& emitter, const Camera& camera)
+{
+    initialize_default_projection_matrix();
+
+    glMatrixMode(GL_MODELVIEW);
+
+    // TODO: 2016: Particles need to be sorted by Z to blend correctly.
+    std::for_each(emitter.cbegin(), emitter.cend(), [&](const Particle& particle)
+    {
+        // TODO: 2016: size should be a member of Emitter.
+        draw_billboard(camera, particle.position, 0.25f, emitter.texture_id());
+    });
+}
+
 static void draw_sprite(float size, unsigned int texture_id)
 {
     // Vertices are specified in left-to-right order from upper-left corner.
@@ -239,21 +254,6 @@ static void draw_sprite(float size, unsigned int texture_id)
     glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords_array[0]);
 
     glDrawElements(GL_TRIANGLES, ARRAYSIZE(index_array), GL_UNSIGNED_SHORT, index_array);
-}
-
-// TODO: 2014: Drawing should be done against a vertex/index array.
-static void draw_emitter(const Emitter& emitter, const Camera& camera)
-{
-    initialize_default_projection_matrix();
-
-    glMatrixMode(GL_MODELVIEW);
-
-    // TODO: 2016: Particles need to be sorted by Z to blend correctly.
-    std::for_each(emitter.cbegin(), emitter.cend(), [&](const Particle& particle)
-    {
-        // TODO: 2016: size should be a member of Emitter.
-        draw_billboard(camera, particle.position, 0.25f, emitter.texture_id());
-    });
 }
 
 // TODO: modularize into separate functions
