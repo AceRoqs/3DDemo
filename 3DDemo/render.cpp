@@ -47,7 +47,9 @@ static void bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap, uns
                  bitmap.bitmap.data());
 }
 
-void initialize_gl_constants()
+// TODO: 2016: To optimize setting this state when it is already set, it might be useful to have
+// an enumeration on the type of projection set - default perspective, orthographic, custom, etc.
+static void initialize_default_projection_matrix()
 {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -67,8 +69,11 @@ void initialize_gl_constants()
     //constexpr double NEARCLIP{1.0};
     //constexpr double FARCLIP{512.0};
     glFrustum(LEFTCLIP, RIGHTCLIP, BOTTOMCLIP, TOPCLIP, NEARCLIP, FARCLIP);
+}
 
-    glMatrixMode(GL_MODELVIEW);
+void initialize_gl_constants()
+{
+    initialize_default_projection_matrix();
 
     // Enable backface culling and hidden surface removal.
     glEnable(GL_DEPTH_TEST);
@@ -99,7 +104,9 @@ static void draw_dynamic_meshes(const std::vector<Implicit_surface>& implicit_su
 {
     assert(implicit_surfaces.size() == dynamic_meshes.implicit_surfaces.size());
 
-    // GL_MODELVIEW assumed.
+    initialize_default_projection_matrix();
+
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
     glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
@@ -128,7 +135,9 @@ static void draw_dynamic_meshes(const std::vector<Implicit_surface>& implicit_su
 #if 0
 static void draw_patch(const Patch& patch, const Camera& camera)
 {
-    // GL_MODELVIEW assumed.
+    initialize_default_projection_matrix();
+
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
     glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
@@ -212,10 +221,12 @@ static void draw_sprite(float size, unsigned int texture_id)
     // And its name IS JOHN CENA^H^H^H^H^H^H^H^H^Hgenerate_implicit_surface_index_array.
     constexpr uint16_t index_array[]{ 0, 2, 1, 1, 2, 3 };
 
+    initialize_default_projection_matrix();
+
     // Project into the world.
     // TODO: 2016: This should be an orthographic projection.
     // TODO: 2016: Pass in the translated coordinates for the full rect.
-    // GL_MODELVIEW assumed.
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(-5, 5, -6);
 
@@ -233,6 +244,10 @@ static void draw_sprite(float size, unsigned int texture_id)
 // TODO: 2014: Drawing should be done against a vertex/index array.
 static void draw_emitter(const Emitter& emitter, const Camera& camera)
 {
+    initialize_default_projection_matrix();
+
+    glMatrixMode(GL_MODELVIEW);
+
     // TODO: 2016: Particles need to be sorted by Z to blend correctly.
     std::for_each(emitter.cbegin(), emitter.cend(), [&](const Particle& particle)
     {
@@ -253,7 +268,9 @@ void draw_map(
     // TODO: 2016: Each draw function should implement this  Move this to each draw function.
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
-    // GL_MODELVIEW assumed.
+    initialize_default_projection_matrix();
+
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glRotatef(camera.m_degrees, 0.0f, 1.0f, 0.0f);
     glTranslatef(camera.m_position.x(), camera.m_position.y(), camera.m_position.z());
