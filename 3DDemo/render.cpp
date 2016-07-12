@@ -241,13 +241,13 @@ static void draw_sprite(float size, unsigned int texture_id)
     // dependent drawing options.
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, 640, 0, 480, -1, 1);
+    glOrtho(0, 784, 0, 561, -1, 1);
 
     // Project into the world.
     // TODO: 2016: Pass in the translated coordinates for the full rect.
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(100.0f, 100.0f, 0.0f);
+    glTranslatef(128.0f, 128.0f, 0.0f);
 
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glDepthFunc(GL_ALWAYS);
@@ -322,7 +322,7 @@ void draw_map(
         draw_emitter(emitter, camera);
     });
 
-    draw_sprite(50, 8);
+    draw_sprite(128, 2);
 
     assert(glGetError() == GL_NO_ERROR);
 }
