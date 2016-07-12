@@ -220,10 +220,10 @@ static void draw_emitter(const Emitter& emitter, const Camera& camera)
 static void draw_sprite(float size, unsigned int texture_id)
 {
     // Vertices are specified in left-to-right order from upper-left corner.
-    const Vector3f vertex_array[]{{ -size,  size, 0.0f },
-                                  {  size,  size, 0.0f },
-                                  { -size, -size, 0.0f },
-                                  {  size, -size, 0.0f }};
+    const Vector3f vertex_array[]{{ 0.0f, size, 0.0f },
+                                  { size, size, 0.0f },
+                                  { 0.0f, 0.0f, 0.0f },
+                                  { size, 0.0f, 0.0f }};
 
     // TODO: 2016: Like below, this texture_coords format could be generated, scaled, etc.
     constexpr Vector2f texture_coords_array[]{{ 0.0f, 0.0f },
@@ -236,14 +236,18 @@ static void draw_sprite(float size, unsigned int texture_id)
     // And its name IS JOHN CENA^H^H^H^H^H^H^H^H^Hgenerate_implicit_surface_index_array.
     constexpr uint16_t index_array[]{ 0, 2, 1, 1, 2, 3 };
 
-    initialize_default_projection_matrix();
+    // TODO: 2016: Figure out something better than 640x480.  At the least, it should use the same
+    // dimensions as glViewport.  There should be both resolution independent and resolution
+    // dependent drawing options.
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0, 640, 0, 480, -1, 1);
 
     // Project into the world.
-    // TODO: 2016: This should be an orthographic projection.
     // TODO: 2016: Pass in the translated coordinates for the full rect.
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(-5, 5, -6);
+    glTranslatef(100.0f, 100.0f, 0.0f);
 
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glDepthFunc(GL_ALWAYS);
@@ -318,7 +322,7 @@ void draw_map(
         draw_emitter(emitter, camera);
     });
 
-    draw_sprite(1, 8);
+    draw_sprite(50, 8);
 
     assert(glGetError() == GL_NO_ERROR);
 }
