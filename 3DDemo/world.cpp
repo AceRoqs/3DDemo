@@ -182,19 +182,18 @@ static std::vector<Emitter> read_emitters(std::istream& is)
     return emitters;
 }
 
-static Map load_world_data(
-    std::istream& is,
-    std::vector<ImageProcessing::Bitmap>* texture_list)
+static Map load_world_data(std::istream& is)
 {
     unsigned int cTextures;
     is >> cTextures;
 
+    std::vector<ImageProcessing::Bitmap> texture_list;
     for(unsigned int ii = 0; ii < cTextures; ++ii)
     {
         // TODO: 2016: Nice buffer overrun here.  This is trusted data, but it should still read into a string.
         char file_name[MAX_PATH];
         is >> file_name;
-        texture_list->emplace_back(bitmap_from_file(file_name));
+        texture_list.emplace_back(bitmap_from_file(file_name));
     }
 
     std::vector<Polygon> world_mesh;
@@ -209,20 +208,20 @@ static Map load_world_data(
     return {std::move(world_mesh),
             std::move(implicit_surfaces),
             std::move(emitters),
+            std::move(texture_list),
             std::move(vertex_array),
             std::move(texture_coords_array)};
 }
 
 // TODO: Ensure file_name is UTF-8.
 Map start_load(
-    _In_z_ const char* file_name,
-    std::vector<ImageProcessing::Bitmap>* texture_list)
+    _In_z_ const char* file_name)
 {
     std::ifstream fis;
     fis.open(file_name);
     CHECK_EXCEPTION(fis.is_open(), std::string("Could not open file:") + file_name);
 
-    return load_world_data(fis, texture_list);
+    return load_world_data(fis);
 }
 
 }

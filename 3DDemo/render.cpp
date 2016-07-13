@@ -215,13 +215,15 @@ static void draw_emitter(const Emitter& emitter, const Camera& camera)
     });
 }
 
-static void draw_sprite(float size, unsigned int texture_id)
+static void draw_sprite(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id)
 {
+    const float float_xsize = static_cast<float>(bitmap.xsize);
+    const float float_ysize = static_cast<float>(bitmap.ysize);
     // Vertices are specified in left-to-right order from upper-left corner.
-    const Vector3f vertex_array[]{{ 0.0f, size, 0.0f },
-                                  { size, size, 0.0f },
-                                  { 0.0f, 0.0f, 0.0f },
-                                  { size, 0.0f, 0.0f }};
+    const Vector3f vertex_array[]{{ 0.0f,        float_ysize, 0.0f },
+                                  { float_xsize, float_ysize, 0.0f },
+                                  { 0.0f,               0.0f, 0.0f },
+                                  { float_xsize,        0.0f, 0.0f }};
 
     // TODO: 2016: Like below, this texture_coords format could be generated, scaled, etc.
     constexpr Vector2f texture_coords_array[]{{ 0.0f, 0.0f },
@@ -248,7 +250,7 @@ static void draw_sprite(float size, unsigned int texture_id)
     glTranslatef(128.0f, 128.0f, 0.0f);
 
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    glDepthFunc(GL_ALWAYS);
+    glDepthFunc(GL_ALWAYS);     // TODO: 2016: Turn off depth testing.
     glBlendFunc(GL_ONE, GL_ZERO);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
@@ -320,7 +322,7 @@ void draw_map(
         draw_emitter(emitter, camera);
     });
 
-    draw_sprite(128, 2);
+    draw_sprite(map.texture_list[2], 2);
 
     assert(glGetError() == GL_NO_ERROR);
 }

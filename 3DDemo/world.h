@@ -35,6 +35,10 @@ struct Map
     std::vector<Implicit_surface> implicit_surfaces;
     std::vector<Emitter> emitters;
 
+    // TODO: 2016: Expensive resources should be put into a resource manager
+    // so they can be shared between maps, be sparse, etc.
+    std::vector<ImageProcessing::Bitmap> texture_list;
+
     // TODO: This is a set of vertices for all of the polygons in the world_mesh.  The world shouldn't
     // be made of individual polygons in 2016, so this is maybe correct to put all world points in one vector
     // instead of individual arrays for each Polygon.  Just moving the vectors here to start to simplify the
@@ -64,9 +68,7 @@ struct Dynamic_meshes
 
 bool is_point_in_world(const struct Vector3f& point);
 
-Map start_load(
-    _In_z_ const char* file_name,
-    std::vector<ImageProcessing::Bitmap>* texture_list);
+Map start_load(_In_z_ const char* file_name);
 
 }
 
