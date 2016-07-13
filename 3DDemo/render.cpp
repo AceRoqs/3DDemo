@@ -73,8 +73,6 @@ static void initialize_default_projection_matrix()
 
 void initialize_gl_constants()
 {
-    initialize_default_projection_matrix();
-
     // Enable backface culling and hidden surface removal.
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
