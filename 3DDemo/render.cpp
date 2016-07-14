@@ -215,7 +215,7 @@ static void draw_emitter(const Emitter& emitter, const Camera& camera)
     });
 }
 
-static void draw_sprite(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id)
+static void draw_sprite_at_position(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id, unsigned short x_position, unsigned short y_position)
 {
     const float float_xsize = static_cast<float>(bitmap.xsize);
     const float float_ysize = static_cast<float>(bitmap.ysize);
@@ -244,10 +244,9 @@ static void draw_sprite(const ImageProcessing::Bitmap& bitmap, unsigned int text
     glOrtho(0, 784, 0, 561, -1, 1);
 
     // Project into the world.
-    // TODO: 2016: Pass in the translated coordinates for the full rect.
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(128.0f, 128.0f, 0.0f);
+    glTranslatef(x_position, y_position, 0.0f);
 
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glDepthFunc(GL_ALWAYS);     // TODO: 2016: Turn off depth testing.
@@ -322,7 +321,7 @@ void draw_map(
         draw_emitter(emitter, camera);
     });
 
-    draw_sprite(map.texture_list[2], 2);
+    draw_sprite_at_position(map.texture_list[2], 2, 128, 128);
 
     assert(glGetError() == GL_NO_ERROR);
 }
