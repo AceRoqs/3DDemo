@@ -219,9 +219,6 @@ static void draw_emitter(const Emitter& emitter, const Camera& camera)
 // and is positioned with 0,0 being at the upper-left of the screen.
 static void draw_sprite_at_position(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id, unsigned short x_position, unsigned short y_position)
 {
-    constexpr auto window_width = 784.0f;
-    constexpr auto window_height = 561.0f;
-
     const float float_xsize = static_cast<float>(bitmap.xsize);
     const float float_ysize = static_cast<float>(bitmap.ysize);
 
@@ -230,38 +227,39 @@ static void draw_sprite_at_position(const ImageProcessing::Bitmap& bitmap, unsig
                                   { float_xsize, float_ysize, 0.0f },
                                   { 0.0f,                0.0f, 0.0f },
                                   { float_xsize,         0.0f, 0.0f }};
+    glVertexPointer(3, GL_FLOAT, 0, &vertex_array[0]);
 
     // TODO: 2016: Like below, this texture_coords format could be generated, scaled, etc.
     constexpr Vector2f texture_coords_array[]{{ 0.0f, 0.0f },
                                               { 1.0f, 0.0f },
                                               { 0.0f, 1.0f },
                                               { 1.0f, 1.0f }};
-
-    // TODO: 2016: With billboards, patches, and world geometry in the same format, there
-    // may be a helper function that can generate the index_array for either.
-    // And its name IS JOHN CENA^H^H^H^H^H^H^H^H^Hgenerate_implicit_surface_index_array.
-    constexpr uint16_t index_array[]{ 0, 2, 1, 1, 2, 3 };
-
-    // TODO: 2016: Figure out something better than 640x480.  At the least, it should use the same
-    // dimensions as glViewport.  There should be both resolution independent and resolution
-    // dependent drawing options.
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0.0f, window_width, 0.0f, window_height, -1.0f, 1.0f);
-
-    // Project into the world.
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glTranslatef(x_position, window_height - (y_position + bitmap.ysize), 0.0f);
+    glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords_array[0]);
 
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glDepthFunc(GL_ALWAYS);     // TODO: 2016: Turn off depth testing.
     glBlendFunc(GL_ONE, GL_ZERO);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
-    glVertexPointer(3, GL_FLOAT, 0, &vertex_array[0]);
-    glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords_array[0]);
+    constexpr auto window_width = 784.0f;
+    constexpr auto window_height = 561.0f;
 
+    // TODO: 2016: Figure out something better than 640x480.  At the least, it should use the same
+    // dimensions as glViewport.  There should be both resolution independent and resolution
+    // dependent drawing options.
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0.0f, window_width, 0.0f - window_height, 0.0f, -1.0f, 1.0f);
+
+    // Project into the world.
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(x_position, 0.0f - (y_position + bitmap.ysize), 0.0f);
+
+    // TODO: 2016: With billboards, patches, and world geometry in the same format, there
+    // may be a helper function that can generate the index_array for either.
+    // And its name IS JOHN CENA^H^H^H^H^H^H^H^H^Hgenerate_implicit_surface_index_array.
+    constexpr uint16_t index_array[]{ 0, 2, 1, 1, 2, 3 };
     glDrawElements(GL_TRIANGLES, ARRAYSIZE(index_array), GL_UNSIGNED_SHORT, index_array);
 }
 
