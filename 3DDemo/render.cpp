@@ -9,6 +9,7 @@
 namespace Demo
 {
 
+// TODO: 2016: glGenTextures to get the texture IDs.
 static void bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id)
 {
     glEnable(GL_TEXTURE_2D);
@@ -215,24 +216,7 @@ static void draw_emitter(const Emitter& emitter, const Camera& camera)
     });
 }
 
-// TODO: 2016: Can bitmap be eliminated as a parameter?
-static void draw_preset_quad_at_position(const ImageProcessing::Bitmap& bitmap, unsigned short x_position, unsigned short y_position)
-{
-    // Project into the world.
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glTranslatef(x_position, 0.0f - (y_position + bitmap.ysize), 0.0f);
-
-    // TODO: 2016: With billboards, patches, and world geometry in the same format, there
-    // may be a helper function that can generate the index_array for either.
-    // And its name IS JOHN CENA^H^H^H^H^H^H^H^H^Hgenerate_implicit_surface_index_array.
-    constexpr uint16_t index_array[]{ 0, 2, 1, 1, 2, 3 };
-    glDrawElements(GL_TRIANGLES, ARRAYSIZE(index_array), GL_UNSIGNED_SHORT, index_array);
-}
-
-// x_position and y_position are the coordinates of the upper-left corner of the image,
-// and is positioned with 0,0 being at the upper-left of the screen.
-static void draw_sprite_at_position(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id, unsigned short x_position, unsigned short y_position)
+static void draw_sprite_group_instance_at_position(const ImageProcessing::Bitmap& bitmap, unsigned short x_position, unsigned short y_position)
 {
     const float float_xsize = static_cast<float>(bitmap.xsize);
     const float float_ysize = static_cast<float>(bitmap.ysize);
@@ -251,6 +235,21 @@ static void draw_sprite_at_position(const ImageProcessing::Bitmap& bitmap, unsig
                                               { 1.0f, 1.0f }};
     glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords_array[0]);
 
+    // Project into the world.
+    // TODO: 2016: Can bitmap be eliminated as a parameter?
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(x_position, 0.0f - (y_position + bitmap.ysize), 0.0f);
+
+    // TODO: 2016: With billboards, patches, and world geometry in the same format, there
+    // may be a helper function that can generate the index_array for either.
+    // And its name IS JOHN CENA^H^H^H^H^H^H^H^H^Hgenerate_implicit_surface_index_array.
+    constexpr uint16_t index_array[]{ 0, 2, 1, 1, 2, 3 };
+    glDrawElements(GL_TRIANGLES, ARRAYSIZE(index_array), GL_UNSIGNED_SHORT, index_array);
+}
+
+static void set_sprite_group_parameters(unsigned int texture_id)
+{
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glDepthFunc(GL_ALWAYS);     // TODO: 2016: Turn off depth testing.
     glBlendFunc(GL_ONE, GL_ZERO);
@@ -265,8 +264,14 @@ static void draw_sprite_at_position(const ImageProcessing::Bitmap& bitmap, unsig
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0.0f, window_width, 0.0f - window_height, 0.0f, -1.0f, 1.0f);
+}
 
-    draw_preset_quad_at_position(bitmap, x_position, y_position);
+// x_position and y_position are the coordinates of the upper-left corner of the image,
+// and is positioned with 0,0 being at the upper-left of the screen.
+static void draw_sprite_at_position(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id, unsigned short x_position, unsigned short y_position)
+{
+    set_sprite_group_parameters(texture_id);
+    draw_sprite_group_instance_at_position(bitmap, x_position, y_position);
 }
 
 // TODO: modularize into separate functions
