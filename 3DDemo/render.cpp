@@ -216,7 +216,7 @@ static void draw_emitter(const Emitter& emitter, const Camera& camera)
     });
 }
 
-static void draw_sprite_group_instance_at_position(const ImageProcessing::Bitmap& bitmap, unsigned short x_position, unsigned short y_position)
+static void draw_sprite_group_instance_at_position(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id, unsigned short x_position, unsigned short y_position)
 {
     const float float_xsize = static_cast<float>(bitmap.xsize);
     const float float_ysize = static_cast<float>(bitmap.ysize);
@@ -235,6 +235,8 @@ static void draw_sprite_group_instance_at_position(const ImageProcessing::Bitmap
                                               { 1.0f, 1.0f }};
     glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords_array[0]);
 
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+
     // Project into the world.
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -247,12 +249,11 @@ static void draw_sprite_group_instance_at_position(const ImageProcessing::Bitmap
     glDrawElements(GL_TRIANGLES, ARRAYSIZE(index_array), GL_UNSIGNED_SHORT, index_array);
 }
 
-static void set_sprite_group_parameters(unsigned int texture_id)
+static void set_sprite_group_parameters()
 {
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glDepthFunc(GL_ALWAYS);     // TODO: 2016: Turn off depth testing.
     glBlendFunc(GL_ONE, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
 
     constexpr auto window_width = 784.0f;
     constexpr auto window_height = 561.0f;
@@ -269,8 +270,8 @@ static void set_sprite_group_parameters(unsigned int texture_id)
 // and is positioned with 0,0 being at the upper-left of the screen.
 static void draw_sprite_at_position(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id, unsigned short x_position, unsigned short y_position)
 {
-    set_sprite_group_parameters(texture_id);
-    draw_sprite_group_instance_at_position(bitmap, x_position, y_position);
+    set_sprite_group_parameters();
+    draw_sprite_group_instance_at_position(bitmap, texture_id, x_position, y_position);
 }
 
 // TODO: modularize into separate functions
