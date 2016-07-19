@@ -222,10 +222,10 @@ static void draw_sprite_group_instance_at_position(const ImageProcessing::Bitmap
     const float float_ysize = static_cast<float>(bitmap.ysize);
 
     // Vertices are specified in left-to-right order from upper-left corner.
-    const Vector3f vertex_array[]{{ 0.0f,        float_ysize, 0.0f },
-                                  { float_xsize, float_ysize, 0.0f },
-                                  { 0.0f,               0.0f, 0.0f },
-                                  { float_xsize,        0.0f, 0.0f }};
+    const Vector3f vertex_array[]{{ 0.0f,               0.0f, 0.0f },
+                                  { float_xsize,        0.0f, 0.0f },
+                                  { 0.0f,        float_ysize, 0.0f },
+                                  { float_xsize, float_ysize, 0.0f }};
     glVertexPointer(3, GL_FLOAT, 0, &vertex_array[0]);
 
     // TODO: 2016: Like below, this texture_coords format could be generated, scaled, etc.
@@ -236,10 +236,9 @@ static void draw_sprite_group_instance_at_position(const ImageProcessing::Bitmap
     glTexCoordPointer(2, GL_FLOAT, 0, &texture_coords_array[0]);
 
     // Project into the world.
-    // TODO: 2016: Can bitmap be eliminated as a parameter?
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(x_position, 0.0f - (y_position + bitmap.ysize), 0.0f);
+    glTranslatef(x_position, y_position, 0.0f);
 
     // TODO: 2016: With billboards, patches, and world geometry in the same format, there
     // may be a helper function that can generate the index_array for either.
@@ -263,7 +262,7 @@ static void set_sprite_group_parameters(unsigned int texture_id)
     // dependent drawing options.
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0.0f, window_width, 0.0f - window_height, 0.0f, -1.0f, 1.0f);
+    glOrtho(0.0f, window_width, window_height, 0.0f, -1.0f, 1.0f);
 }
 
 // x_position and y_position are the coordinates of the upper-left corner of the image,
