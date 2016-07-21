@@ -9,9 +9,11 @@
 namespace Demo
 {
 
-// TODO: 2016: glGenTextures to get the texture IDs.
-static void bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id)
+static unsigned int bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap)
 {
+    unsigned int texture_id;
+    glGenTextures(1, &texture_id);
+
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -46,6 +48,8 @@ static void bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bitmap, uns
                  GL_RGB,
                  GL_UNSIGNED_BYTE,
                  bitmap.bitmap.data());
+
+    return texture_id;
 }
 
 // TODO: 2016: To optimize setting this state when it is already set, it might be useful to have
@@ -87,19 +91,36 @@ void initialize_gl_constants()
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-void initialize_gl_world_data(
+std::vector<unsigned int> initialize_gl_world_data(
     const std::vector<ImageProcessing::Bitmap>& texture_list)
 {
+    std::vector<unsigned int> texture_ids;
+    texture_ids.reserve(texture_list.size());
+
     // Load all texture data.
     assert(texture_list.size() <= UINT_MAX);
     const auto size = static_cast<unsigned int>(texture_list.size());
     for(unsigned int ix = 0; ix < size; ++ix)
     {
-        bind_bitmap_to_gl_texture(texture_list[ix], ix);
+        unsigned int id = bind_bitmap_to_gl_texture(texture_list[ix]);
+        texture_ids.emplace_back(id);
     }
+
+    return texture_ids;
 }
 
-static void draw_dynamic_meshes(const std::vector<Implicit_surface>& implicit_surfaces, const Dynamic_meshes& dynamic_meshes, const Camera& camera)
+void deinitialize_gl_world_data(const std::vector<unsigned int>& texture_ids)
+{
+    glBindTexture(GL_TEXTURE_2D, 0);
+    assert(texture_ids.size() <= UINT_MAX);
+    glDeleteTextures(static_cast<unsigned int>(texture_ids.size()), &texture_ids[0]);
+}
+
+static void draw_dynamic_meshes(
+    const std::vector<Implicit_surface>& implicit_surfaces,
+    const std::vector<unsigned int>& texture_ids,
+    const Dynamic_meshes& dynamic_meshes,
+    const Camera& camera)
 {
     assert(implicit_surfaces.size() == dynamic_meshes.implicit_surfaces.size());
 
@@ -121,7 +142,7 @@ static void draw_dynamic_meshes(const std::vector<Implicit_surface>& implicit_su
     const auto implicit_surface_count = static_cast<unsigned int>(implicit_surfaces.size());
     for(auto ix = 0u; ix < implicit_surface_count; ++ix)
     {
-        glBindTexture(GL_TEXTURE_2D, implicit_surfaces[ix].texture_id);
+        glBindTexture(GL_TEXTURE_2D, texture_ids[implicit_surfaces[ix].texture_index]);
 
         assert(dynamic_meshes.index_array.size() < INT_MAX);    // GLsizei == int
         glDrawElements(GL_TRIANGLES,
@@ -144,7 +165,7 @@ static void draw_patch(const Patch& patch, const Camera& camera)
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glDepthFunc(GL_LESS);
     glBlendFunc(GL_ONE, GL_ZERO);
-    glBindTexture(GL_TEXTURE_2D, patch.texture_id);
+    glBindTexture(GL_TEXTURE_2D, patch.texture_index);
 
     glVertexPointer(3, GL_FLOAT, 0, patch.vertex_array.data());
     glTexCoordPointer(2, GL_FLOAT, 0, patch.texture_coords_array.data());
@@ -202,7 +223,7 @@ static void draw_billboard(const Camera& camera, const Vector3f& position, float
 }
 
 // TODO: 2014: Drawing should be done against a vertex/index array.
-static void draw_emitter(const Emitter& emitter, const Camera& camera)
+static void draw_emitter(const Emitter& emitter, const std::vector<unsigned int>& texture_ids, const Camera& camera)
 {
     initialize_default_projection_matrix();
 
@@ -212,7 +233,7 @@ static void draw_emitter(const Emitter& emitter, const Camera& camera)
     std::for_each(emitter.cbegin(), emitter.cend(), [&](const Particle& particle)
     {
         // TODO: 2016: size should be a member of Emitter.
-        draw_billboard(camera, particle.position, 0.25f, emitter.texture_id());
+        draw_billboard(camera, particle.position, 0.25f, texture_ids[emitter.texture_index()]);
     });
 }
 
@@ -277,6 +298,7 @@ static void draw_sprite_at_position(const ImageProcessing::Bitmap& bitmap, unsig
 // TODO: modularize into separate functions
 void draw_map(
     const Map& map,
+    const std::vector<unsigned int>& texture_ids,
     const Dynamic_meshes& dynamic_meshes,
     const Camera& camera)
 {
@@ -306,12 +328,12 @@ void draw_map(
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glDepthFunc(GL_LESS);
         glBlendFunc(GL_ONE, GL_ZERO);
-        glBindTexture(GL_TEXTURE_2D, iter->texture_id);
+        glBindTexture(GL_TEXTURE_2D, texture_ids[iter->texture_index]);
 
         assert(iter->index_array.size() <= INT_MAX);
         glDrawElements(GL_TRIANGLES, static_cast<int>(iter->index_array.size()), GL_UNSIGNED_SHORT, iter->index_array.data());
 
-        if(iter->lightmap_id == 0)
+        if(iter->lightmap_index == 0)
         {
             continue;
         }
@@ -319,24 +341,24 @@ void draw_map(
         glColor4f(0.0f, 0.0f, 0.0f, 0.25f);
         glDepthFunc(GL_EQUAL);
         glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
-        glBindTexture(GL_TEXTURE_2D, iter->lightmap_id);
+        glBindTexture(GL_TEXTURE_2D, texture_ids[iter->lightmap_index]);
 
         glDrawElements(GL_TRIANGLES, static_cast<int>(iter->index_array.size()), GL_UNSIGNED_SHORT, iter->index_array.data());
     }
 
     //(void)dynamic_meshes;
-    draw_dynamic_meshes(map.implicit_surfaces, dynamic_meshes, camera);
+    draw_dynamic_meshes(map.implicit_surfaces, texture_ids, dynamic_meshes, camera);
     //(void)patch1;
     //(void)patch2;
     //draw_patch(patch1, camera);
     //draw_patch(patch2, camera);
 
-    std::for_each(std::cbegin(map.emitters), std::cend(map.emitters), [&camera](const Emitter& emitter)
+    std::for_each(std::cbegin(map.emitters), std::cend(map.emitters), [&camera, &texture_ids](const Emitter& emitter)
     {
-        draw_emitter(emitter, camera);
+        draw_emitter(emitter, texture_ids, camera);
     });
 
-    draw_sprite_at_position(map.texture_list[2], 2, 128, 128);
+    draw_sprite_at_position(map.texture_list[2], texture_ids[2], 128, 128);
 
     assert(glGetError() == GL_NO_ERROR);
 }

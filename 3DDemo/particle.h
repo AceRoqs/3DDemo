@@ -37,14 +37,14 @@ class Emitter
     Particle_descriptor m_descriptor{};
     std::vector<Particle> m_particles{};
     Vector3f m_position{};
-    unsigned int m_texture_id{};
+    unsigned int m_texture_index{};
 
 public:
-    Emitter(const Vector3f& emitter_position, unsigned int particle_count, const Particle_descriptor& descriptor, unsigned int texture_id);
+    Emitter(const Vector3f& emitter_position, unsigned int particle_count, const Particle_descriptor& descriptor, unsigned int texture_index);
 
     void update(float elapsed_milliseconds);
 
-    unsigned int texture_id() const noexcept;
+    unsigned int texture_index() const noexcept;
 
     std::vector<Particle>::const_iterator cbegin() const;
     std::vector<Particle>::const_iterator cend() const;

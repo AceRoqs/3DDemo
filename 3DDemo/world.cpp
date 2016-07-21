@@ -114,10 +114,10 @@ static std::tuple<std::vector<Polygon>, std::vector<Vector3f>, std::vector<Vecto
 
         std::vector<uint16_t> index_subarray{generate_biased_quad_index_array(ii * quad_point_count)};
 
-        unsigned int texture_id, lightmap_id;
-        is >> texture_id >> lightmap_id;
+        unsigned int texture_index, lightmap_index;
+        is >> texture_index >> lightmap_index;
 
-        world_mesh.push_back({std::move(index_subarray), texture_id, lightmap_id});
+        world_mesh.push_back({std::move(index_subarray), texture_index, lightmap_index});
     }
 
     return std::make_tuple(world_mesh, vertex_array, texture_coords_array);
@@ -135,8 +135,8 @@ static std::vector<Implicit_surface> read_implicit_surfaces(std::istream& is)
     bezier_control_points.reserve(quadratic_bezier_control_point_count * quadratic_bezier_control_point_count);
     for(unsigned int ii = 0; ii < implicit_surface_count; ++ii)
     {
-        unsigned int implicit_surface_texture_id;
-        is >> implicit_surface_texture_id;
+        unsigned int implicit_surface_texture_index;
+        is >> implicit_surface_texture_index;
 
         Vector3f implicit_surface_origin;
         is >> implicit_surface_origin;
@@ -151,7 +151,7 @@ static std::vector<Implicit_surface> read_implicit_surfaces(std::istream& is)
             bezier_control_points.emplace_back(control_point);
         }
 
-        implicit_surfaces.push_back({std::move(bezier_control_points), implicit_surface_texture_id, implicit_surface_origin});
+        implicit_surfaces.push_back({std::move(bezier_control_points), implicit_surface_texture_index, implicit_surface_origin});
     }
 
     return implicit_surfaces;
@@ -173,10 +173,10 @@ static std::vector<Emitter> read_emitters(std::istream& is)
         unsigned int particle_count;
         is >> particle_count;
 
-        unsigned int texture_id;
-        is >> texture_id;
+        unsigned int texture_index;
+        is >> texture_index;
 
-        emitters.push_back({origin, particle_count, particle_descriptor, texture_id});
+        emitters.push_back({origin, particle_count, particle_descriptor, texture_index});
     }
 
     return emitters;

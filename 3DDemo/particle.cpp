@@ -62,11 +62,11 @@ static std::vector<Particle> generate_dead_particles(unsigned int particle_count
     return particles;
 }
 
-Emitter::Emitter(const Vector3f& position, unsigned int particle_count, const Particle_descriptor& descriptor, unsigned int texture_id) :
+Emitter::Emitter(const Vector3f& position, unsigned int particle_count, const Particle_descriptor& descriptor, unsigned int texture_index) :
     m_descriptor(descriptor),
     m_particles(generate_dead_particles(particle_count)),
     m_position(position),
-    m_texture_id(texture_id)
+    m_texture_index(texture_index)
 {
 }
 
@@ -81,9 +81,9 @@ void Emitter::update(float elapsed_milliseconds)
     std::transform(std::begin(m_particles), std::end(m_particles), std::begin(m_particles), update);
 }
 
-unsigned int Emitter::texture_id() const noexcept
+unsigned int Emitter::texture_index() const noexcept
 {
-    return m_texture_id;
+    return m_texture_index;
 }
 
 std::vector<Particle>::const_iterator Emitter::cbegin() const

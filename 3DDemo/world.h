@@ -12,14 +12,14 @@ struct Polygon
 {
     std::vector<uint16_t> index_array;
 
-    unsigned int texture_id;                        // Texture ID.
-    unsigned int lightmap_id;                       // Index into lightmap list.
+    unsigned int texture_index;                     // Texture ID.
+    unsigned int lightmap_index;                    // Index into lightmap list.
 };
 
 struct Implicit_surface
 {
     Control_point_patch control_points;
-    unsigned int texture_id;
+    unsigned int texture_index;
     Vector3f origin;
 };
 
@@ -51,7 +51,7 @@ struct Map
     //std::vector<struct Vector3f> vertices;
     //std::vector<struct Vector3f> vertices2;
     //unsigned int patch_count;
-    //unsigned int patch_texture_id;
+    //unsigned int patch_texture_index;
     //class Emitter emitter;
 };
 
