@@ -94,7 +94,7 @@ static UINT_PTR game_message_loop(Map& map, const std::vector<unsigned int>& tex
             emitter.update(elapsed_milliseconds);
         });
 
-        draw_map(map, texture_ids, dynamic_meshes, camera);
+        Renderer::draw_map(map, texture_ids, dynamic_meshes, camera);
 
         const HDC device_context = wglGetCurrentDC();
         SwapBuffers(device_context);
@@ -158,8 +158,8 @@ void app_run(_In_ HINSTANCE instance, int show_command)
     App_window app(instance, true);
 
     // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
-    initialize_gl_constants();
-    const auto texture_ids = initialize_gl_world_data(map.texture_list);
+    Renderer::initialize_gl_constants();
+    const auto texture_ids = Renderer::initialize_gl_world_data(map.texture_list);
 
     // Set thread affinity to the first available processor, so that QPC
     // will always be done on the same processor.
@@ -175,7 +175,7 @@ void app_run(_In_ HINSTANCE instance, int show_command)
     const auto return_code = game_message_loop(map, texture_ids, clock, keyboard);
 
     // TODO: 2016: This is not called if an exception happens.
-    deinitialize_gl_world_data(texture_ids);
+    Renderer::deinitialize_gl_world_data(texture_ids);
 
 #ifndef NDEBUG
     assert(fpu.current_control() == current_control);

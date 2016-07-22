@@ -76,7 +76,7 @@ static void initialize_default_projection_matrix()
     glFrustum(LEFTCLIP, RIGHTCLIP, BOTTOMCLIP, TOPCLIP, NEARCLIP, FARCLIP);
 }
 
-void initialize_gl_constants()
+void Renderer::initialize_gl_constants()
 {
     // Enable backface culling and hidden surface removal.
     glEnable(GL_DEPTH_TEST);
@@ -91,7 +91,7 @@ void initialize_gl_constants()
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-std::vector<unsigned int> initialize_gl_world_data(
+std::vector<unsigned int> Renderer::initialize_gl_world_data(
     const std::vector<ImageProcessing::Bitmap>& texture_list)
 {
     std::vector<unsigned int> texture_ids;
@@ -109,7 +109,7 @@ std::vector<unsigned int> initialize_gl_world_data(
     return texture_ids;
 }
 
-void deinitialize_gl_world_data(const std::vector<unsigned int>& texture_ids)
+void Renderer::deinitialize_gl_world_data(const std::vector<unsigned int>& texture_ids)
 {
     glBindTexture(GL_TEXTURE_2D, 0);
     assert(texture_ids.size() <= UINT_MAX);
@@ -296,7 +296,7 @@ static void draw_sprite_at_position(const ImageProcessing::Bitmap& bitmap, unsig
 }
 
 // TODO: modularize into separate functions
-void draw_map(
+void Renderer::draw_map(
     const Map& map,
     const std::vector<unsigned int>& texture_ids,
     const Dynamic_meshes& dynamic_meshes,
