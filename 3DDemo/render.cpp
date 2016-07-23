@@ -76,7 +76,7 @@ static void initialize_default_projection_matrix()
     glFrustum(LEFTCLIP, RIGHTCLIP, BOTTOMCLIP, TOPCLIP, NEARCLIP, FARCLIP);
 }
 
-void Renderer::initialize_gl_constants()
+Renderer::Renderer()
 {
     // Enable backface culling and hidden surface removal.
     glEnable(GL_DEPTH_TEST);

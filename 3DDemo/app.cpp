@@ -61,7 +61,7 @@ static UINT_PTR game_message_loop(Map& map, const std::vector<unsigned int>& tex
         }
 
         const float elapsed_milliseconds = clock.ellapsed_milliseconds();
-        PortableRuntime::dprintf("QPC: %f\n", elapsed_milliseconds);
+        PortableRuntime::dprintf("QPC: %f ms\n", elapsed_milliseconds);
 
         WindowsCommon::Keyboard_state keyboard_state;
         keyboard.get_input(&keyboard_state);
@@ -156,9 +156,8 @@ void app_run(_In_ HINSTANCE instance, int show_command)
     Map map = start_load("polydefs.txt");
 
     App_window app(instance, true);
+    Renderer renderer;
 
-    // TODO: 2014: does this need to be reinitialized if the video engine is reinitialized?
-    Renderer::initialize_gl_constants();
     const auto texture_ids = Renderer::initialize_gl_world_data(map.texture_list);
 
     // Set thread affinity to the first available processor, so that QPC
