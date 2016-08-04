@@ -165,10 +165,10 @@ void app_run(_In_ HINSTANCE instance, int show_command)
     WindowsCommon::lock_thread_to_first_processor();
     WindowsCommon::Clock clock;
 
-    WindowsCommon::Input_device keyboard(instance, app.state().window);
+    WindowsCommon::Input_device keyboard(instance, app.window());
 
-    ShowWindow(app.state().window, show_command);
-    UpdateWindow(app.state().window);
+    ShowWindow(app.window(), show_command);
+    UpdateWindow(app.window());
 
     WindowsCommon::debug_validate_message_map();
     const auto return_code = game_message_loop(map, texture_ids, clock, keyboard);
@@ -190,7 +190,7 @@ void app_run(_In_ HINSTANCE instance, int show_command)
     //static_cast<int>(return_code);
     (void)return_code;  // Unreferenced variable.
 
-    assert((nullptr == app.state().window) && "window handle was never released.");
+    assert((nullptr == app.window()) && "window handle was never released.");
 }
 
 }
