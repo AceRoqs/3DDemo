@@ -152,6 +152,8 @@ void app_run(_In_ HINSTANCE instance, int show_command)
     const auto current_control = fpu.current_control();
 #endif
 
+    WindowsCommon::dprintf_system_cpu_set_information();
+
     // Start load first, to kick off async reads.
     Map map = start_load("polydefs.txt");
 
