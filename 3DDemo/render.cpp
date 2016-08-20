@@ -42,8 +42,8 @@ static unsigned int bind_bitmap_to_gl_texture(const ImageProcessing::Bitmap& bit
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  GL_RGB,
-                 bitmap.xsize,
-                 bitmap.ysize,
+                 bitmap.width,
+                 bitmap.height,
                  0,
                  GL_RGB,
                  GL_UNSIGNED_BYTE,
@@ -239,14 +239,14 @@ static void draw_emitter(const Emitter& emitter, const std::vector<unsigned int>
 
 static void draw_sprite_group_instance_at_position(const ImageProcessing::Bitmap& bitmap, unsigned int texture_id, unsigned short x_position, unsigned short y_position)
 {
-    const float float_xsize = static_cast<float>(bitmap.xsize);
-    const float float_ysize = static_cast<float>(bitmap.ysize);
+    const float float_width = static_cast<float>(bitmap.width);
+    const float float_height = static_cast<float>(bitmap.height);
 
     // Vertices are specified in left-to-right order from upper-left corner.
-    const Vector3f vertex_array[]{{ 0.0f,               0.0f, 0.0f },
-                                  { float_xsize,        0.0f, 0.0f },
-                                  { 0.0f,        float_ysize, 0.0f },
-                                  { float_xsize, float_ysize, 0.0f }};
+    const Vector3f vertex_array[]{{ 0.0f,                0.0f, 0.0f },
+                                  { float_width,         0.0f, 0.0f },
+                                  { 0.0f,        float_height, 0.0f },
+                                  { float_width, float_height, 0.0f }};
     glVertexPointer(3, GL_FLOAT, 0, &vertex_array[0]);
 
     // TODO: 2016: Like below, this texture_coords format could be generated, scaled, etc.
