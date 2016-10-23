@@ -35,7 +35,7 @@ namespace detail
 
 Vector3f calculate_quadratic_bezier_vertex(const std::vector<struct Vector3f>& control_points, float t_u, float t_v)
 {
-    Vector3f vertex = make_vector(0.0f, 0.0f, 0.0f);
+    Vector3f vertex = {0.0f, 0.0f, 0.0f};
 
     // Calculate the u,v point of the patch using three control points in each (u/v) direction.
     for(unsigned int j = 0; j < quadratic_bezier_control_point_count; ++j)

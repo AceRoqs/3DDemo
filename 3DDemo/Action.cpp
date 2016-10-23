@@ -78,11 +78,11 @@ Camera apply_actions(const std::vector<std::pair<float, Action>>& actions, const
 
     // Testing each coordinate on its own only is correct because each boundary is axis aligned.
     float updated_x = new_camera.m_position.x();
-    if(is_point_in_world(make_vector(new_x, new_camera.m_position.y(), new_camera.m_position.z())))
+    if(is_point_in_world({new_x, new_camera.m_position.y(), new_camera.m_position.z()}))
     {
         updated_x = new_x;
     }
-    if(is_point_in_world(make_vector(new_camera.m_position.x(), new_camera.m_position.y(), new_z)))
+    if(is_point_in_world({new_camera.m_position.x(), new_camera.m_position.y(), new_z}))
     {
         new_camera.m_position.z() = new_z;
     }
