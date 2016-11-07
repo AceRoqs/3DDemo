@@ -131,6 +131,11 @@ Vector3f operator*(const Vector3f& v1, float f1)
     return result;
 }
 
+Vector3f operator*(float f1, const Vector3f& v1)
+{
+    return operator*(v1, f1);
+}
+
 Vector3f& operator*= (Vector3f& v1, float magnitude)
 {
     v1.x() *= magnitude;
