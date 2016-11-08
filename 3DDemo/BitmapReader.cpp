@@ -11,24 +11,61 @@
 namespace Demo
 {
 
-bool intersects(const Vector3f& ray)
+// Implements a non-optimized version of a ray-sphere intersection.
+bool ray_sphere_intersects(const Vector3f& ray_origin, const Vector3f& ray_direction, const Vector3f& circle, float circle_radius, _Out_ Vector3f* intersection_point)
 {
-    constexpr float radius = 0.5f;
-    constexpr float r2 = radius * radius;
-    constexpr Vector3f circle = {0, 0, -2};
-    constexpr Vector3f zero = {0, 0, 0};
-    const Vector3f p = zero - circle;
+    // Real Time Rendering, 3rd edition has a good explaination of Ray/Sphere intersection.
+    // t^2 + 2tb + c = 0
+    // Rearranged:
+    // t = -b +/- sqrt(b^2 - c)
 
-    const Vector3f a = p - (ray * dot(p, ray));
-    const float a2 = dot(a, a);
-    return a2 <= r2;
+    const float r2 = circle_radius * circle_radius;
+    const Vector3f o_c = ray_origin - circle;
+    const float b = dot(ray_direction, o_c);
+    const float c = dot(o_c, o_c) - r2;
+    const float b2_c = b * b - c;
+
+    if(b2_c >= 0.0f)
+    {
+        const float sqrt_b2_c = sqrt(b2_c);
+        const float t1 = -b + sqrt_b2_c;
+        const float t2 = -b - sqrt_b2_c;
+        *intersection_point = std::min(t1, t2) * ray_direction;
+
+        return true;
+    }
+    return false;
+}
+
+// Light vector and normal vector must be in the same coordinate space.
+ImageProcessing::Color_rgb lambertian_shading(const Vector3f& light_vector, const Vector3f& normal_vector, ImageProcessing::Color_rgb material_color)
+{
+    const float intensity = dot(light_vector, normal_vector);
+
+    ImageProcessing::Color_rgb color;
+    color.red = static_cast<unsigned char>(material_color.red * intensity);
+    color.green = static_cast<unsigned char>(material_color.green * intensity);
+    color.blue = static_cast<unsigned char>(material_color.blue * intensity);
+
+    return color;
 }
 
 ImageProcessing::Bitmap get_ray_traced_bitmap()
 {
     int width = 512;
     int height = 512;
-    float near_plane = -1.f;
+    float near_plane = -1.0f;
+
+    constexpr Vector3f circle = {0.0f, 0.0f, -2.0f};
+    constexpr float circle_radius = 0.5f;
+    constexpr Vector3f camera = {0.0f, 0.0f, 0.0f};
+    constexpr Vector3f ray_origin = {0.0f, 0.0f, 0.0f};
+
+    // TODO: 2016: Support initializer list of Color_rgb.
+    ImageProcessing::Color_rgb material_color;
+    material_color.red = 255;
+    material_color.green = 0;
+    material_color.blue = 0;
 
     ImageProcessing::Bitmap bitmap;
     bitmap.height = height;
@@ -40,19 +77,20 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
     {
         for(int i = 0; i < width; ++i)
         {
+            // ray_direction calculation assumes ray_origin is {0,0,0}.
             // TODO: range is [-1, 1) instead of [-1,1].
-            Vector3f ray = {static_cast<float>(i) / width * 2 - 1, static_cast<float>(j) / height * 2 - 1, near_plane};
-            float dist = point_distance(ray, {0,0,0});
+            const Vector3f ray_direction = normalize({static_cast<float>(i) / width * 2 - 1, static_cast<float>(j) / height * 2 - 1, near_plane});
 
-            ray[0] /= dist;
-            ray[1] /= dist;
-            ray[2] /= dist;
-
-            if(intersects(ray))
+            Vector3f intersection_point;
+            if(ray_sphere_intersects(ray_origin, ray_direction, circle, circle_radius, &intersection_point))
             {
-                bitmap.bitmap[j * width * 3 + i * 3 + 0] = 255;
-                bitmap.bitmap[j * width * 3 + i * 3 + 1] = 0;
-                bitmap.bitmap[j * width * 3 + i * 3 + 2] = 0;
+                Vector3f normal = normalize(intersection_point - circle);
+                Vector3f light = normalize(camera - intersection_point);
+
+                ImageProcessing::Color_rgb final_color = lambertian_shading(light, normal, material_color);
+                bitmap.bitmap[j * width * 3 + i * 3 + 0] = final_color.red;
+                bitmap.bitmap[j * width * 3 + i * 3 + 1] = final_color.green;
+                bitmap.bitmap[j * width * 3 + i * 3 + 2] = final_color.blue;
             }
             else
             {
