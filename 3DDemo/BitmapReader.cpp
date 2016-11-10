@@ -38,9 +38,9 @@ bool ray_sphere_intersects(const Vector3f& ray_origin, const Vector3f& ray_direc
 }
 
 // Light vector and normal vector must be in the same coordinate space.
-ImageProcessing::Color_rgb lambertian_shading(const Vector3f& light_vector, const Vector3f& normal_vector, ImageProcessing::Color_rgb material_color)
+ImageProcessing::Color_rgb lambertian_shading_with_clamp(const Vector3f& light_vector, const Vector3f& normal_vector, ImageProcessing::Color_rgb material_color)
 {
-    const float intensity = dot(light_vector, normal_vector);
+    const float intensity = std::max(dot(light_vector, normal_vector), 0.0f);
 
     ImageProcessing::Color_rgb color;
     color.red = static_cast<unsigned char>(material_color.red * intensity);
@@ -58,7 +58,7 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
 
     constexpr Vector3f circle = {0.0f, 0.0f, -2.0f};
     constexpr float circle_radius = 0.5f;
-    constexpr Vector3f camera = {0.0f, 0.0f, 0.0f};
+    constexpr Vector3f light_source = {-1.0f, 0.0f, 0.0f};
     constexpr Vector3f ray_origin = {0.0f, 0.0f, 0.0f};
 
     // TODO: 2016: Support initializer list of Color_rgb.
@@ -85,9 +85,9 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
             if(ray_sphere_intersects(ray_origin, ray_direction, circle, circle_radius, &intersection_point))
             {
                 Vector3f normal = normalize(intersection_point - circle);
-                Vector3f light = normalize(camera - intersection_point);
+                Vector3f light = normalize(light_source - intersection_point);
 
-                ImageProcessing::Color_rgb final_color = lambertian_shading(light, normal, material_color);
+                ImageProcessing::Color_rgb final_color = lambertian_shading_with_clamp(light, normal, material_color);
                 bitmap.bitmap[j * width * 3 + i * 3 + 0] = final_color.red;
                 bitmap.bitmap[j * width * 3 + i * 3 + 1] = final_color.green;
                 bitmap.bitmap[j * width * 3 + i * 3 + 2] = final_color.blue;
