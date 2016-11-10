@@ -28,9 +28,10 @@ bool ray_sphere_intersects(const Vector3f& ray_origin, const Vector3f& ray_direc
     if(b2_c >= 0.0f)
     {
         const float sqrt_b2_c = sqrt(b2_c);
-        const float t1 = -b + sqrt_b2_c;
-        const float t2 = -b - sqrt_b2_c;
-        *intersection_point = std::min(t1, t2) * ray_direction;
+        const float t = -b - sqrt_b2_c;
+        assert(t < -b + sqrt_b2_c);
+
+        *intersection_point = t * ray_direction;
 
         return true;
     }
