@@ -6,6 +6,7 @@
 #include <WindowsCommon/CheckHR.h>
 #include <WindowsCommon/Wrappers.h>
 #include <PortableRuntime/CheckException.h>
+#include <PortableRuntime/Tracing.h>
 
 #include "LinearAlgebra.h"
 namespace Demo
@@ -51,6 +52,29 @@ ImageProcessing::Color_rgb lambertian_shading_with_clamp(const Vector3f& light_v
     return color;
 }
 
+// Input vectors must be in the same coordinate space.
+ImageProcessing::Color_rgb phong_shading_with_clamp(const Vector3f& eye_vector, const Vector3f& light_vector, const Vector3f& normal_vector, ImageProcessing::Color_rgb material_color)
+{
+    float ambient_intensity = 0.0f;
+    float specular_power = 15.0f;
+
+    const float diffuse_intensity = std::max(dot(light_vector, normal_vector), 0.0f);
+    float specular_intensity = 0.0f;
+    if(diffuse_intensity > 0.0f)
+    {
+        const Vector3f reflection_vector = 2.0f * diffuse_intensity * normal_vector - light_vector;
+        const float specular = std::max(dot(reflection_vector, eye_vector), 0.0f);
+        specular_intensity = powf(specular, specular_power);
+    }
+
+    ImageProcessing::Color_rgb color;
+    color.red   = static_cast<unsigned char>(std::min(ambient_intensity + material_color.red   * diffuse_intensity + 255.0f * specular_intensity, 255.0f));
+    color.green = static_cast<unsigned char>(std::min(ambient_intensity + material_color.green * diffuse_intensity + 255.0f * specular_intensity, 255.0f));
+    color.blue  = static_cast<unsigned char>(std::min(ambient_intensity + material_color.blue  * diffuse_intensity + 255.0f * specular_intensity, 255.0f));
+
+    return color;
+}
+
 ImageProcessing::Bitmap get_ray_traced_bitmap()
 {
     int width = 512;
@@ -59,8 +83,10 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
 
     constexpr Vector3f circle = {0.0f, 0.0f, -2.0f};
     constexpr float circle_radius = 0.5f;
-    constexpr Vector3f light_source = {-1.0f, 0.0f, 0.0f};
+    constexpr Vector3f light_source = {-1.0f, 1.0f, 0.0f};
     constexpr Vector3f ray_origin = {0.0f, 0.0f, 0.0f};
+    constexpr Vector3f eye_origin = {0.0f, 0.0f, 0.0f};
+    //constexpr Vector3f look_at = {0.0f, 0.0f, -1.0f};
 
     // TODO: 2016: Support initializer list of Color_rgb.
     ImageProcessing::Color_rgb material_color;
@@ -78,8 +104,10 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
     {
         for(int i = 0; i < width; ++i)
         {
+            // TODO: 2016: Y axis appears to be inverted.
+            // TODO: 2016: ray direction needs to use camera.
             // ray_direction calculation assumes ray_origin is {0,0,0}.
-            // TODO: range is [-1, 1) instead of [-1,1].
+            // TODO: 2016: range is [-1, 1) instead of [-1,1].
             const Vector3f ray_direction = normalize({static_cast<float>(i) / width * 2 - 1, static_cast<float>(j) / height * 2 - 1, near_plane});
 
             Vector3f intersection_point;
@@ -88,7 +116,7 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
                 Vector3f normal = normalize(intersection_point - circle);
                 Vector3f light = normalize(light_source - intersection_point);
 
-                ImageProcessing::Color_rgb final_color = lambertian_shading_with_clamp(light, normal, material_color);
+                ImageProcessing::Color_rgb final_color = phong_shading_with_clamp(normalize(eye_origin - intersection_point), light, normal, material_color);
                 bitmap.bitmap[j * width * 3 + i * 3 + 0] = final_color.red;
                 bitmap.bitmap[j * width * 3 + i * 3 + 1] = final_color.green;
                 bitmap.bitmap[j * width * 3 + i * 3 + 2] = final_color.blue;
@@ -140,7 +168,7 @@ ImageProcessing::Bitmap bitmap_from_file(_In_z_ const char* file_name)
     }
     else
     {
-#if 1
+#if 0
         const bool is_ppm = ImageProcessing::is_pixmap_file_name(file_name);
         CHECK_EXCEPTION(is_ppm, std::string("Unsupported file type: ") + file_name);
 
