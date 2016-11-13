@@ -104,11 +104,9 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
     {
         for(int i = 0; i < width; ++i)
         {
-            // TODO: 2016: Y axis appears to be inverted.
             // TODO: 2016: ray direction needs to use camera.
             // ray_direction calculation assumes ray_origin is {0,0,0}.
-            // TODO: 2016: range is [-1, 1) instead of [-1,1].
-            const Vector3f ray_direction = normalize({static_cast<float>(i) / width * 2 - 1, static_cast<float>(j) / height * 2 - 1, near_plane});
+            const Vector3f ray_direction = normalize({static_cast<float>(i) / (width - 1) * 2 - 1, ((height - 1) - static_cast<float>(j)) / (height - 1) * 2 - 1, near_plane});
 
             Vector3f intersection_point;
             if(ray_sphere_intersects(ray_origin, ray_direction, circle, circle_radius, &intersection_point))
