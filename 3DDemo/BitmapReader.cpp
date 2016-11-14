@@ -55,7 +55,7 @@ ImageProcessing::Color_rgb lambertian_shading_with_clamp(const Vector3f& light_v
 // Input vectors must be in the same coordinate space.
 ImageProcessing::Color_rgb phong_shading_with_clamp(const Vector3f& eye_vector, const Vector3f& light_vector, const Vector3f& normal_vector, ImageProcessing::Color_rgb material_color)
 {
-    float ambient_intensity = 0.0f;
+    float ambient_intensity = 10.0f;
     float specular_power = 15.0f;
 
     const float diffuse_intensity = std::max(dot(light_vector, normal_vector), 0.0f);
@@ -83,8 +83,10 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
 
     constexpr Vector3f circle = {0.0f, 0.0f, -2.0f};
     constexpr float circle_radius = 0.5f;
+    constexpr Vector3f circle2 = {10.0f, 10.0f, -20.0f};
+    constexpr float circle_radius2 = 5.5f;
+
     constexpr Vector3f light_source = {-1.0f, 1.0f, 0.0f};
-    constexpr Vector3f ray_origin = {0.0f, 0.0f, 0.0f};
     constexpr Vector3f eye_origin = {0.0f, 0.0f, 0.0f};
     //constexpr Vector3f look_at = {0.0f, 0.0f, -1.0f};
 
@@ -108,10 +110,36 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
             // ray_direction calculation assumes ray_origin is {0,0,0}.
             const Vector3f ray_direction = normalize({static_cast<float>(i) / (width - 1) * 2 - 1, ((height - 1) - static_cast<float>(j)) / (height - 1) * 2 - 1, near_plane});
 
-            Vector3f intersection_point;
-            if(ray_sphere_intersects(ray_origin, ray_direction, circle, circle_radius, &intersection_point))
+            Vector3f intersection_point1;
+            bool i1 = ray_sphere_intersects(eye_origin, ray_direction, circle, circle_radius, &intersection_point1);
+
+            Vector3f intersection_point2;
+            bool i2 = ray_sphere_intersects(eye_origin, ray_direction, circle2, circle_radius2, &intersection_point2);
+
+            if(i1 || i2)
             {
-                Vector3f normal = normalize(intersection_point - circle);
+                Vector3f intersection_point;
+                Vector3f c;
+                if(i1)
+                {
+                    intersection_point = intersection_point1;
+                    c = circle;
+                    if(i2)
+                    {
+                        if(dot(intersection_point2, intersection_point2) < dot(intersection_point1, intersection_point1))
+                        {
+                            intersection_point = intersection_point2;
+                            c = circle2;
+                        }
+                    }
+                }
+                else if(i2)
+                {
+                    intersection_point = intersection_point2;
+                    c = circle2;
+                }
+
+                Vector3f normal = normalize(intersection_point - c);
                 Vector3f light = normalize(light_source - intersection_point);
 
                 ImageProcessing::Color_rgb final_color = phong_shading_with_clamp(normalize(eye_origin - intersection_point), light, normal, material_color);
