@@ -12,16 +12,22 @@
 namespace Demo
 {
 
+struct Sphere
+{
+    Vector3f center;
+    float radius;
+};
+
 // Implements a non-optimized version of a ray-sphere intersection.
-bool ray_sphere_intersects(const Vector3f& ray_origin, const Vector3f& ray_direction, const Vector3f& circle, float circle_radius, _Out_ Vector3f* intersection_point)
+bool ray_sphere_intersects(const Vector3f& ray_origin, const Vector3f& ray_direction, const Sphere& sphere, _Out_ Vector3f* intersection_point)
 {
     // Real Time Rendering, 3rd edition has a good explaination of Ray/Sphere intersection.
     // t^2 + 2tb + c = 0
     // Rearranged:
     // t = -b +/- sqrt(b^2 - c)
 
-    const float r2 = circle_radius * circle_radius;
-    const Vector3f o_c = ray_origin - circle;
+    const float r2 = sphere.radius * sphere.radius;
+    const Vector3f o_c = ray_origin - sphere.center;
     const float b = dot(ray_direction, o_c);
     const float c = dot(o_c, o_c) - r2;
     const float b2_c = b * b - c;
@@ -37,6 +43,34 @@ bool ray_sphere_intersects(const Vector3f& ray_origin, const Vector3f& ray_direc
         return true;
     }
     return false;
+}
+
+const Sphere* find_nearest_intersection(const Vector3f& ray_origin, const Vector3f& ray_direction, const std::vector<Sphere>& objects, _Out_ Vector3f* intersection_point)
+{
+    const Sphere* intersects = nullptr;
+
+    for_each(std::cbegin(objects), std::cend(objects), [&](const Sphere& sphere)
+    {
+        Vector3f current_intersection_point;
+        bool current_intersects = ray_sphere_intersects(ray_origin, ray_direction, sphere, &current_intersection_point);
+        if(current_intersects)
+        {
+            if(intersects != nullptr)
+            {
+                if(dot(current_intersection_point, current_intersection_point) < dot(*intersection_point, *intersection_point))
+                {
+                    *intersection_point = current_intersection_point;
+                }
+            }
+            else
+            {
+                intersects = &sphere;
+                *intersection_point = current_intersection_point;
+            }
+        }
+    });
+
+    return intersects;
 }
 
 // Light vector and normal vector must be in the same coordinate space.
@@ -75,45 +109,21 @@ ImageProcessing::Color_rgb phong_shading_with_clamp(const Vector3f& eye_vector, 
     return color;
 }
 
-struct Circle
-{
-    Vector3f center;
-    float radius;
-};
-
-struct Object_intersection
-{
-    const Circle* circle;
-    Vector3f intersection;
-    bool intersection_valid;
-};
-
 ImageProcessing::Bitmap get_ray_traced_bitmap()
 {
     int width = 512;
     int height = 512;
     float near_plane = -1.0f;
 
-    const std::vector<Circle> objects =
+    const std::vector<Sphere> objects =
     {
         { {0.0f,   0.0f,  -2.0f}, 0.5f },
         { {10.0f, 10.0f, -20.0f}, 5.5f }
     };
-    constexpr Vector3f circle = {0.0f, 0.0f, -2.0f};
-    constexpr float circle_radius = 0.5f;
-    constexpr Vector3f circle2 = {10.0f, 10.0f, -20.0f};
-    constexpr float circle_radius2 = 5.5f;
 
     constexpr Vector3f light_source = {-1.0f, 1.0f, 0.0f};
     constexpr Vector3f eye_origin = {0.0f, 0.0f, 0.0f};
     //constexpr Vector3f look_at = {0.0f, 0.0f, -1.0f};
-
-    std::vector<Object_intersection> intersections;
-    intersections.resize(objects.size());
-    for(size_t ix = 0; ix < objects.size(); ++ix)
-    {
-        intersections[ix].circle = &objects[ix];
-    }
 
     // TODO: 2016: Support initializer list of Color_rgb.
     ImageProcessing::Color_rgb material_color;
@@ -135,40 +145,12 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
             // ray_direction calculation assumes ray_origin is {0,0,0}.
             const Vector3f ray_direction = normalize({static_cast<float>(i) / (width - 1) * 2 - 1, ((height - 1) - static_cast<float>(j)) / (height - 1) * 2 - 1, near_plane});
 
-            std::for_each(std::begin(intersections), std::end(intersections), [&](Object_intersection& intersection){
-                intersection.intersection_valid = ray_sphere_intersects(eye_origin, ray_direction, intersection.circle->center, intersection.circle->radius, &intersection.intersection);
-            });
+            Vector3f intersection_point;
+            const Sphere* sphere = find_nearest_intersection(eye_origin, ray_direction, objects, &intersection_point);
 
-            Vector3f intersection_point1;
-            bool i1 = ray_sphere_intersects(eye_origin, ray_direction, circle, circle_radius, &intersection_point1);
-
-            Vector3f intersection_point2;
-            bool i2 = ray_sphere_intersects(eye_origin, ray_direction, circle2, circle_radius2, &intersection_point2);
-
-            if(i1 || i2)
+            if(sphere != nullptr)
             {
-                Vector3f intersection_point;
-                Vector3f c;
-                if(i1)
-                {
-                    intersection_point = intersection_point1;
-                    c = circle;
-                    if(i2)
-                    {
-                        if(dot(intersection_point2, intersection_point2) < dot(intersection_point1, intersection_point1))
-                        {
-                            intersection_point = intersection_point2;
-                            c = circle2;
-                        }
-                    }
-                }
-                else if(i2)
-                {
-                    intersection_point = intersection_point2;
-                    c = circle2;
-                }
-
-                Vector3f normal = normalize(intersection_point - c);
+                Vector3f normal = normalize(intersection_point - sphere->center);
                 Vector3f light = normalize(light_source - intersection_point);
 
                 ImageProcessing::Color_rgb final_color = phong_shading_with_clamp(normalize(eye_origin - intersection_point), light, normal, material_color);
