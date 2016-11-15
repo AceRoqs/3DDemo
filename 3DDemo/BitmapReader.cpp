@@ -75,12 +75,30 @@ ImageProcessing::Color_rgb phong_shading_with_clamp(const Vector3f& eye_vector, 
     return color;
 }
 
+struct Circle
+{
+    Vector3f center;
+    float radius;
+};
+
+struct Object_intersection
+{
+    const Circle* circle;
+    Vector3f intersection;
+    bool intersection_valid;
+};
+
 ImageProcessing::Bitmap get_ray_traced_bitmap()
 {
     int width = 512;
     int height = 512;
     float near_plane = -1.0f;
 
+    const std::vector<Circle> objects =
+    {
+        { {0.0f,   0.0f,  -2.0f}, 0.5f },
+        { {10.0f, 10.0f, -20.0f}, 5.5f }
+    };
     constexpr Vector3f circle = {0.0f, 0.0f, -2.0f};
     constexpr float circle_radius = 0.5f;
     constexpr Vector3f circle2 = {10.0f, 10.0f, -20.0f};
@@ -89,6 +107,13 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
     constexpr Vector3f light_source = {-1.0f, 1.0f, 0.0f};
     constexpr Vector3f eye_origin = {0.0f, 0.0f, 0.0f};
     //constexpr Vector3f look_at = {0.0f, 0.0f, -1.0f};
+
+    std::vector<Object_intersection> intersections;
+    intersections.resize(objects.size());
+    for(size_t ix = 0; ix < objects.size(); ++ix)
+    {
+        intersections[ix].circle = &objects[ix];
+    }
 
     // TODO: 2016: Support initializer list of Color_rgb.
     ImageProcessing::Color_rgb material_color;
@@ -109,6 +134,10 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
             // TODO: 2016: ray direction needs to use camera.
             // ray_direction calculation assumes ray_origin is {0,0,0}.
             const Vector3f ray_direction = normalize({static_cast<float>(i) / (width - 1) * 2 - 1, ((height - 1) - static_cast<float>(j)) / (height - 1) * 2 - 1, near_plane});
+
+            std::for_each(std::begin(intersections), std::end(intersections), [&](Object_intersection& intersection){
+                intersection.intersection_valid = ray_sphere_intersects(eye_origin, ray_direction, intersection.circle->center, intersection.circle->radius, &intersection.intersection);
+            });
 
             Vector3f intersection_point1;
             bool i1 = ray_sphere_intersects(eye_origin, ray_direction, circle, circle_radius, &intersection_point1);
