@@ -19,7 +19,7 @@ struct Sphere
 };
 
 // Implements a non-optimized version of a ray-sphere intersection.
-bool ray_sphere_intersects(const Vector3f& ray_origin, const Vector3f& ray_direction, const Sphere& sphere, _Out_ Vector3f* intersection_point)
+_Success_(return) bool ray_sphere_intersects(const Vector3f& ray_origin, const Vector3f& ray_direction, const Sphere& sphere, _Out_ Vector3f* intersection_point)
 {
     // Real Time Rendering, 3rd edition has a good explaination of Ray/Sphere intersection.
     // t^2 + 2tb + c = 0
@@ -125,11 +125,7 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
     constexpr Vector3f eye_origin = {0.0f, 0.0f, 0.0f};
     //constexpr Vector3f look_at = {0.0f, 0.0f, -1.0f};
 
-    // TODO: 2016: Support initializer list of Color_rgb.
-    ImageProcessing::Color_rgb material_color;
-    material_color.red = 255;
-    material_color.green = 0;
-    material_color.blue = 0;
+    const ImageProcessing::Color_rgb material_color = {255, 0, 0};
 
     ImageProcessing::Bitmap bitmap;
     bitmap.height = height;
@@ -141,6 +137,8 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
     {
         for(int i = 0; i < width; ++i)
         {
+            ImageProcessing::Color_rgb final_color = {0, 0, 0};
+
             // TODO: 2016: ray direction needs to use camera.
             // ray_direction calculation assumes ray_origin is {0,0,0}.
             const Vector3f ray_direction = normalize({static_cast<float>(i) / (width - 1) * 2 - 1, ((height - 1) - static_cast<float>(j)) / (height - 1) * 2 - 1, near_plane});
@@ -153,17 +151,12 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
                 Vector3f normal = normalize(intersection_point - sphere->center);
                 Vector3f light = normalize(light_source - intersection_point);
 
-                ImageProcessing::Color_rgb final_color = phong_shading_with_clamp(normalize(eye_origin - intersection_point), light, normal, material_color);
-                bitmap.bitmap[j * width * 3 + i * 3 + 0] = final_color.red;
-                bitmap.bitmap[j * width * 3 + i * 3 + 1] = final_color.green;
-                bitmap.bitmap[j * width * 3 + i * 3 + 2] = final_color.blue;
+                final_color = phong_shading_with_clamp(normalize(eye_origin - intersection_point), light, normal, material_color);
             }
-            else
-            {
-                bitmap.bitmap[j * width * 3 + i * 3 + 0] = 0;
-                bitmap.bitmap[j * width * 3 + i * 3 + 1] = 0;
-                bitmap.bitmap[j * width * 3 + i * 3 + 2] = 0;
-            }
+
+            bitmap.bitmap[j * width * 3 + i * 3 + 0] = final_color.red;
+            bitmap.bitmap[j * width * 3 + i * 3 + 1] = final_color.green;
+            bitmap.bitmap[j * width * 3 + i * 3 + 2] = final_color.blue;
         }
     }
 
