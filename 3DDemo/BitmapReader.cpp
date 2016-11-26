@@ -1,5 +1,6 @@
 #include "PreCompile.h"
 #include "BitmapReader.h"       // Pick up forward declarations to ensure correctness.
+#include <ImageProcessing/Filter.h>
 #include <ImageProcessing/pcx.h>
 #include <ImageProcessing/targa.h>
 #include <ImageProcessing/PixMap.h>
@@ -9,6 +10,7 @@
 #include <PortableRuntime/Tracing.h>
 
 #include "LinearAlgebra.h"
+
 namespace Demo
 {
 
@@ -19,6 +21,7 @@ struct Sphere
 };
 
 // Implements a non-optimized version of a ray-sphere intersection.
+// TODO: 2016: Use a more optimal solution.
 _Success_(return) bool ray_sphere_intersects(const Vector3f& ray_origin, const Vector3f& ray_direction, const Sphere& sphere, _Out_ Vector3f* intersection_point)
 {
     // Real Time Rendering, 3rd edition has a good explaination of Ray/Sphere intersection.
@@ -159,6 +162,9 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
             bitmap.bitmap[j * width * 3 + i * 3 + 2] = final_color.blue;
         }
     }
+
+    const auto filter = ImageProcessing::generate_simple_box_filter(3);
+    bitmap = ImageProcessing::apply_box_filter(filter, 3, bitmap);
 
     return bitmap;
 }
