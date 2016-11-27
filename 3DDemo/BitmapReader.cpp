@@ -136,25 +136,40 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
     bitmap.filtered = true;
     bitmap.bitmap.resize(height * width * 3);
 
+    constexpr int samples_per_direction = 2;
+    constexpr float sample_filter = 1.0f / (samples_per_direction * samples_per_direction);
+
     for(int j = 0; j < height; ++j)
     {
         for(int i = 0; i < width; ++i)
         {
             ImageProcessing::Color_rgb final_color = {0, 0, 0};
 
-            // TODO: 2016: ray direction needs to use camera.
-            // ray_direction calculation assumes ray_origin is {0,0,0}.
-            const Vector3f ray_direction = normalize({static_cast<float>(i) / (width - 1) * 2 - 1, ((height - 1) - static_cast<float>(j)) / (height - 1) * 2 - 1, near_plane});
-
-            Vector3f intersection_point;
-            const Sphere* sphere = find_nearest_intersection(eye_origin, ray_direction, objects, &intersection_point);
-
-            if(sphere != nullptr)
+            // Average multiple rays per pixel.
+            for(int s = 0; s < samples_per_direction; ++s)
             {
-                Vector3f normal = normalize(intersection_point - sphere->center);
-                Vector3f light = normalize(light_source - intersection_point);
+                for(int t = 0; t < samples_per_direction; ++t)
+                {
+                    // TODO: 2016: ray direction needs to use camera.
+                    // ray_direction calculation assumes ray_origin is {0,0,0}.
+                    const Vector3f ray_direction = normalize({static_cast<float>(i * samples_per_direction + t) / (width * samples_per_direction - 1) * 2 - 1,
+                                                              ((height * samples_per_direction - 1) - static_cast<float>(j * samples_per_direction + s)) / (height * samples_per_direction - 1) * 2 - 1,
+                                                              near_plane});
 
-                final_color = phong_shading_with_clamp(normalize(eye_origin - intersection_point), light, normal, material_color);
+                    Vector3f intersection_point;
+                    const Sphere* sphere = find_nearest_intersection(eye_origin, ray_direction, objects, &intersection_point);
+
+                    if(sphere != nullptr)
+                    {
+                        Vector3f normal = normalize(intersection_point - sphere->center);
+                        Vector3f light = normalize(light_source - intersection_point);
+
+                        ImageProcessing::Color_rgb color = phong_shading_with_clamp(normalize(eye_origin - intersection_point), light, normal, material_color);
+                        final_color.red += static_cast<uint8_t>(color.red * sample_filter);
+                        final_color.green += static_cast<uint8_t>(color.green * sample_filter);
+                        final_color.blue += static_cast<uint8_t>(color.blue * sample_filter);
+                    }
+                }
             }
 
             bitmap.bitmap[j * width * 3 + i * 3 + 0] = final_color.red;
