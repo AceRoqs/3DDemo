@@ -46,5 +46,8 @@
 
 #endif  // _WIN32
 
-#include <gl/GL.h>
+// Windows defines this as gl/GL.h, whereas Linux defines this
+// as GL/gl.h.  Since Windows is less case sensitive, use the
+// Linux style.
+#include <GL/gl.h>
 
