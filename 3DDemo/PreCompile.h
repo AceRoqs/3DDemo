@@ -51,3 +51,5 @@
 // Linux style.
 #include <GL/gl.h>
 
+#include <PortableRuntime/StaticAnalysis.h>
+
