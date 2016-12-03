@@ -190,10 +190,9 @@ static Map load_world_data(std::istream& is)
     std::vector<ImageProcessing::Bitmap> texture_list;
     for(unsigned int ii = 0; ii < cTextures; ++ii)
     {
-        // TODO: 2016: Nice buffer overrun here.  This is trusted data, but it should still read into a string.
-        char file_name[MAX_PATH];
+        std::string file_name;
         is >> file_name;
-        texture_list.emplace_back(bitmap_from_file(file_name));
+        texture_list.emplace_back(bitmap_from_file(file_name.c_str()));
     }
 
     std::vector<Polygon> world_mesh;
