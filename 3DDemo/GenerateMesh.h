@@ -1,10 +1,11 @@
 #pragma once
 
+// Required for Clang to compile templates which depend on Vector3f.
+// This prevents an error regarding an incomplete type.
+#include "LinearAlgebra.h"
+
 namespace Demo
 {
-
-struct Vector2f;
-struct Vector3f;
 
 namespace detail
 {
@@ -80,4 +81,3 @@ void generate_implicit_surface_index_array(unsigned int patch_count, size_t bias
 }
 
 }
-
