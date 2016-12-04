@@ -136,6 +136,8 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
     bitmap.filtered = true;
     bitmap.bitmap.resize(height * width * 3);
 
+    generate_topdown_gradient_in_place(bitmap, {0, 0, 0}, {255, 255, 255});
+
     constexpr int samples_per_direction = 2;
     constexpr float sample_filter = 1.0f / (samples_per_direction * samples_per_direction);
 
@@ -143,7 +145,13 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
     {
         for(int i = 0; i < width; ++i)
         {
-            ImageProcessing::Color_rgb final_color = {0, 0, 0};
+            //ImageProcessing::Color_rgb final_color = {0, 0, 0};
+            unsigned int red = 0, green = 0, blue = 0;
+
+            ImageProcessing::Color_rgb blend_color;
+            blend_color.red = bitmap.bitmap[j * width * 3 + i * 3 + 0];
+            blend_color.green = bitmap.bitmap[j * width * 3 + i * 3 + 1];
+            blend_color.blue = bitmap.bitmap[j * width * 3 + i * 3 + 2];
 
             // Average multiple rays per pixel.
             for(int s = 0; s < samples_per_direction; ++s)
@@ -165,21 +173,38 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
                         Vector3f light = normalize(light_source - intersection_point);
 
                         ImageProcessing::Color_rgb color = phong_shading_with_clamp(normalize(eye_origin - intersection_point), light, normal, material_color);
-                        final_color.red += static_cast<uint8_t>(color.red * sample_filter);
-                        final_color.green += static_cast<uint8_t>(color.green * sample_filter);
-                        final_color.blue += static_cast<uint8_t>(color.blue * sample_filter);
+                        //final_color.red += static_cast<uint8_t>(color.red * sample_filter);
+                        //final_color.green += static_cast<uint8_t>(color.green * sample_filter);
+                        //final_color.blue += static_cast<uint8_t>(color.blue * sample_filter);
+                        red += color.red;
+                        green += color.green;
+                        blue += color.blue;
+                    }
+                    else
+                    {
+                        // TODO: 2016: This is causing some sort of banding for the background.
+                        //final_color.red += static_cast<uint8_t>(blend_color.red * sample_filter);
+                        //final_color.green += static_cast<uint8_t>(blend_color.green * sample_filter);
+                        //final_color.blue += static_cast<uint8_t>(blend_color.blue * sample_filter);
+                        red += blend_color.red;
+                        green += blend_color.green;
+                        blue += blend_color.blue;
                     }
                 }
             }
 
-            bitmap.bitmap[j * width * 3 + i * 3 + 0] = final_color.red;
-            bitmap.bitmap[j * width * 3 + i * 3 + 1] = final_color.green;
-            bitmap.bitmap[j * width * 3 + i * 3 + 2] = final_color.blue;
+            //bitmap.bitmap[j * width * 3 + i * 3 + 0] = final_color.red;
+            //bitmap.bitmap[j * width * 3 + i * 3 + 1] = final_color.green;
+            //bitmap.bitmap[j * width * 3 + i * 3 + 2] = final_color.blue;
+            bitmap.bitmap[j * width * 3 + i * 3 + 0] = static_cast<uint8_t>(red * sample_filter);
+            bitmap.bitmap[j * width * 3 + i * 3 + 1] = static_cast<uint8_t>(green * sample_filter);
+            bitmap.bitmap[j * width * 3 + i * 3 + 2] = static_cast<uint8_t>(blue * sample_filter);
         }
     }
 
-    const auto filter = ImageProcessing::generate_simple_box_filter(3);
-    bitmap = ImageProcessing::apply_box_filter(filter, 3, bitmap);
+    // TODO: 2016: This is causing banding on the gradiant.  Is the filter clipping somewhere?
+    //const auto filter = ImageProcessing::generate_simple_box_filter(3);
+    //bitmap = ImageProcessing::apply_box_filter(filter, 3, bitmap);
 
     return bitmap;
 }
