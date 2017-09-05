@@ -114,8 +114,8 @@ ImageProcessing::Color_rgb phong_shading_with_clamp(const Vector3f& eye_vector, 
 
 ImageProcessing::Bitmap get_ray_traced_bitmap()
 {
-    int width = 512;
-    int height = 512;
+    int width = 256;
+    int height = 256;
     float near_plane = -1.0f;
 
     const std::vector<Sphere> objects =
@@ -136,7 +136,7 @@ ImageProcessing::Bitmap get_ray_traced_bitmap()
     bitmap.filtered = true;
     bitmap.bitmap.resize(height * width * 3);
 
-    generate_topdown_gradient_in_place(bitmap, {0, 0, 0}, {255, 255, 255});
+    generate_bottomup_gradient_in_place(bitmap, {0, 0, 0}, {255, 255, 255});
 
     constexpr int samples_per_direction = 2;
     constexpr float sample_filter = 1.0f / (samples_per_direction * samples_per_direction);
